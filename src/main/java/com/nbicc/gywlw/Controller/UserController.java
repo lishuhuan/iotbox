@@ -161,13 +161,23 @@ public class UserController {
             return MyUtil.getJSONString(1,msg);
         }catch (Exception e){
             logger.error("添加项目成员失败" + e.getMessage());
-            return MyUtil.getJSONString(1, "添加项目成员失败");
+            return MyUtil.getJSONString(1, "添加项目成员失败!");
         }
     }
 
     //删除项目成员
-  //  @RequestMapping(path = {"/user/addprojectmember"}, method = {RequestMethod.POST})
-  //  @ResponseBody
+    @RequestMapping(path = {"/user/deleteprojectmember"}, method = {RequestMethod.POST})
+    @ResponseBody
+    public String deleteProjectMember(@RequestParam("project_id")String projectId,
+                                      @RequestParam("user_id")String userId){
+        try {
+            projectService.deleteProjectMember(projectId, userId);
+            return MyUtil.getJSONString(0, "删除项目成员成功!");
+        }catch (Exception e){
+            logger.error("删除项目成员失败" + e.getMessage());
+            return MyUtil.getJSONString(1, "删除项目成员失败!");
+        }
+    }
 
 
     //修改项目成员权限aaa

@@ -26,9 +26,9 @@
     from gywlw_project_user_group
     where project_id = #{projectId,jdbcType=VARCHAR} and del_mark = 0 And user_id = #{userId,jdbcType=VARCHAR}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+  <delete id="deleteByProjectIdAndUserId" parameterType="java.lang.String" >
     delete from gywlw_project_user_group
-    where id = #{id,jdbcType=INTEGER}
+    where project_id = #{projectId,jdbcType=VARCHAR} AND user_id = #{userId,jdbcType=VARCHAR}
   </delete>
   <insert id="insert" parameterType="com.nbicc.gywlw.Model.GywlwProjectUserGroup" >
     insert into gywlw_project_user_group (project_id, user_id,

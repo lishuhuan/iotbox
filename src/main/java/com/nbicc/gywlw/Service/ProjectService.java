@@ -100,4 +100,8 @@ public class ProjectService {
             return "添加项目成员成功";
         }
     }
+
+    public void deleteProjectMember(String projectId, String userId){
+        gywlwProjectUserGroupMapper.deleteByProjectIdAndUserId(projectId,userId);
+    }
 }

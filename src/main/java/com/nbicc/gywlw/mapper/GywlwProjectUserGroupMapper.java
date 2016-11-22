@@ -7,7 +7,8 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 @Mapper
 public interface GywlwProjectUserGroupMapper {
-    int deleteByPrimaryKey(Integer id);
+    int deleteByProjectIdAndUserId(@Param("projectId")String projectId,
+                                   @Param("userId")String userId);
 
     int insert(GywlwProjectUserGroup record);
 
