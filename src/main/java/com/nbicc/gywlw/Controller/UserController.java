@@ -158,7 +158,7 @@ public class UserController {
         try {
 
             String msg = projectService.addProjectMember(projectId, userId, Byte.parseByte(writePermission));
-            return MyUtil.getJSONString(1,msg);
+            return MyUtil.getJSONString(0,msg);
         }catch (Exception e){
             logger.error("添加项目成员失败" + e.getMessage());
             return MyUtil.getJSONString(1, "添加项目成员失败!");
