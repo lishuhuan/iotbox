@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+ <generatorConfiguration>
+     <!-- 数据库驱动包位置 -->
+     <classPathEntry location="C:\Users\BigMao\.m2\repository\mysql\mysql-connector-java\5.1.38\mysql-connector-java-5.1.38.jar" />
+     <!-- <classPathEntry location="C:\oracle\product\10.2.0\db_1\jdbc\lib\ojdbc14.jar" />-->
+     <context id="DB2Tables" targetRuntime="MyBatis3">
+         <commentGenerator>
+             <property name="suppressAllComments" value="true" />
+         </commentGenerator>
+         <!-- 数据库链接URL、用户名、密码 -->
+          <jdbcConnection driverClass="com.mysql.jdbc.Driver" connectionURL="jdbc:mysql://rds108q93whvfw8yotbr.mysql.rds.aliyuncs.com:3306/nbicc_home" userId="newcon" password="Nbicc_Expeed_Mysql_3122">
+         <!--<jdbcConnection driverClass="oracle.jdbc.driver.OracleDriver" connectionURL="jdbc:oracle:thin:@localhost:1521:orcl" userId="msa" password="msa">-->
+         </jdbcConnection>
+         <javaTypeResolver>
+             <property name="forceBigDecimals" value="false" />
+         </javaTypeResolver>
+         <!-- 生成实体类的包名和位置，这里配置将生成的实体类放在com.liyi.test.domain这个包下 -->
+         <javaModelGenerator targetPackage="com.nbicc.gywlw.Model" targetProject="C:\Users\BigMao\Desktop\work\gywlw\Industrial_Iot_box\src\main\java\">
+                                                                                 
+             <property name="enableSubPackages" value="true" />
+             <property name="trimStrings" value="true" />
+         </javaModelGenerator>
+         <!-- 生成的SQL映射文件包名和位置，这里配置将生成的SQL映射文件放在com.liyi.test.mapping这个包下 -->
+         <sqlMapGenerator targetPackage="com.nbicc.gywlw.mapper" targetProject="C:\Users\BigMao\Desktop\work\gywlw\Industrial_Iot_box\src\main\resources\">
+             <property name="enableSubPackages" value="true" />
+         </sqlMapGenerator>
+         <!-- 生成DAO的包名和位置，这里配置将生成的dao类放在com.liyi.test.mapping这个包下 -->
+         <javaClientGenerator type="XMLMAPPER" targetPackage="com.nbicc.gywlw.mapper" targetProject="C:\Users\BigMao\Desktop\work\gywlw\Industrial_Iot_box\src\main\java\">
+             <property name="enableSubPackages" value="true" />
+         </javaClientGenerator>
+         <!-- 要生成那些表(更改tableName和domainObjectName就可以) -->
+         <table tableName="gywlw_project_user_group" domainObjectName="GywlwProjectUserGroup" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false" />
+     </context>
+</generatorConfiguration>

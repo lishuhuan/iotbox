@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nbicc.gywlw.mapper.GywlwProjectMapper" >
+  <resultMap id="BaseResultMap" type="com.nbicc.gywlw.Model.GywlwProject" >
+    <id column="project_id" property="projectId" jdbcType="VARCHAR" />
+    <result column="project_name" property="projectName" jdbcType="VARCHAR" />
+    <result column="admin_id" property="adminId" jdbcType="VARCHAR" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="longitude" property="longitude" jdbcType="VARCHAR" />
+    <result column="latitude" property="latitude" jdbcType="VARCHAR" />
+    <result column="parent_text" property="parentText" jdbcType="VARCHAR" />
+    <result column="province" property="province" jdbcType="VARCHAR" />
+    <result column="city" property="city" jdbcType="VARCHAR" />
+    <result column="purchase_date" property="purchaseDate" jdbcType="VARCHAR" />
+    <result column="completion_date" property="completionDate" jdbcType="VARCHAR" />
+    <result column="install_date" property="installDate" jdbcType="VARCHAR" />
+    <result column="contact_name" property="contactName" jdbcType="VARCHAR" />
+    <result column="contact_phone" property="contactPhone" jdbcType="VARCHAR" />
+    <result column="customer_type" property="customerType" jdbcType="VARCHAR" />
+    <result column="firstparty" property="firstparty" jdbcType="VARCHAR" />
+    <result column="project_type" property="projectType" jdbcType="VARCHAR" />
+    <result column="project_desc" property="projectDesc" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    project_id, project_name, admin_id, content, create_time, longitude, latitude, parent_text, 
+    province, city, purchase_date, completion_date, install_date, contact_name, contact_phone, 
+    customer_type, firstparty, project_type, project_desc
+  </sql>
+  <select id="selectByGywlwUserId" resultMap="BaseResultMap" parameterType="com.nbicc.gywlw.Model.GywlwProject" >
+    select
+    <include refid="Base_Column_List" />
+    from gywlw_project
+    where admin_id = #{gywlwUserId,jdbcType=VARCHAR} and del_mark = #{projectStatus,jdbcType=TINYINT}
+    ORDER BY create_time DESC
+    LIMIT #{offset},#{limit}
+  </select>
+  <select id="selectByGywlwProjectId" resultMap="BaseResultMap" parameterType="com.nbicc.gywlw.Model.GywlwProject" >
+    select
+    <include refid="Base_Column_List" />
+    from gywlw_project
+    where project_id = #{gywlwProjectId,jdbcType=VARCHAR} and del_mark = 0
+  </select>
+  <delete id="deleteByProjectId" parameterType="java.lang.String" >
+    delete from gywlw_project
+    where project_id = #{gywlwProjectId},jdbcType=VARCHAR}
+  </delete>
+  <insert id="addProject" parameterType="com.nbicc.gywlw.Model.GywlwProject" >
+    insert into gywlw_project (project_id, project_name, admin_id,
+    content, create_time, longitude,
+    latitude, parent_text, province,
+    city, purchase_date, completion_date,
+    install_date, contact_name, contact_phone,
+    customer_type, firstparty, project_type,
+    project_desc)
+    values (#{projectId,jdbcType=VARCHAR}, #{projectName,jdbcType=VARCHAR}, #{adminId,jdbcType=VARCHAR},
+    #{content,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{longitude,jdbcType=TINYINT},
+    #{latitude,jdbcType=TINYINT}, #{parentText,jdbcType=VARCHAR}, #{province,jdbcType=VARCHAR},
+    #{city,jdbcType=VARCHAR}, #{purchaseDate,jdbcType=VARCHAR}, #{completionDate,jdbcType=VARCHAR},
+    #{installDate,jdbcType=VARCHAR}, #{contactName,jdbcType=VARCHAR}, #{contactPhone,jdbcType=VARCHAR},
+    #{customerType,jdbcType=VARCHAR}, #{firstparty,jdbcType=VARCHAR}, #{projectType,jdbcType=VARCHAR},
+    #{projectDesc,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.nbicc.gywlw.Model.GywlwProject" >
+    insert into gywlw_project
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="projectId != null" >
+        project_id,
+      </if>
+      <if test="projectName != null" >
+        project_name,
+      </if>
+      <if test="adminId != null" >
+        admin_id,
+      </if>
+      <if test="content != null" >
+        content,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="longitude != null" >
+        longitude,
+      </if>
+      <if test="latitude != null" >
+        latitude,
+      </if>
+      <if test="parentText != null" >
+        parent_text,
+      </if>
+      <if test="province != null" >
+        province,
+      </if>
+      <if test="city != null" >
+        city,
+      </if>
+      <if test="purchaseDate != null" >
+        purchase_date,
+      </if>
+      <if test="completionDate != null" >
+        completion_date,
+      </if>
+      <if test="installDate != null" >
+        install_date,
+      </if>
+      <if test="contactName != null" >
+        contact_name,
+      </if>
+      <if test="contactPhone != null" >
+        contact_phone,
+      </if>
+      <if test="customerType != null" >
+        customer_type,
+      </if>
+      <if test="firstparty != null" >
+        firstparty,
+      </if>
+      <if test="projectType != null" >
+        project_type,
+      </if>
+      <if test="projectDesc != null" >
+        project_desc,
+      </if>
+      <if test="delMark != null" >
+        del_mark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="projectId != null" >
+        #{projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="projectName != null" >
+        #{projectName,jdbcType=VARCHAR},
+      </if>
+      <if test="adminId != null" >
+        #{adminId,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null" >
+        #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="longitude != null" >
+        #{longitude,jdbcType=VARCHAR},
+      </if>
+      <if test="latitude != null" >
+        #{latitude,jdbcType=VARCHAR},
+      </if>
+      <if test="parentText != null" >
+        #{parentText,jdbcType=VARCHAR},
+      </if>
+      <if test="province != null" >
+        #{province,jdbcType=VARCHAR},
+      </if>
+      <if test="city != null" >
+        #{city,jdbcType=VARCHAR},
+      </if>
+      <if test="purchaseDate != null" >
+        #{purchaseDate,jdbcType=VARCHAR},
+      </if>
+      <if test="completionDate != null" >
+        #{completionDate,jdbcType=VARCHAR},
+      </if>
+      <if test="installDate != null" >
+        #{installDate,jdbcType=VARCHAR},
+      </if>
+      <if test="contactName != null" >
+        #{contactName,jdbcType=VARCHAR},
+      </if>
+      <if test="contactPhone != null" >
+        #{contactPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="customerType != null" >
+        #{customerType,jdbcType=VARCHAR},
+      </if>
+      <if test="firstparty != null" >
+        #{firstparty,jdbcType=VARCHAR},
+      </if>
+      <if test="projectType != null" >
+        #{projectType,jdbcType=VARCHAR},
+      </if>
+      <if test="projectDesc != null" >
+        #{projectDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="delMark != null" >
+        #{delMark,jdbcType=TINYINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.nbicc.gywlw.Model.GywlwProject" >
+    update gywlw_project
+    <set >
+      <if test="projectName != null" >
+        project_name = #{projectName,jdbcType=VARCHAR},
+      </if>
+      <if test="adminId != null" >
+        admin_id = #{adminId,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null" >
+        content = #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="longitude != null" >
+        longitude = #{longitude,jdbcType=VARCHAR},
+      </if>
+      <if test="latitude != null" >
+        latitude = #{latitude,jdbcType=VARCHAR},
+      </if>
+      <if test="parentText != null" >
+        parent_text = #{parentText,jdbcType=VARCHAR},
+      </if>
+      <if test="province != null" >
+        province = #{province,jdbcType=VARCHAR},
+      </if>
+      <if test="city != null" >
+        city = #{city,jdbcType=VARCHAR},
+      </if>
+      <if test="purchaseDate != null" >
+        purchase_date = #{purchaseDate,jdbcType=VARCHAR},
+      </if>
+      <if test="completionDate != null" >
+        completion_date = #{completionDate,jdbcType=VARCHAR},
+      </if>
+      <if test="installDate != null" >
+        install_date = #{installDate,jdbcType=VARCHAR},
+      </if>
+      <if test="contactName != null" >
+        contact_name = #{contactName,jdbcType=VARCHAR},
+      </if>
+      <if test="contactPhone != null" >
+        contact_phone = #{contactPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="customerType != null" >
+        customer_type = #{customerType,jdbcType=VARCHAR},
+      </if>
+      <if test="firstparty != null" >
+        firstparty = #{firstparty,jdbcType=VARCHAR},
+      </if>
+      <if test="projectType != null" >
+        project_type = #{projectType,jdbcType=VARCHAR},
+      </if>
+      <if test="projectDesc != null" >
+        project_desc = #{projectDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="delMark != null" >
+        del_mark = #{delMark,jdbcType=TINYINT},
+      </if>
+    </set>
+    where project_id = #{projectId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByProjectId" parameterType="com.nbicc.gywlw.Model.GywlwProject" >
+    update gywlw_project
+    set project_name = #{projectName,jdbcType=VARCHAR},
+      longitude = #{longitude,jdbcType=VARCHAR},
+      latitude = #{latitude,jdbcType=VARCHAR},
+      parent_text = #{parentText,jdbcType=VARCHAR},
+      province = #{province,jdbcType=VARCHAR},
+      city = #{city,jdbcType=VARCHAR},
+      purchase_date = #{purchaseDate,jdbcType=VARCHAR},
+      completion_date = #{completionDate,jdbcType=VARCHAR},
+      install_date = #{installDate,jdbcType=VARCHAR},
+      contact_name = #{contactName,jdbcType=VARCHAR},
+      contact_phone = #{contactPhone,jdbcType=VARCHAR},
+      customer_type = #{customerType,jdbcType=VARCHAR},
+      firstparty = #{firstparty,jdbcType=VARCHAR},
+      project_type = #{projectType,jdbcType=VARCHAR},
+      project_desc = #{projectDesc,jdbcType=VARCHAR}
+    where project_id = #{projectId,jdbcType=VARCHAR}
+  </update>
+  <update id="stopByProjectId" parameterType="java.lang.String" >
+    update gywlw_project
+    set del_mark = 1
+    where project_id = #{gywlwProjectId,jdbcType=VARCHAR}
+  </update>
+</mapper>
