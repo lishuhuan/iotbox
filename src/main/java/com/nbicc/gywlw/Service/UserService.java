@@ -25,7 +25,7 @@ public class UserService {
     private LoginTicketDAO loginTicketDAO;
 
     //注册
-    public Map<String, Object> register(String username, String password, String phone, String companyName, String userType) {
+    public Map<String, Object> register(String username, String password, String phone, String companyName) {
         Map<String, Object> map = new HashMap<String, Object>();
         if (StringUtils.isBlank(username)) {
             map.put("msgname", "用户名不能为空");
@@ -51,11 +51,9 @@ public class UserService {
         gywlwUser.setCompanyName(companyName);
         gywlwUser.setUserPhone(phone);
         gywlwUser.setDelMark(false);
-        if("0".equals(userType)){
-            gywlwUser.setDuserLevel(1);
-        } else {
-            gywlwUser.setUserLevel(1);
-        }
+        gywlwUser.setDuserLevel(1);
+        gywlwUser.setUserLevel(1);
+
         gywlwUser.setUserPsd(MyUtil.MD5(password));
         gywlwUserMapper.insert(gywlwUser);
 
@@ -79,7 +77,7 @@ public class UserService {
             return map;
         }
 
-        GywlwUser gywlwUser = gywlwUserMapper.selectByPhone(phone);
+        GywlwUser gywlwUser = gywlwUserMapper.selectByPhoneWithPsd(phone);
 
         if (gywlwUser == null) {
             map.put("msgname", "手机号不存在");

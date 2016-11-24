@@ -1,12 +1,10 @@
 package com.nbicc.gywlw.Service;
 
-import com.nbicc.gywlw.Model.GywlwProject;
-import com.nbicc.gywlw.Model.GywlwProjectUserGroup;
-import com.nbicc.gywlw.Model.GywlwUser;
-import com.nbicc.gywlw.Model.HostHolder;
+import com.nbicc.gywlw.Model.*;
 import com.nbicc.gywlw.mapper.GywlwProjectMapper;
 import com.nbicc.gywlw.mapper.GywlwProjectUserGroupMapper;
 import com.nbicc.gywlw.mapper.GywlwUserMapper;
+import com.nbicc.gywlw.mapper.GywlwVariableRegGroupMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +25,8 @@ public class ProjectService {
     private HostHolder hostHolder;
     @Autowired
     private GywlwProjectUserGroupMapper gywlwProjectUserGroupMapper;
+    @Autowired
+    private GywlwVariableRegGroupMapper gywlwVariableRegGroupMapper;
 
     public List<GywlwProject> projectList(String gywlwUserId, int offset, int limit, Byte projectStatus){
         return gywlwProjectMapper.selectByGywlwUserId(gywlwUserId, offset, limit, projectStatus);
@@ -103,5 +103,9 @@ public class ProjectService {
 
     public void deleteProjectMember(String projectId, String userId){
         gywlwProjectUserGroupMapper.deleteByProjectIdAndUserId(projectId,userId);
+    }
+
+    public List<GywlwVariableRegGroup> searchDataInProject(String projectId, String variableName){
+        return gywlwVariableRegGroupMapper.selectByProjectIdAndVariableName(projectId,variableName);
     }
 }

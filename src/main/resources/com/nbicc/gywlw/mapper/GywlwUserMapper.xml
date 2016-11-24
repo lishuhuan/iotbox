@@ -34,6 +34,13 @@
     from gywlw_user
     where user_phone = #{phone,jdbcType=VARCHAR} AND del_mark = 0
   </select>
+  <select id="selectByPhoneWithPsd" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    user_id, user_psd, user_phone, user_name, create_time, user_level, duser_level, parent_id,
+    user_sex, user_email, user_fixedphone, company_id, company_name
+    from gywlw_user
+    where user_phone = #{phone,jdbcType=VARCHAR} AND del_mark = 0
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
     delete from gywlw_user
     where user_id = #{userId,jdbcType=VARCHAR}

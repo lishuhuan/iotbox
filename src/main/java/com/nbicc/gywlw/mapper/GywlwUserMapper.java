@@ -19,5 +19,7 @@ public interface GywlwUserMapper {
 
     GywlwUser selectByPhone(String phone);
 
+    GywlwUser selectByPhoneWithPsd(String phone);
+
 
 }

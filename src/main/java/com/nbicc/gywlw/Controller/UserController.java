@@ -1,9 +1,6 @@
 package com.nbicc.gywlw.Controller;
 
-import com.nbicc.gywlw.Model.GywlwProject;
-import com.nbicc.gywlw.Model.GywlwProjectUserGroup;
-import com.nbicc.gywlw.Model.GywlwUser;
-import com.nbicc.gywlw.Model.HostHolder;
+import com.nbicc.gywlw.Model.*;
 import com.nbicc.gywlw.Service.ProjectService;
 import com.nbicc.gywlw.util.MyUtil;
 import org.slf4j.Logger;
@@ -180,9 +177,22 @@ public class UserController {
     }
 
 
-    //修改项目成员权限aaa
+    //修改项目成员权限
 
     //项目关联变量组列表，并提供变量组搜索
+    @RequestMapping(path = {"/user/datainproject"}, method = {RequestMethod.GET})
+    @ResponseBody
+    public String dataInProject(@RequestParam("project_id")String projectId,
+                                @RequestParam(value = "variable_name",defaultValue = "ALL")String variableName){
+        try{
+            List<GywlwVariableRegGroup> list = projectService.searchDataInProject(projectId,variableName);
+            return MyUtil.getJSONString(0,list);
+        }catch (Exception e){
+            logger.error("未查到项目相关数据（变量组）" + e.getMessage());
+            return MyUtil.getJSONString(1, "未查到相关数据!");
+        }
+    }
+
 
     //变量组中的数据详情
 

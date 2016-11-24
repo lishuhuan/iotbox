@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nbicc.gywlw.mapper.GywlwVariableRegGroupMapper" >
+  <resultMap id="BaseResultMap" type="com.nbicc.gywlw.Model.GywlwVariableRegGroup" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="variable_id" property="variableId" jdbcType="VARCHAR" />
+    <result column="variable_name" property="variableName" jdbcType="VARCHAR" />
+    <result column="reg_id" property="regId" jdbcType="VARCHAR" />
+    <result column="reg_name" property="regName" jdbcType="VARCHAR" />
+    <result column="device_id" property="deviceId" jdbcType="VARCHAR" />
+    <result column="device_name" property="deviceName" jdbcType="VARCHAR" />
+    <result column="project_id" property="projectId" jdbcType="VARCHAR" />
+    <result column="last_connected" property="lastConnected" jdbcType="TIMESTAMP" />
+
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, variable_id, reg_id, device_id, project_id, del_mark
+  </sql>
+  <select id="selectByProjectIdAndVariableName" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    a.id,a.variable_id,b.variable_name,a.reg_id,c.reg_name,a.device_id,d.device_name,a.project_id,d.last_connected
+    from gywlw_variable_reg_group a,gywlw_variable b,gywlw_reg_info c,gywlw_device d, gywlw_project e
+    <if test="variableName == 'ALL'">
+    where a.project_id = #{projectId,jdbcType=VARCHAR} AND a.device_id = d.device_id and a.project_id = e.project_id and a.reg_id = c.reg_id and a.variable_id = b.variable_id
+    </if>
+    <if test="variableName != 'ALL'">
+      where a.project_id = #{projectId,jdbcType=VARCHAR} AND a.device_id = d.device_id and a.project_id = e.project_id and a.reg_id = c.reg_id and a.variable_id = b.variable_id and b.variable_name = #{variableName,jdbcType=VARCHAR};
+    </if>
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from gywlw_variable_reg_group
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.nbicc.gywlw.Model.GywlwVariableRegGroup" >
+    insert into gywlw_variable_reg_group (id, variable_id, reg_id, 
+      device_id, project_id, del_mark
+      )
+    values (#{id,jdbcType=INTEGER}, #{variableId,jdbcType=VARCHAR}, #{regId,jdbcType=VARCHAR}, 
+      #{deviceId,jdbcType=VARCHAR}, #{projectId,jdbcType=VARCHAR}, #{delMark,jdbcType=TINYINT}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.nbicc.gywlw.Model.GywlwVariableRegGroup" >
+    insert into gywlw_variable_reg_group
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="variableId != null" >
+        variable_id,
+      </if>
+      <if test="regId != null" >
+        reg_id,
+      </if>
+      <if test="deviceId != null" >
+        device_id,
+      </if>
+      <if test="projectId != null" >
+        project_id,
+      </if>
+      <if test="delMark != null" >
+        del_mark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="variableId != null" >
+        #{variableId,jdbcType=VARCHAR},
+      </if>
+      <if test="regId != null" >
+        #{regId,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceId != null" >
+        #{deviceId,jdbcType=VARCHAR},
+      </if>
+      <if test="projectId != null" >
+        #{projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="delMark != null" >
+        #{delMark,jdbcType=TINYINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.nbicc.gywlw.Model.GywlwVariableRegGroup" >
+    update gywlw_variable_reg_group
+    <set >
+      <if test="variableId != null" >
+        variable_id = #{variableId,jdbcType=VARCHAR},
+      </if>
+      <if test="regId != null" >
+        reg_id = #{regId,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceId != null" >
+        device_id = #{deviceId,jdbcType=VARCHAR},
+      </if>
+      <if test="projectId != null" >
+        project_id = #{projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="delMark != null" >
+        del_mark = #{delMark,jdbcType=TINYINT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.nbicc.gywlw.Model.GywlwVariableRegGroup" >
+    update gywlw_variable_reg_group
+    set variable_id = #{variableId,jdbcType=VARCHAR},
+      reg_id = #{regId,jdbcType=VARCHAR},
+      device_id = #{deviceId,jdbcType=VARCHAR},
+      project_id = #{projectId,jdbcType=VARCHAR},
+      del_mark = #{delMark,jdbcType=TINYINT}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

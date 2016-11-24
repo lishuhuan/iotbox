@@ -23,17 +23,16 @@ public class LoginController {
     @Autowired
     private UserService userService;
 
-    @RequestMapping(path = {"/reg/"}, method = {RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(path = {"/reg"}, method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     public String reg(@RequestParam("user_name") String username,
                       @RequestParam("password") String password,
                       @RequestParam("phone") String phone,
                       @RequestParam(value = "sms_code",defaultValue = "0") String smsCode,
                       @RequestParam("company_name") String companyName,
-                      @RequestParam("user_type") String userType,
                       HttpServletResponse response) {
         try {
-            Map<String, Object> map = userService.register(username, password, phone, companyName, userType);
+            Map<String, Object> map = userService.register(username, password, phone, companyName);
             if (map.containsKey("ticket")) {
                 Cookie cookie = new Cookie("ticket", map.get("ticket").toString());
                 cookie.setPath("/");
@@ -49,11 +48,10 @@ public class LoginController {
         }
     }
 
-    @RequestMapping(path = {"/login/"}, method = {RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(path = {"/login"}, method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     public String login(@RequestParam(value = "phone") String phone,
                         @RequestParam(value = "password") String password,
-                        @RequestParam(value = "rember", defaultValue = "0")int rember,
                         @RequestParam(value = "user_type", defaultValue = "1")int userType,
                         HttpServletResponse response) {
         try {
@@ -61,9 +59,7 @@ public class LoginController {
             if( map.containsKey("ticket")) {
                 Cookie cookie = new Cookie("ticket", map.get("ticket").toString());
                 cookie.setPath("/");
-                if( rember > 0) {
-                    cookie.setMaxAge(3600*24*5);
-                }
+                cookie.setMaxAge(3600*24*5);
                 response.addCookie(cookie);
                 return MyUtil.getJSONString(0, "成功");
             } else {
@@ -76,7 +72,7 @@ public class LoginController {
         }
     }
 
-    @RequestMapping(path = {"/logout/"}, method = {RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(path = {"/logout"}, method = {RequestMethod.GET, RequestMethod.POST})
     public String logout(@CookieValue("ticket") String ticket) {
         userService.logout(ticket);
         return "redirect:/";  //返回首页

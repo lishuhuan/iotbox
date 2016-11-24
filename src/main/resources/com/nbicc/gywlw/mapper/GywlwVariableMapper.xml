@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nbicc.gywlw.mapper.GywlwVariableMapper" >
+  <resultMap id="BaseResultMap" type="com.nbicc.gywlw.Model.GywlwVariable" >
+    <id column="variable_id" property="variableId" jdbcType="VARCHAR" />
+    <result column="project_id" property="projectId" jdbcType="VARCHAR" />
+    <result column="variable_name" property="variableName" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    variable_id, project_id, variable_name
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from gywlw_variable
+    where variable_id = #{variableId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from gywlw_variable
+    where variable_id = #{variableId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.nbicc.gywlw.Model.GywlwVariable" >
+    insert into gywlw_variable (variable_id, project_id, variable_name
+      )
+    values (#{variableId,jdbcType=VARCHAR}, #{projectId,jdbcType=VARCHAR}, #{variableName,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.nbicc.gywlw.Model.GywlwVariable" >
+    insert into gywlw_variable
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="variableId != null" >
+        variable_id,
+      </if>
+      <if test="projectId != null" >
+        project_id,
+      </if>
+      <if test="variableName != null" >
+        variable_name,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="variableId != null" >
+        #{variableId,jdbcType=VARCHAR},
+      </if>
+      <if test="projectId != null" >
+        #{projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="variableName != null" >
+        #{variableName,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.nbicc.gywlw.Model.GywlwVariable" >
+    update gywlw_variable
+    <set >
+      <if test="projectId != null" >
+        project_id = #{projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="variableName != null" >
+        variable_name = #{variableName,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where variable_id = #{variableId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.nbicc.gywlw.Model.GywlwVariable" >
+    update gywlw_variable
+    set project_id = #{projectId,jdbcType=VARCHAR},
+      variable_name = #{variableName,jdbcType=VARCHAR}
+    where variable_id = #{variableId,jdbcType=VARCHAR}
+  </update>
+</mapper>
