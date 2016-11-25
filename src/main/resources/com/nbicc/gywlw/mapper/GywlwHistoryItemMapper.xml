@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nbicc.gywlw.mapper.GywlwHistoryItemMapper" >
+  <resultMap id="BaseResultMap" type="com.nbicc.gywlw.Model.GywlwHistoryItem" >
+    <id column="item_id" property="itemId" jdbcType="INTEGER" />
+    <result column="variable_name" property="variableName" jdbcType="VARCHAR" />
+    <result column="device_name" property="deviceName" jdbcType="VARCHAR" />
+    <result column="item_name" property="itemName" jdbcType="VARCHAR" />
+    <result column="item_alias" property="itemAlias" jdbcType="VARCHAR" />
+    <result column="item_type" property="itemType" jdbcType="INTEGER" />
+    <result column="item_value" property="itemValue" jdbcType="DOUBLE" />
+    <result column="item_time" property="itemTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <resultMap id="BaseResultMap1" type="com.nbicc.gywlw.Model.GywlwHistoryItem" >
+    <id column="item_id" property="itemId" jdbcType="INTEGER" />
+    <result column="variable_name" property="variableName" jdbcType="VARCHAR" />
+    <result column="device_name" property="deviceName" jdbcType="VARCHAR" />
+    <result column="item_name" property="itemName" jdbcType="VARCHAR" />
+    <result column="item_alias" property="itemAlias" jdbcType="VARCHAR" />
+    <result column="item_content" property="itemContent" jdbcType="VARCHAR" />
+    <result column="severity" property="severity" jdbcType="VARCHAR" />
+    <result column="item_type" property="itemType" jdbcType="INTEGER" />
+    <result column="item_value" property="itemValue" jdbcType="DOUBLE" />
+    <result column="item_time" property="itemTime" jdbcType="TIMESTAMP" />
+    <result column="rule_id" property="ruleId" jdbcType="INTEGER" />
+    <result column="operator" property="operator" jdbcType="VARCHAR" />
+    <result column="operand" property="operand" jdbcType="DOUBLE" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    item_id, reg_id, device_id, project_id, variable_name, device_name, item_name, item_alias, 
+    item_address, item_type, item_value, item_time, severity, item_content, del_mark
+  </sql>
+  <select id="selectByVariableName" resultMap="BaseResultMap" parameterType="com.nbicc.gywlw.Model.GywlwHistoryItem" >
+    select 
+    item_id,device_name,item_name,item_alias,item_type,item_value,item_time,variable_name
+    from gywlw_history_item
+    where variable_name = #{variableName,jdbcType=VARCHAR} AND project_id = #{projectId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectwarning" resultMap="BaseResultMap1" parameterType="com.nbicc.gywlw.Model.GywlwHistoryItem" >
+    select
+    a.item_id,a.device_name,a.item_type,a.item_content,a.item_time,a.variable_name,a.severity,a.item_name,a.item_alias,a.rule_id,b.rule_name,b.operator,b.operand
+    from gywlw_history_item a,gywlw_warning_rules b
+    <if test="variableName != 'ALL'">
+    where a.item_time BETWEEN #{startTime,jdbcType=TIMESTAMP} AND #{endTime,jdbcType=TIMESTAMP} and a.rule_id = b.rule_id and a.variable_name = #{variableName,jdbcType=VARCHAR} AND a.project_id = #{projectId,jdbcType=VARCHAR};
+   </if>
+    <if test="variableName == 'ALL'">
+    where a.item_time BETWEEN #{startTime,jdbcType=TIMESTAMP} AND #{endTime,jdbcType=TIMESTAMP} and a.rule_id = b.rule_id AND a.project_id = #{projectId,jdbcType=VARCHAR};
+    </if>
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from gywlw_history_item
+    where item_id = #{itemId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.nbicc.gywlw.Model.GywlwHistoryItem" >
+    insert into gywlw_history_item (item_id, reg_id, device_id, 
+      project_id, variable_name, device_name, 
+      item_name, item_alias, item_address, 
+      item_type, item_value, item_time, 
+      severity, item_content, del_mark
+      )
+    values (#{itemId,jdbcType=INTEGER}, #{regId,jdbcType=VARCHAR}, #{deviceId,jdbcType=VARCHAR}, 
+      #{projectId,jdbcType=VARCHAR}, #{variableName,jdbcType=VARCHAR}, #{deviceName,jdbcType=VARCHAR}, 
+      #{itemName,jdbcType=VARCHAR}, #{itemAlias,jdbcType=VARCHAR}, #{itemAddress,jdbcType=VARCHAR}, 
+      #{itemType,jdbcType=INTEGER}, #{itemValue,jdbcType=DOUBLE}, #{itemTime,jdbcType=TIMESTAMP}, 
+      #{severity,jdbcType=INTEGER}, #{itemContent,jdbcType=VARCHAR}, #{delMark,jdbcType=TINYINT}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.nbicc.gywlw.Model.GywlwHistoryItem" >
+    insert into gywlw_history_item
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="itemId != null" >
+        item_id,
+      </if>
+      <if test="regId != null" >
+        reg_id,
+      </if>
+      <if test="deviceId != null" >
+        device_id,
+      </if>
+      <if test="projectId != null" >
+        project_id,
+      </if>
+      <if test="variableName != null" >
+        variable_name,
+      </if>
+      <if test="deviceName != null" >
+        device_name,
+      </if>
+      <if test="itemName != null" >
+        item_name,
+      </if>
+      <if test="itemAlias != null" >
+        item_alias,
+      </if>
+      <if test="itemAddress != null" >
+        item_address,
+      </if>
+      <if test="itemType != null" >
+        item_type,
+      </if>
+      <if test="itemValue != null" >
+        item_value,
+      </if>
+      <if test="itemTime != null" >
+        item_time,
+      </if>
+      <if test="severity != null" >
+        severity,
+      </if>
+      <if test="itemContent != null" >
+        item_content,
+      </if>
+      <if test="delMark != null" >
+        del_mark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="itemId != null" >
+        #{itemId,jdbcType=INTEGER},
+      </if>
+      <if test="regId != null" >
+        #{regId,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceId != null" >
+        #{deviceId,jdbcType=VARCHAR},
+      </if>
+      <if test="projectId != null" >
+        #{projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="variableName != null" >
+        #{variableName,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceName != null" >
+        #{deviceName,jdbcType=VARCHAR},
+      </if>
+      <if test="itemName != null" >
+        #{itemName,jdbcType=VARCHAR},
+      </if>
+      <if test="itemAlias != null" >
+        #{itemAlias,jdbcType=VARCHAR},
+      </if>
+      <if test="itemAddress != null" >
+        #{itemAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="itemType != null" >
+        #{itemType,jdbcType=INTEGER},
+      </if>
+      <if test="itemValue != null" >
+        #{itemValue,jdbcType=DOUBLE},
+      </if>
+      <if test="itemTime != null" >
+        #{itemTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="severity != null" >
+        #{severity,jdbcType=INTEGER},
+      </if>
+      <if test="itemContent != null" >
+        #{itemContent,jdbcType=VARCHAR},
+      </if>
+      <if test="delMark != null" >
+        #{delMark,jdbcType=TINYINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.nbicc.gywlw.Model.GywlwHistoryItem" >
+    update gywlw_history_item
+    <set >
+      <if test="regId != null" >
+        reg_id = #{regId,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceId != null" >
+        device_id = #{deviceId,jdbcType=VARCHAR},
+      </if>
+      <if test="projectId != null" >
+        project_id = #{projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="variableName != null" >
+        variable_name = #{variableName,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceName != null" >
+        device_name = #{deviceName,jdbcType=VARCHAR},
+      </if>
+      <if test="itemName != null" >
+        item_name = #{itemName,jdbcType=VARCHAR},
+      </if>
+      <if test="itemAlias != null" >
+        item_alias = #{itemAlias,jdbcType=VARCHAR},
+      </if>
+      <if test="itemAddress != null" >
+        item_address = #{itemAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="itemType != null" >
+        item_type = #{itemType,jdbcType=INTEGER},
+      </if>
+      <if test="itemValue != null" >
+        item_value = #{itemValue,jdbcType=DOUBLE},
+      </if>
+      <if test="itemTime != null" >
+        item_time = #{itemTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="severity != null" >
+        severity = #{severity,jdbcType=INTEGER},
+      </if>
+      <if test="itemContent != null" >
+        item_content = #{itemContent,jdbcType=VARCHAR},
+      </if>
+      <if test="delMark != null" >
+        del_mark = #{delMark,jdbcType=TINYINT},
+      </if>
+    </set>
+    where item_id = #{itemId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.nbicc.gywlw.Model.GywlwHistoryItem" >
+    update gywlw_history_item
+    set reg_id = #{regId,jdbcType=VARCHAR},
+      device_id = #{deviceId,jdbcType=VARCHAR},
+      project_id = #{projectId,jdbcType=VARCHAR},
+      variable_name = #{variableName,jdbcType=VARCHAR},
+      device_name = #{deviceName,jdbcType=VARCHAR},
+      item_name = #{itemName,jdbcType=VARCHAR},
+      item_alias = #{itemAlias,jdbcType=VARCHAR},
+      item_address = #{itemAddress,jdbcType=VARCHAR},
+      item_type = #{itemType,jdbcType=INTEGER},
+      item_value = #{itemValue,jdbcType=DOUBLE},
+      item_time = #{itemTime,jdbcType=TIMESTAMP},
+      severity = #{severity,jdbcType=INTEGER},
+      item_content = #{itemContent,jdbcType=VARCHAR},
+      del_mark = #{delMark,jdbcType=TINYINT}
+    where item_id = #{itemId,jdbcType=INTEGER}
+  </update>
+</mapper>

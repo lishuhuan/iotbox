@@ -29,6 +29,16 @@ public class GywlwDevice {
 
     private Byte delMark;
 
+    private Byte expiredRight;
+
+    public Byte getExpiredRight() {
+        return expiredRight;
+    }
+
+    public void setExpiredRight(Byte expiredRight) {
+        this.expiredRight = expiredRight;
+    }
+
     public String getDeviceId() {
         return deviceId;
     }

@@ -14,17 +14,42 @@
     <result column="last_connected" property="lastConnected" jdbcType="TIMESTAMP" />
     <result column="gateway" property="gateway" jdbcType="VARCHAR" />
     <result column="expired" property="expired" jdbcType="TIMESTAMP" />
-    <result column="del_mark" property="delMark" jdbcType="TINYINT" />
+
   </resultMap>
   <sql id="Base_Column_List" >
     device_id, device_sn, admin_id, factory_id, create_time, content, online, device_type_id, 
     device_name, last_connected, gateway, expired, del_mark
   </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+  <select id="selectByUserIdAndDeviceSn" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
-    <include refid="Base_Column_List" />
+    a.admin_id,a.device_id,a.device_sn,a.device_name,a.last_connected,a.device_online
+    from gywlw_device a,(SELECT device_id FROM `gywlw_project_device_group`
+                         JOIN gywlw_project_user_group
+                         ON gywlw_project_device_group.project_id=gywlw_project_user_group.project_id
+                        where gywlw_project_user_group.user_id = #{userId,jdbcType=VARCHAR}) t
+    <if test="deviceSn =='ALL'">
+      where a.device_id = t.device_id ;
+    </if>
+    <if test="deviceSn !='ALL'">
+      where a.device_id = t.device_id AND a.device_sn = {deviceSn,jdbcType=VARCHAR};
+    </if>
+  </select>
+  <select id="selectByUserIdAndDeviceSnWithAdmin" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    admin_id,device_id,device_sn,device_name,last_connected,device_online
     from gywlw_device
-    where device_id = #{deviceId,jdbcType=VARCHAR}
+    <if test="deviceSn =='ALL'">
+      where admin_id = #{userId,jdbcType=VARCHAR};
+    </if>
+    <if test="deviceSn !='ALL'">
+      where admin_id = #{userId,jdbcType=VARCHAR} AND device_sn = {deviceSn,jdbcType=VARCHAR};
+    </if>
+  </select>
+  <select id="selectByDeviceId" resultMap="BaseResultMap" parameterType="java.lang.String">
+    SELECT
+    admin_id
+    from gywlw_device
+    WHERE device_id = #{deviceId,jdbcType=VARCHAR};
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
     delete from gywlw_device
@@ -165,6 +190,9 @@
       </if>
       <if test="delMark != null" >
         del_mark = #{delMark,jdbcType=TINYINT},
+      </if>
+      <if test="expiredRight != null" >
+        expired_right = #{expiredRight,jdbcType=TINYINT},
       </if>
     </set>
     where device_id = #{deviceId,jdbcType=VARCHAR}

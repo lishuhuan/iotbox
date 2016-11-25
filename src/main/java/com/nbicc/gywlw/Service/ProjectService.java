@@ -1,13 +1,11 @@
 package com.nbicc.gywlw.Service;
 
 import com.nbicc.gywlw.Model.*;
-import com.nbicc.gywlw.mapper.GywlwProjectMapper;
-import com.nbicc.gywlw.mapper.GywlwProjectUserGroupMapper;
-import com.nbicc.gywlw.mapper.GywlwUserMapper;
-import com.nbicc.gywlw.mapper.GywlwVariableRegGroupMapper;
+import com.nbicc.gywlw.mapper.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,6 +25,10 @@ public class ProjectService {
     private GywlwProjectUserGroupMapper gywlwProjectUserGroupMapper;
     @Autowired
     private GywlwVariableRegGroupMapper gywlwVariableRegGroupMapper;
+    @Autowired
+    private GywlwHistoryItemMapper gywlwHistoryItemMapper;
+    @Autowired
+    private GywlwDeviceMapper gywlwDeviceMapper;
 
     public List<GywlwProject> projectList(String gywlwUserId, int offset, int limit, Byte projectStatus){
         return gywlwProjectMapper.selectByGywlwUserId(gywlwUserId, offset, limit, projectStatus);
@@ -107,5 +109,48 @@ public class ProjectService {
 
     public List<GywlwVariableRegGroup> searchDataInProject(String projectId, String variableName){
         return gywlwVariableRegGroupMapper.selectByProjectIdAndVariableName(projectId,variableName);
+    }
+
+    public List<GywlwHistoryItem> searchHistoryData(String projectId,String variableName){
+        return gywlwHistoryItemMapper.selectByVariableName(variableName,projectId);
+    }
+
+    public List<GywlwHistoryItem> warningList(String projectId,String variableName,String startTime,String endTime){
+        return gywlwHistoryItemMapper.selectwarning(projectId,variableName,startTime,endTime);
+    }
+
+    public List<GywlwDevice> getDeviceList(String deviceSn){
+        if(hostHolder.getGywlwUser().getUserLevel()==0){
+            List<GywlwDevice> list = gywlwDeviceMapper.selectByUserIdAndDeviceSnWithAdmin(
+                    hostHolder.getGywlwUser().getUserId(),deviceSn);
+            list.addAll(gywlwDeviceMapper.selectByUserIdAndDeviceSn(hostHolder.getGywlwUser().getUserId(),deviceSn));
+            return list;
+        }else {
+            return gywlwDeviceMapper.selectByUserIdAndDeviceSn(hostHolder.getGywlwUser().getUserId(),deviceSn);
+        }
+    }
+
+    public void setExpire(String deviceId, Date expiredDate, Byte expiredRight){
+        GywlwDevice gywlwDevice = new GywlwDevice();
+        gywlwDevice.setDeviceId(deviceId);
+        gywlwDevice.setExpired(expiredDate);
+        gywlwDevice.setExpiredRight(expiredRight);
+        gywlwDeviceMapper.updateByPrimaryKeySelective(gywlwDevice);
+    }
+
+    public GywlwDevice getDevice(String deviceId){
+        return gywlwDeviceMapper.selectByDeviceId(deviceId);
+    }
+
+    public void changeInfo(String userName,String companyName,String sex,String email,String fixedphone){
+        GywlwUser gywlwUser = new GywlwUser();
+        gywlwUser.setUserId(hostHolder.getGywlwUser().getUserId());
+        gywlwUser.setUserName(userName);
+        gywlwUser.setCompanyName(companyName);
+        gywlwUser.setUserEmail(email);
+        gywlwUser.setUserFixedphone(fixedphone);
+        gywlwUser.setUserSex(Boolean.parseBoolean(sex));
+        gywlwUserMapper.updateByPrimaryKeySelective(gywlwUser);
+
     }
 }

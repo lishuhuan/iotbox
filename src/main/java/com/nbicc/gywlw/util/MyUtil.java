@@ -6,6 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.security.MessageDigest;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +54,20 @@ public class MyUtil {
         String returnString = JSON.toJSONString(map);
         System.out.println("输出项目列表： " + returnString);
         return returnString;
+    }
+
+    public static String timeTransformToString(String time){
+        SimpleDateFormat format =  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Long time1=Long.parseLong(time);
+        String d = format.format(time1 * 1000);
+        return d;
+    }
+    public static Date timeTransformToDate(String time) throws ParseException {
+        SimpleDateFormat format =  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Long time1=Long.parseLong(time);
+        String d = format.format(time1*1000);
+        Date date=format.parse(d);
+        return date;
     }
 
 
