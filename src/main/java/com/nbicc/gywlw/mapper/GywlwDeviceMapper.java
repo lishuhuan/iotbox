@@ -1,7 +1,11 @@
 package com.nbicc.gywlw.mapper;
 
 import com.nbicc.gywlw.Model.GywlwDevice;
+
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface GywlwDeviceMapper {
@@ -16,4 +20,6 @@ public interface GywlwDeviceMapper {
     int updateByPrimaryKeySelective(GywlwDevice record);
 
     int updateByPrimaryKey(GywlwDevice record);
+    
+    public List<GywlwDevice> searchDeviceByFactory(@Param("adminId") String adminId);
 }

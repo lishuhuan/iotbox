@@ -185,4 +185,8 @@
       del_mark = #{delMark,jdbcType=TINYINT}
     where device_id = #{deviceId,jdbcType=VARCHAR}
   </update>
+  
+  <select id="searchDeviceByFactory" resultMap="BaseResultMap" parameterType="java.lang.String" >
+  	 select * from gywlw_device  where admin_id=#{adminId}
+  </select>
 </mapper>

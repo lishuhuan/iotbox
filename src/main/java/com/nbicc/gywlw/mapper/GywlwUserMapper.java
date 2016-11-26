@@ -1,7 +1,11 @@
 package com.nbicc.gywlw.mapper;
 
 import com.nbicc.gywlw.Model.GywlwUser;
+
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface GywlwUserMapper {
@@ -21,5 +25,7 @@ public interface GywlwUserMapper {
 
     GywlwUser selectByPhoneWithPsd(String phone);
 
+    List<GywlwUser> searchUserByFactoy(@Param("factoryId") String factoryId,@Param("level") int level,@Param("name") String name);
+    
 
 }
