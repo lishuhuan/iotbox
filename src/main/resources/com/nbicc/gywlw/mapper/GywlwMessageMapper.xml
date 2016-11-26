@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nbicc.gywlw.mapper.GywlwMessageMapper">
+  <resultMap id="BaseResultMap" type="com.nbicc.gywlw.Model.GywlwMessage">
+    <id column="message_id" jdbcType="INTEGER" property="messageId" />
+    <result column="send_id" jdbcType="VARCHAR" property="sendId" />
+    <result column="receive_id" jdbcType="VARCHAR" property="receiveId" />
+    <result column="content" jdbcType="VARCHAR" property="content" />
+    <result column="operation" jdbcType="TINYINT" property="operation" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="message_type" jdbcType="TINYINT" property="messageType" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    message_id, send_id, receive_id, content, operation, create_time, message_type
+  </sql>
+  <select id="selectByUserId" resultMap="BaseResultMap" parameterType="java.lang.String">
+    select 
+    <include refid="Base_Column_List" />
+    from gywlw_message
+    where send_id = #{userId,jdbcType=VARCHAR} OR receive_id = #{userId,jdbcType=VARCHAR};
+  </select>
+  <select id="selectByUserIdAndMessageType" resultMap="BaseResultMap" parameterType="com.nbicc.gywlw.Model.GywlwMessage">
+    select
+    <include refid="Base_Column_List" />
+    from gywlw_message
+    where send_id = #{sendId,jdbcType=VARCHAR} OR message_type = #{messageType,jdbcType=TINYINT};
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from gywlw_message
+    where message_id = #{messageId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.nbicc.gywlw.Model.GywlwMessage">
+    insert into gywlw_message (message_id, send_id, receive_id, 
+      content, operation, create_time, 
+      message_type)
+    values (#{messageId,jdbcType=INTEGER}, #{sendId,jdbcType=VARCHAR}, #{receiveId,jdbcType=VARCHAR}, 
+      #{content,jdbcType=VARCHAR}, #{operation,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{messageType,jdbcType=TINYINT})
+  </insert>
+  <insert id="insertSelective" parameterType="com.nbicc.gywlw.Model.GywlwMessage">
+    insert into gywlw_message
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="messageId != null">
+        message_id,
+      </if>
+      <if test="sendId != null">
+        send_id,
+      </if>
+      <if test="receiveId != null">
+        receive_id,
+      </if>
+      <if test="content != null">
+        content,
+      </if>
+      <if test="operation != null">
+        operation,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="messageType != null">
+        message_type,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="messageId != null">
+        #{messageId,jdbcType=INTEGER},
+      </if>
+      <if test="sendId != null">
+        #{sendId,jdbcType=VARCHAR},
+      </if>
+      <if test="receiveId != null">
+        #{receiveId,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null">
+        #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="operation != null">
+        #{operation,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="messageType != null">
+        #{messageType,jdbcType=TINYINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.nbicc.gywlw.Model.GywlwMessage">
+    update gywlw_message
+    <set>
+      <if test="sendId != null">
+        send_id = #{sendId,jdbcType=VARCHAR},
+      </if>
+      <if test="receiveId != null">
+        receive_id = #{receiveId,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null">
+        content = #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="operation != null">
+        operation = #{operation,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="messageType != null">
+        message_type = #{messageType,jdbcType=TINYINT},
+      </if>
+    </set>
+    where message_id = #{messageId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.nbicc.gywlw.Model.GywlwMessage">
+    update gywlw_message
+    set send_id = #{sendId,jdbcType=VARCHAR},
+      receive_id = #{receiveId,jdbcType=VARCHAR},
+      content = #{content,jdbcType=VARCHAR},
+      operation = #{operation,jdbcType=TINYINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      message_type = #{messageType,jdbcType=TINYINT}
+    where message_id = #{messageId,jdbcType=INTEGER}
+  </update>
+</mapper>

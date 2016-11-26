@@ -31,6 +31,17 @@ public class GywlwUser {
 
     private Boolean delMark;
 
+    //记录用户以什么身份登录的
+    private Byte userType;
+
+    public Byte getUserType() {
+        return userType;
+    }
+
+    public void setUserType(Byte userType) {
+        this.userType = userType;
+    }
+
     public String getUserId() {
         return userId;
     }

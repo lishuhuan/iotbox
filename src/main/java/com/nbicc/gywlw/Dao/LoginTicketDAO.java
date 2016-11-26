@@ -10,11 +10,11 @@ import org.apache.ibatis.annotations.*;
 @Mapper
 public interface LoginTicketDAO {
     String TABLE_NAME = "gywlw_login_ticket";
-    String INSET_FIELDS = " user_id, expired, status, ticket ";
+    String INSET_FIELDS = " user_id, expired, status, ticket, user_type ";
     String SELECT_FIELDS = " id, " + INSET_FIELDS;
 
     @Insert({"insert into ", TABLE_NAME, "(", INSET_FIELDS,
-            ") values (#{userId},#{expired},#{status},#{ticket})" })
+            ") values (#{userId},#{expired},#{status},#{ticket},#{userType})" })
     int addTicket(LoginTicket ticket);
 
     @Select({"select ", SELECT_FIELDS, " from ", TABLE_NAME, "where ticket=#{ticket}"})

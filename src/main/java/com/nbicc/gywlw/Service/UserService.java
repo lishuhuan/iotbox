@@ -28,19 +28,19 @@ public class UserService {
     public Map<String, Object> register(String username, String password, String phone, String companyName) {
         Map<String, Object> map = new HashMap<String, Object>();
         if (StringUtils.isBlank(username)) {
-            map.put("msgname", "用户名不能为空");
+            map.put("data", "用户名不能为空");
             return map;
         }
 
         if (StringUtils.isBlank(password)) {
-            map.put("msgpwd", "密码不能为空");
+            map.put("data", "密码不能为空");
             return map;
         }
 
         GywlwUser gywlwUser = gywlwUserMapper.selectByPhone(phone);
 
         if (gywlwUser != null) {
-            map.put("msgname", "用户名已经被注册");
+            map.put("data", "用户名已经被注册");
             return map;
         }
 
@@ -58,34 +58,34 @@ public class UserService {
         gywlwUserMapper.insert(gywlwUser);
 
 
-        // 登陆
-        String ticket = addLoginTicket(gywlwUser.getUserId());
+        // 注册完以普通用户登录
+        String ticket = addLoginTicket(gywlwUser.getUserId(),Byte.parseByte("0"));
         map.put("ticket", ticket);
         return map;
     }
 
     //登录
-    public Map<String, Object> login(String phone, String password) {
+    public Map<String, Object> login(String phone, String password,Byte userType) {
         Map<String, Object> map = new HashMap<String, Object>();
         if (StringUtils.isBlank(phone)) {
-            map.put("msgphone", "手机号不能为空");
+            map.put("data", "手机号不能为空");
             return map;
         }
 
         if (StringUtils.isBlank(password)) {
-            map.put("msgpwd", "密码不能为空");
+            map.put("data", "密码不能为空");
             return map;
         }
 
         GywlwUser gywlwUser = gywlwUserMapper.selectByPhoneWithPsd(phone);
 
         if (gywlwUser == null) {
-            map.put("msgname", "手机号不存在");
+            map.put("data", "手机号不存在");
             return map;
         }
 
         if (!MyUtil.MD5(password).equals(gywlwUser.getUserPsd())) {
-            map.put("msgpwd", "密码不正确");
+            map.put("data", "密码不正确");
             return map;
         }
 
@@ -94,15 +94,16 @@ public class UserService {
         map.put("userLevel", gywlwUser.getUserLevel());
         map.put("duserLevel", gywlwUser.getDuserLevel());
 
-        String ticket = addLoginTicket(gywlwUser.getUserId());
+        String ticket = addLoginTicket(gywlwUser.getUserId(),userType);
         map.put("ticket", ticket);
         return map;
     }
 
     //添加ticket
-    private String addLoginTicket(String userId){
+    private String addLoginTicket(String userId,Byte userType){
         LoginTicket ticket = new LoginTicket();
         ticket.setUserId(userId);
+        ticket.setUserType(userType);
         Date date = new Date();
         date.setTime(date.getTime() + 1000*3600*24);
         ticket.setExpired(date);

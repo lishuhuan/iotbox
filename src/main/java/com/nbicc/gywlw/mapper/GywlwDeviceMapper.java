@@ -1,11 +1,10 @@
 package com.nbicc.gywlw.mapper;
 
 import com.nbicc.gywlw.Model.GywlwDevice;
-
-import java.util.List;
-
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 @Mapper
 public interface GywlwDeviceMapper {
@@ -15,11 +14,21 @@ public interface GywlwDeviceMapper {
 
     int insertSelective(GywlwDevice record);
 
-    GywlwDevice selectByPrimaryKey(String deviceId);
+    List<GywlwDevice> selectByUserIdAndDeviceSn(@Param("userId")String userId,
+                                               @Param("deviceSn")String deviceSn);
+    List<GywlwDevice> selectByUserIdAndDeviceSnWithAdmin(@Param("userId")String userId,
+                                                   @Param("deviceSn")String deviceSn);
+    GywlwDevice selectByDeviceSn(String deviceSn);
 
-    int updateByPrimaryKeySelective(GywlwDevice record);
+    List<GywlwDevice> selectByAdminId(String adminId);
+
+    List<GywlwDevice> selectByFactoryId(String factoryId);
+
+    GywlwDevice selectByDeviceId(String deviceId);
+
+    int updateByDeviceSnSelective(GywlwDevice gywlwDevice);
+
+    int updateByPrimaryKeySelective(GywlwDevice gywlwDevice);
 
     int updateByPrimaryKey(GywlwDevice record);
-    
-    public List<GywlwDevice> searchDeviceByFactory(@Param("adminId") String adminId);
 }

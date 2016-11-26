@@ -48,6 +48,7 @@ public class PassportInterceptor implements HandlerInterceptor {
                 return true;
             }
             GywlwUser gywlwUser = gywlwUserMapper.selectByPrimaryKey(loginTicket.getUserId());
+            gywlwUser.setUserType(loginTicket.getUserType());
             hostHolder.setGywlwUser(gywlwUser);
 
         }

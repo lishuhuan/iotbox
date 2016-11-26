@@ -15,7 +15,7 @@ public class GywlwDevice {
 
     private String content;
 
-    private Byte online;
+    private Byte deviceOnline;
 
     private String deviceTypeId;
 
@@ -28,6 +28,16 @@ public class GywlwDevice {
     private Date expired;
 
     private Byte delMark;
+
+    private Byte expiredRight;
+
+    public Byte getExpiredRight() {
+        return expiredRight;
+    }
+
+    public void setExpiredRight(Byte expiredRight) {
+        this.expiredRight = expiredRight;
+    }
 
     public String getDeviceId() {
         return deviceId;
@@ -77,13 +87,7 @@ public class GywlwDevice {
         this.content = content == null ? null : content.trim();
     }
 
-    public Byte getOnline() {
-        return online;
-    }
 
-    public void setOnline(Byte online) {
-        this.online = online;
-    }
 
     public String getDeviceTypeId() {
         return deviceTypeId;

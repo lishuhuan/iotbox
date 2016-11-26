@@ -16,7 +16,7 @@
   <sql id="Base_Column_List" >
     id, variable_id, reg_id, device_id, project_id, del_mark
   </sql>
-  <select id="selectByProjectIdAndVariableName" resultMap="BaseResultMap" parameterType="java.lang.String" >
+  <select id="selectByProjectIdAndVariableName" resultMap="BaseResultMap" parameterType="com.nbicc.gywlw.Model.GywlwVariableRegGroup" >
     select
     a.id,a.variable_id,b.variable_name,a.reg_id,c.reg_name,a.device_id,d.device_name,a.project_id,d.last_connected
     from gywlw_variable_reg_group a,gywlw_variable b,gywlw_reg_info c,gywlw_device d, gywlw_project e
