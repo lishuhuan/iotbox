@@ -29,19 +29,22 @@ public class ProjectService {
     private GywlwHistoryItemMapper gywlwHistoryItemMapper;
     @Autowired
     private GywlwDeviceMapper gywlwDeviceMapper;
+    @Autowired
+    private MessageService messageService;
+    @Autowired
+    private GywlwMessageMapper gywlwMessageMapper;
 
-    public List<GywlwProject> projectList(String gywlwUserId, int offset, int limit, Byte projectStatus){
+    public List<GywlwProject> projectList(String gywlwUserId, int offset, int limit, Byte projectStatus) {
         return gywlwProjectMapper.selectByGywlwUserId(gywlwUserId, offset, limit, projectStatus);
     }
 
     public String editProject(String projectId, String projectName, String parentText, String projectDesc,
                               String longitude, String latitude, String province, String city, String purchaseDate,
-                              String completionDate,String installDate, String contactName, String contactPhone,
-                              String customerType, String firstParty, String projectType)
-    {
+                              String completionDate, String installDate, String contactName, String contactPhone,
+                              String customerType, String firstParty, String projectType) {
         int mark = 0;
         GywlwProject gywlwProject = gywlwProjectMapper.selectByGywlwProjectId(projectId);
-        if(gywlwProject == null) {
+        if (gywlwProject == null) {
             mark = 1;
             gywlwProject = new GywlwProject();
             gywlwProject.setProjectId(UUID.randomUUID().toString().replaceAll("-", ""));
@@ -63,7 +66,7 @@ public class ProjectService {
         gywlwProject.setFirstparty(firstParty);
         gywlwProject.setProjectType(projectType);
 
-        if(mark == 1){
+        if (mark == 1) {
             gywlwProjectMapper.addProject(gywlwProject);
         } else {
             gywlwProjectMapper.updateByProjectId(gywlwProject);
@@ -71,29 +74,29 @@ public class ProjectService {
         return gywlwProject.getProjectId();
     }
 
-    public void stopProject(String gywlwProjectId){
+    public void stopProject(String gywlwProjectId) {
         gywlwProjectMapper.stopByProjectId(gywlwProjectId);
     }
 
-    public List<GywlwProjectUserGroup> projectMemberList(String projectId, int offset, int limit){
-        List<GywlwProjectUserGroup> list =  gywlwProjectUserGroupMapper.selectByProjectId(projectId,offset,limit);
-        //这里因为两次查询反应速度有点慢，考虑要不要加冗余字段提高速度
-        for(GywlwProjectUserGroup group : list){
+    public List<GywlwProjectUserGroup> projectMemberList(String projectId, int offset, int limit) {
+        List<GywlwProjectUserGroup> list = gywlwProjectUserGroupMapper.selectByProjectId(projectId, offset, limit);
+
+        for (GywlwProjectUserGroup group : list) {
             group.setUserName(gywlwUserMapper.selectByPrimaryKey(group.getUserId()).getUserName());
         }
         return list;
 
     }
 
-    public GywlwUser searchUser(String userPhone){
+    public GywlwUser searchUser(String userPhone) {
         return gywlwUserMapper.selectByPhone(userPhone);
     }
 
-    public String addProjectMember(String projectId, String userId, Byte writePermission){
-        GywlwProjectUserGroup userInProject = gywlwProjectUserGroupMapper.selectByProjectIdAndUserId(projectId,userId);
-        if(userInProject != null){
+    public String addProjectMember(String projectId, String userId, Byte writePermission) {
+        GywlwProjectUserGroup userInProject = gywlwProjectUserGroupMapper.selectByProjectIdAndUserId(projectId, userId);
+        if (userInProject != null) {
             return "该成员已添加！";
-        }else {
+        } else {
             GywlwProjectUserGroup gywlwProjectUserGroup = new GywlwProjectUserGroup();
             gywlwProjectUserGroup.setProjectId(projectId);
             gywlwProjectUserGroup.setUserId(userId);
@@ -103,34 +106,34 @@ public class ProjectService {
         }
     }
 
-    public void deleteProjectMember(String projectId, String userId){
-        gywlwProjectUserGroupMapper.deleteByProjectIdAndUserId(projectId,userId);
+    public void deleteProjectMember(String projectId, String userId) {
+        gywlwProjectUserGroupMapper.deleteByProjectIdAndUserId(projectId, userId);
     }
 
-    public List<GywlwVariableRegGroup> searchDataInProject(String projectId, String variableName){
-        return gywlwVariableRegGroupMapper.selectByProjectIdAndVariableName(projectId,variableName);
+    public List<GywlwVariableRegGroup> searchDataInProject(String projectId, String variableName) {
+        return gywlwVariableRegGroupMapper.selectByProjectIdAndVariableName(projectId, variableName);
     }
 
-    public List<GywlwHistoryItem> searchHistoryData(String projectId,String variableName){
-        return gywlwHistoryItemMapper.selectByVariableName(variableName,projectId);
+    public List<GywlwHistoryItem> searchHistoryData(String projectId, String variableName) {
+        return gywlwHistoryItemMapper.selectByVariableName(variableName, projectId);
     }
 
-    public List<GywlwHistoryItem> warningList(String projectId,String variableName,String startTime,String endTime){
-        return gywlwHistoryItemMapper.selectwarning(projectId,variableName,startTime,endTime);
+    public List<GywlwHistoryItem> warningList(String projectId, String variableName, String startTime, String endTime) {
+        return gywlwHistoryItemMapper.selectwarning(projectId, variableName, startTime, endTime);
     }
 
-    public List<GywlwDevice> getDeviceList(String deviceSn){
-        if(hostHolder.getGywlwUser().getUserLevel()==0){
+    public List<GywlwDevice> getDeviceList(String deviceSn) {
+        if (hostHolder.getGywlwUser().getUserLevel() == 0) {
             List<GywlwDevice> list = gywlwDeviceMapper.selectByUserIdAndDeviceSnWithAdmin(
-                    hostHolder.getGywlwUser().getUserId(),deviceSn);
-            list.addAll(gywlwDeviceMapper.selectByUserIdAndDeviceSn(hostHolder.getGywlwUser().getUserId(),deviceSn));
+                    hostHolder.getGywlwUser().getUserId(), deviceSn);
+            list.addAll(gywlwDeviceMapper.selectByUserIdAndDeviceSn(hostHolder.getGywlwUser().getUserId(), deviceSn));
             return list;
-        }else {
-            return gywlwDeviceMapper.selectByUserIdAndDeviceSn(hostHolder.getGywlwUser().getUserId(),deviceSn);
+        } else {
+            return gywlwDeviceMapper.selectByUserIdAndDeviceSn(hostHolder.getGywlwUser().getUserId(), deviceSn);
         }
     }
 
-    public void setExpire(String deviceId, Date expiredDate, Byte expiredRight){
+    public void setExpire(String deviceId, Date expiredDate, Byte expiredRight) {
         GywlwDevice gywlwDevice = new GywlwDevice();
         gywlwDevice.setDeviceId(deviceId);
         gywlwDevice.setExpired(expiredDate);
@@ -138,11 +141,11 @@ public class ProjectService {
         gywlwDeviceMapper.updateByPrimaryKeySelective(gywlwDevice);
     }
 
-    public GywlwDevice getDevice(String deviceId){
+    public GywlwDevice getDevice(String deviceId) {
         return gywlwDeviceMapper.selectByDeviceId(deviceId);
     }
 
-    public void changeInfo(String userName,String companyName,String sex,String email,String fixedphone){
+    public void changeInfo(String userName, String companyName, String sex, String email, String fixedphone) {
         GywlwUser gywlwUser = new GywlwUser();
         gywlwUser.setUserId(hostHolder.getGywlwUser().getUserId());
         gywlwUser.setUserName(userName);
@@ -153,4 +156,101 @@ public class ProjectService {
         gywlwUserMapper.updateByPrimaryKeySelective(gywlwUser);
 
     }
+
+    public String bindDevice(String deviceSn, int mark) {
+        String msg = null;
+        GywlwDevice gywlwDevice = gywlwDeviceMapper.selectByDeviceSn(deviceSn);
+        if (gywlwDevice == null) {
+            return "该唯一标识码不存在！";
+        }
+
+        if (hostHolder.getGywlwUser().getUserType() == 1) {
+            //成为普通用户管理员
+            GywlwDevice gywlwDevice1 = new GywlwDevice();
+            GywlwUser gywlwUser = new GywlwUser();
+            gywlwUser.setUserId(hostHolder.getGywlwUser().getUserId());
+            gywlwDevice1.setDeviceSn(deviceSn);
+            if (mark == 0) {
+                if (!gywlwDevice.getAdminId().equals("")) {
+                    return "该唯一标识码已被用户管理员绑定";
+                }
+                gywlwUser.setUserLevel(0);
+                gywlwDevice1.setAdminId(hostHolder.getGywlwUser().getUserId());
+                gywlwUserMapper.updateByPrimaryKeySelective(gywlwUser);
+                gywlwDeviceMapper.updateByDeviceSnSelective(gywlwDevice1);
+                msg = "绑定成功";
+            }
+            if (mark == 1) {
+                if (gywlwDevice.getAdminId().equals("")) {
+                    return "该唯一标识码未被绑定";
+                }
+                gywlwDevice1.setAdminId("");
+                gywlwDeviceMapper.updateByDeviceSnSelective(gywlwDevice1);
+                List<GywlwDevice> list = gywlwDeviceMapper.selectByAdminId(hostHolder.getGywlwUser().getUserId());
+                if (list.size()==0) {
+                    //如果该用户管理员下无设备，则将其设为受限用户；
+                    gywlwUser.setUserLevel(1);
+                    gywlwUserMapper.updateByPrimaryKeySelective(gywlwUser);
+                }
+                msg =  "解绑成功";
+            }
+            return msg;
+
+        } else {
+            //成为厂商用户
+            GywlwDevice gywlwDevice1 = new GywlwDevice();
+            GywlwUser gywlwUser = new GywlwUser();
+            gywlwUser.setUserId(hostHolder.getGywlwUser().getUserId());
+            gywlwDevice1.setDeviceSn(deviceSn);
+            if (mark == 0) {
+                if (!gywlwDevice.getFactoryId().equals("")) {
+                    return "该唯一标识码已被用户管理员绑定";
+                }
+                gywlwUser.setDuserLevel(0);
+                gywlwDevice1.setFactoryId(hostHolder.getGywlwUser().getUserId());
+                gywlwUserMapper.updateByPrimaryKeySelective(gywlwUser);
+                gywlwDeviceMapper.updateByDeviceSnSelective(gywlwDevice1);
+                msg =  "绑定成功";
+            }
+            if (mark == 1) {
+                if (gywlwDevice.getFactoryId().equals("")) {
+                    return "该唯一标识码未被绑定";
+                }
+                gywlwDevice1.setFactoryId("");
+                gywlwDeviceMapper.updateByDeviceSnSelective(gywlwDevice1);
+                List<GywlwDevice> list = gywlwDeviceMapper.selectByFactoryId(hostHolder.getGywlwUser().getUserId());
+                if (list.size()==0) {
+                    //如果该用户管理员下无设备，则将其设为受限用户；
+                    gywlwUser.setDuserLevel(1);
+                    gywlwUserMapper.updateByPrimaryKeySelective(gywlwUser);
+                }
+                msg =  "解绑成功";
+            }
+            return msg;
+            }
+        }
+
+    public String giveAdmin(String userPhone){
+        //限制只能转移权限给一个人，只一次
+        GywlwMessage msg = new GywlwMessage();
+        msg.setMessageType(Byte.parseByte("1"));
+        msg.setSendId(hostHolder.getGywlwUser().getUserId());
+        GywlwMessage message = gywlwMessageMapper.selectByUserIdAndMessageType(msg);
+        if(message != null){
+            return "您只能转移一次权限";
+        }
+
+
+        GywlwUser receive = gywlwUserMapper.selectByPhone(userPhone);
+        if(receive == null){
+            return "该手机用户不存在";
+        }
+        String receiveId = receive.getUserId();
+        String content = hostHolder.getGywlwUser().getUserName() + "向你转移系统管理员权限";
+        Byte messageType = 1;
+        messageService.sendMessage(hostHolder.getGywlwUser().getUserId(),receiveId,content,messageType);
+        return "转移权限消息发送成功";
+    }
+
 }
+

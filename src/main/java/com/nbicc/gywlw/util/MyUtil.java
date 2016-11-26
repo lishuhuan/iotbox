@@ -20,27 +20,27 @@ public class MyUtil {
     private static final Logger logger = LoggerFactory.getLogger(MyUtil.class);
     public static String getJSONString(int code) {
         JSONObject json = new JSONObject();
-        json.put("code", code);
+        json.put("result_code", code);
         return json.toJSONString();
     }
 
     public static String getJSONString(int code, String msg) {
         JSONObject json = new JSONObject();
-        json.put("code", code);
+        json.put("result_code", code);
         json.put("data", msg);
         return json.toJSONString();
     }
 
     public static String getJSONString(int code, Object o) {
         JSONObject json = new JSONObject();
-        json.put("code", code);
+        json.put("result_code", code);
         json.put("data", o);
         return json.toJSONString();
     }
 
     public static String getJSONString(int code, Map<String, Object> map) {
         JSONObject json = new JSONObject();
-        json.put("code", code);
+        json.put("result_code", code);
         for (Map.Entry<String, Object> entry : map.entrySet()) {
             json.put(entry.getKey(), entry.getValue());
         }
@@ -49,7 +49,7 @@ public class MyUtil {
 
     public static String getJSONString(int code, List list){
         Map<String, Object> map = new HashMap<>();
-        map.put("result code", 0);
+        map.put("result_code", 0);
         map.put("data", list);
         String returnString = JSON.toJSONString(map);
         System.out.println("输出项目列表： " + returnString);

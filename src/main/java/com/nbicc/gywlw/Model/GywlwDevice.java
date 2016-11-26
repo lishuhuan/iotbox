@@ -15,7 +15,7 @@ public class GywlwDevice {
 
     private String content;
 
-    private Byte online;
+    private Byte deviceOnline;
 
     private String deviceTypeId;
 
@@ -87,13 +87,7 @@ public class GywlwDevice {
         this.content = content == null ? null : content.trim();
     }
 
-    public Byte getOnline() {
-        return online;
-    }
 
-    public void setOnline(Byte online) {
-        this.online = online;
-    }
 
     public String getDeviceTypeId() {
         return deviceTypeId;

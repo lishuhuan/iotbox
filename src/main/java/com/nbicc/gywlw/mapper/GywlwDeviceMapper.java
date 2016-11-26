@@ -18,8 +18,15 @@ public interface GywlwDeviceMapper {
                                                @Param("deviceSn")String deviceSn);
     List<GywlwDevice> selectByUserIdAndDeviceSnWithAdmin(@Param("userId")String userId,
                                                    @Param("deviceSn")String deviceSn);
+    GywlwDevice selectByDeviceSn(String deviceSn);
+
+    List<GywlwDevice> selectByAdminId(String adminId);
+
+    List<GywlwDevice> selectByFactoryId(String factoryId);
 
     GywlwDevice selectByDeviceId(String deviceId);
+
+    int updateByDeviceSnSelective(GywlwDevice gywlwDevice);
 
     int updateByPrimaryKeySelective(GywlwDevice gywlwDevice);
 

@@ -294,6 +294,44 @@ public class UserController {
 
 
     //绑定设备
+    @RequestMapping(path = {"/user/binddevice"}, method = {RequestMethod.POST})
+    @ResponseBody
+    public String bindDevvice(@RequestParam("device_sn")String deviceSn){
+        try{
+            String msg = projectService.bindDevice(deviceSn,0);//mark=0为绑定设备
+            return MyUtil.getJSONString(0,msg);
+        }catch (Exception e){
+            logger.error("绑定设备出错" + e.getMessage());
+            return MyUtil.getJSONString(1, "绑定设备出错!");
+        }
+
+    }
+
+    //解绑设备
+    @RequestMapping(path = {"/user/unbinddevice"}, method = {RequestMethod.POST})
+    @ResponseBody
+    public String unbindDevvice(@RequestParam("device_sn")String deviceSn){
+        try{
+            String msg = projectService.bindDevice(deviceSn,1);//mark=1为解绑设备
+            return MyUtil.getJSONString(0,msg);
+        }catch (Exception e){
+            logger.error("解绑设备出错" + e.getMessage());
+            return MyUtil.getJSONString(1, "解绑设备出错!");
+        }
+
+    }
+
+    @RequestMapping(path = {"/user/giveadmin"}, method = {RequestMethod.POST})
+    @ResponseBody
+    public String giveAdmin(@RequestParam("user_phone")String userPhone){
+        try {
+            String msg = projectService.giveAdmin(userPhone);
+            return MyUtil.getJSONString(0, msg);
+        }catch (Exception e){
+            logger.error("转移管理员权限出错" + e.getMessage());
+            return MyUtil.getJSONString(1, "转移管理员权限出错!");
+        }
+    }
 
 
 

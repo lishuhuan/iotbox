@@ -52,10 +52,10 @@ public class LoginController {
     @ResponseBody
     public String login(@RequestParam(value = "phone") String phone,
                         @RequestParam(value = "password") String password,
-                        @RequestParam(value = "user_type", defaultValue = "1")int userType,
+                        @RequestParam(value = "user_type", defaultValue = "1")String userType,
                         HttpServletResponse response) {
         try {
-            Map<String, Object> map = userService.login(phone, password);
+            Map<String, Object> map = userService.login(phone, password,Byte.parseByte(userType));
             if( map.containsKey("ticket")) {
                 Cookie cookie = new Cookie("ticket", map.get("ticket").toString());
                 cookie.setPath("/");

@@ -11,6 +11,15 @@ public class LoginTicket {
     private Date expired;
     private Integer status;//0有效，1无效；
     private String ticket;
+    private Byte userType;
+
+    public Byte getUserType() {
+        return userType;
+    }
+
+    public void setUserType(Byte userType) {
+        this.userType = userType;
+    }
 
     public String getTicket() {
         return ticket;
