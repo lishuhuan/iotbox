@@ -24,4 +24,10 @@ public interface GywlwHistoryItemMapper {
     int updateByPrimaryKeySelective(GywlwHistoryItem record);
 
     int updateByPrimaryKey(GywlwHistoryItem record);
+    
+    public List<GywlwHistoryItem> getHistoryData(@Param("deviceId") String deviceId);
+    
+    public GywlwHistoryItem getAlarmDetail(@Param("itemId") String itemId);
+    
+    public List<GywlwHistoryItem> getDeviceAlarmlist(@Param("startTime") String startTime,@Param("endTime") String endTime,@Param("deviceId") String deviceId);
 }

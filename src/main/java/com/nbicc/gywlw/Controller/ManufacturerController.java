@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.nbicc.gywlw.Model.GywlwDevice;
+import com.nbicc.gywlw.Model.GywlwHistoryItem;
 import com.nbicc.gywlw.Model.GywlwUser;
 import com.nbicc.gywlw.Model.HostHolder;
 import com.nbicc.gywlw.Service.ManufacturerService;
-import com.nbicc.gywlw.util.MyUtil;
 import com.nbicc.gywlw.util.ResponseCode;
 
 import net.sf.json.JSONObject;
@@ -60,13 +60,39 @@ public class ManufacturerController {
 	
 	@RequestMapping(path = { "/factory/deviceDatalist" }, method = { RequestMethod.POST })
 	@ResponseBody
-	public JSONObject deviceDatalist(@RequestParam(value = "adminId") String adminId) {
+	public JSONObject deviceDatalist(@RequestParam(value = "deviceId") String deviceId) {
 		try{
-            List<GywlwDevice> list = manufacturerService.searchDevice(adminId);
+            List<GywlwHistoryItem> list = manufacturerService.getHistoryData(deviceId);
             return ResponseCode.response(0, list);
         }catch (Exception e){
-            logger.error("搜索设备失败" + e.getMessage());
-            return ResponseCode.response(1, "搜索设备失败");
+            logger.error("获取数据失败" + e.getMessage());
+            return ResponseCode.response(1, "获取数据失败");
+        }
+	}
+	
+	@RequestMapping(path = { "/factory/deviceAlarmlist" }, method = { RequestMethod.POST })
+	@ResponseBody
+	public JSONObject deviceAlarmlist(@RequestParam(value = "startTime") String startTime,
+									  @RequestParam(value = "endTime") String endTime,
+									  @RequestParam(value = "deviceId") String deviceId) {
+		try{
+            List<GywlwHistoryItem> list = manufacturerService.getDeviceAlarmlist(startTime,endTime,deviceId);
+            return ResponseCode.response(0, list);
+        }catch (Exception e){
+            logger.error("获取告警失败" + e.getMessage());
+            return ResponseCode.response(1, "获取告警失败");
+        }
+	}
+	
+	@RequestMapping(path = { "/factory/AlarmDetail" }, method = { RequestMethod.POST })
+	@ResponseBody
+	public JSONObject AlarmDetail(@RequestParam(value = "itemId") String deviceId) {
+		try{
+            GywlwHistoryItem item= manufacturerService.getAlarmDetail(deviceId);
+            return ResponseCode.response(0, item);
+        }catch (Exception e){
+            logger.error("获取告警详情失败" + e.getMessage());
+            return ResponseCode.response(1, "获取告警详情失败");
         }
 	}
 	

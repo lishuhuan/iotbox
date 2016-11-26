@@ -228,4 +228,20 @@
       del_mark = #{delMark,jdbcType=TINYINT}
     where item_id = #{itemId,jdbcType=INTEGER}
   </update>
+  
+   <select id="getHistoryData" resultMap="BaseResultMap1" >
+   		SELECT * from gywlw_history_item where device_id=#{deviceId}
+  </select>
+  
+  <select id="getDeviceAlarmlist" resultMap="BaseResultMap" >
+   		SELECT item_id,device_name,item_name,item_alias,item_type,item_value,item_time,variable_name from gywlw_history_item where device_id=#{deviceId} and item_type=0
+   		<if test="startTime != null and endTime !=null and startTime != '' and endTime !=''">
+   			and item_time between #{startTime} and #{endTime}
+   		</if>
+  </select>
+  
+  <select id="getAlarmDetail" resultMap="BaseResultMap1" >
+   		SELECT * from gywlw_history_item where item_id=#{itemId}
+  </select>
+  
 </mapper>
