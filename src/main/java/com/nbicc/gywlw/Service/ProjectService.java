@@ -33,6 +33,8 @@ public class ProjectService {
     private MessageService messageService;
     @Autowired
     private GywlwMessageMapper gywlwMessageMapper;
+    @Autowired
+    private GywlwVariableMapper gywlwVariableMapper;
 
     public List<GywlwProject> projectList(String gywlwUserId, int offset, int limit, Byte projectStatus) {
         return gywlwProjectMapper.selectByGywlwUserId(gywlwUserId, offset, limit, projectStatus);
@@ -112,6 +114,9 @@ public class ProjectService {
 
     public List<GywlwVariableRegGroup> searchDataInProject(String projectId, String variableName) {
         return gywlwVariableRegGroupMapper.selectByProjectIdAndVariableName(projectId, variableName);
+    }
+    public List<GywlwVariable> variableList(String projectId){
+        return gywlwVariableMapper.selectByProjectId(projectId);
     }
 
     public List<GywlwHistoryItem> searchHistoryData(String projectId, String variableName) {

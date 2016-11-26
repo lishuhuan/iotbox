@@ -321,6 +321,7 @@ public class UserController {
 
     }
 
+    //转移管理员权限
     @RequestMapping(path = {"/user/giveadmin"}, method = {RequestMethod.POST})
     @ResponseBody
     public String giveAdmin(@RequestParam("user_phone")String userPhone){
@@ -330,6 +331,19 @@ public class UserController {
         }catch (Exception e){
             logger.error("转移管理员权限出错" + e.getMessage());
             return MyUtil.getJSONString(1, "转移管理员权限出错!");
+        }
+    }
+
+    //变量组列表
+    @RequestMapping(path = {"/user/variablelist"}, method = {RequestMethod.GET})
+    @ResponseBody
+    public String variableList(@RequestParam("project_id") String projectId){
+        try{
+            List<GywlwVariable> list = projectService.variableList(projectId);
+            return MyUtil.getJSONString(0,list);
+        }catch (Exception e){
+            logger.error("获取变量组列表失败" + e.getMessage());
+            return MyUtil.getJSONString(1, "获取变量组列表失败!");
         }
     }
 
