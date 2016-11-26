@@ -7,6 +7,10 @@ public class GywlwHistoryItem {
 
     private String regId;
 
+    private String plcId;
+
+    private String plcName;
+
     private String deviceId;
 
     private String projectId;
@@ -37,6 +41,14 @@ public class GywlwHistoryItem {
     private String ruleName;
     private String operator;
     private Double operand;
+
+    public String getPlcId() {
+        return plcId;
+    }
+
+    public void setPlcId(String plcId) {
+        this.plcId = plcId;
+    }
 
     public String getRuleName() {
         return ruleName;
