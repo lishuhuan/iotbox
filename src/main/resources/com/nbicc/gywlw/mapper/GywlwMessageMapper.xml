@@ -19,6 +19,12 @@
     from gywlw_message
     where send_id = #{userId,jdbcType=VARCHAR} OR receive_id = #{userId,jdbcType=VARCHAR};
   </select>
+  <select id="selectByMessageId" resultMap="BaseResultMap" parameterType="java.lang.String">
+    select
+    <include refid="Base_Column_List" />
+    from gywlw_message
+    where message_id = #{messageId,jdbcType=VARCHAR};
+  </select>
   <select id="selectByUserIdAndMessageType" resultMap="BaseResultMap" parameterType="com.nbicc.gywlw.Model.GywlwMessage">
     select
     <include refid="Base_Column_List" />

@@ -148,6 +148,8 @@ public class ProjectService {
         gywlwDevice.setExpired(expiredDate);
         gywlwDevice.setExpiredRight(expiredRight);
         gywlwDeviceMapper.updateByPrimaryKeySelective(gywlwDevice);
+        messageService.sendMessage(hostHolder.getGywlwUser().getUserId(),
+                gywlwDeviceMapper.selectByDeviceId(deviceId).getFactoryId(),"用户向您分配设备权限",Byte.parseByte("0"));
     }
 
     public GywlwDevice getDevice(String deviceId) {

@@ -41,6 +41,12 @@
     from gywlw_project
     where project_id = #{gywlwProjectId,jdbcType=VARCHAR} and del_mark = 0
   </select>
+  <select id="selectByGywlwUserId1" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from gywlw_project
+    where admin_id = #{gywlwUserId,jdbcType=VARCHAR};
+  </select>
   <delete id="deleteByProjectId" parameterType="java.lang.String" >
     delete from gywlw_project
     where project_id = #{gywlwProjectId},jdbcType=VARCHAR}
