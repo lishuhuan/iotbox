@@ -14,6 +14,8 @@ public interface GywlwMessageMapper {
 
     List<GywlwMessage> selectByUserId(String userId);
 
+    GywlwMessage selectByMessageId(String messageId);
+
     GywlwMessage selectByUserIdAndMessageType(GywlwMessage msg);
 
     int updateByPrimaryKeySelective(GywlwMessage record);

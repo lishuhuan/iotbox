@@ -26,6 +26,12 @@
     from gywlw_project_user_group
     where project_id = #{projectId,jdbcType=VARCHAR} and del_mark = 0 And user_id = #{userId,jdbcType=VARCHAR}
   </select>
+  <select id="selectByUserId" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from gywlw_project_user_group
+    where user_id = #{userId,jdbcType=VARCHAR};
+  </select>
   <delete id="deleteByProjectIdAndUserId" parameterType="java.lang.String" >
     delete from gywlw_project_user_group
     where project_id = #{projectId,jdbcType=VARCHAR} AND user_id = #{userId,jdbcType=VARCHAR}

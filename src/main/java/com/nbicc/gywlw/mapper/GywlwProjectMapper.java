@@ -20,6 +20,8 @@ public interface GywlwProjectMapper {
     List<GywlwProject> selectByGywlwUserId(@Param("gywlwUserId") String gywlwUserId, @Param("offset") int offset,
                                            @Param("limit") int limit, @Param("projectStatus") Byte projectStatus);
 
+    List<GywlwProject> selectByGywlwUserId1(String gywlwUserId);
+
     int updateByPrimaryKeySelective(GywlwProject record);
 
     int updateByProjectId(GywlwProject record);

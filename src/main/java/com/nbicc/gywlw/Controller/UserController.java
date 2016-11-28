@@ -347,6 +347,59 @@ public class UserController {
         }
     }
 
+    //plc列表
+    @RequestMapping(path = {"/user/plclist"}, method = {RequestMethod.GET})
+    @ResponseBody
+    public String plcList(@RequestParam("device_id") String deviceId){
+        try{
+            List<GywlwPlcInfo> list = projectService.getPlcListByDeviceId(deviceId);
+            return MyUtil.getJSONString(0,list);
+        }catch (Exception e){
+            logger.error("获取plc列表失败" + e.getMessage());
+            return MyUtil.getJSONString(1, "获取plc列表失败!");
+        }
+    }
+
+    //数据项列表
+    @RequestMapping(path = {"/user/reglist"}, method = {RequestMethod.GET})
+    @ResponseBody
+    public String regList(@RequestParam("plc_id") String plcId){
+        try{
+            List<GywlwRegInfo> list = projectService.getRegListByPlcId(plcId);
+            return MyUtil.getJSONString(0,list);
+        }catch (Exception e){
+            logger.error("获取数据项列表失败" + e.getMessage());
+            return MyUtil.getJSONString(1, "获取数据项列表失败!");
+        }
+    }
+
+    @RequestMapping(path = {"/user/bindvariableandreg"}, method = {RequestMethod.POST})
+    @ResponseBody
+    public String bindVariableAndReg(@RequestParam("variable_id")String variableId,
+                                     @RequestParam("reg_id")String regId,
+                                     @RequestParam("device_id")String deviceId,
+                                     @RequestParam("project_id")String projectId){
+        try{
+            projectService.bindRegAndVariable(variableId,regId,deviceId,projectId);
+            return MyUtil.getJSONString(0,"绑定成功");
+        }catch (Exception e){
+            logger.error("绑定失败（variableandreg）" + e.getMessage());
+            return MyUtil.getJSONString(1, "绑定失败!");
+        }
+    }
+
+    @RequestMapping(path = {"/user/unbindvariableandreg"}, method = {RequestMethod.POST})
+    @ResponseBody
+    public String unbindVariableAndReg(@RequestParam("id")String id){
+        try{
+            projectService.unbindRegAndVariable(id);
+            return MyUtil.getJSONString(0,"解绑成功");
+        }catch (Exception e){
+            logger.error("解绑失败（variableandreg）" + e.getMessage());
+            return MyUtil.getJSONString(1, "解绑失败!");
+        }
+    }
+
 
 
 

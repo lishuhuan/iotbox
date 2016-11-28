@@ -21,6 +21,8 @@ public interface GywlwProjectUserGroupMapper {
     GywlwProjectUserGroup selectByProjectIdAndUserId(@Param("projectId") String projectId,
                                                      @Param("userId") String userId);
 
+    List<GywlwProjectUserGroup> selectByUserId(String userId);
+
     int updateByPrimaryKeySelective(GywlwProjectUserGroup record);
 
     int updateByPrimaryKey(GywlwProjectUserGroup record);
