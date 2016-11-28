@@ -3,56 +3,53 @@ package com.nbicc.gywlw.Model;
 import java.util.Date;
 
 public class GywlwUserAdminGroup {
+    private String id;
 
-	private String id;
-	
-	private String adminId;
-	
-	private String userId;
-	
-	private Date createTime;
-	
-	private int delMark;
+    private String adminId;
 
-	public String getId() {
-		return id;
-	}
+    private String userId;
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    private Date createTime;
 
-	public String getAdminId() {
-		return adminId;
-	}
+    private Integer delMark;
 
-	public void setAdminId(String adminId) {
-		this.adminId = adminId;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public String getUserId() {
-		return userId;
-	}
+    public void setId(String id) {
+        this.id = id == null ? null : id.trim();
+    }
 
-	public void setUserId(String userId) {
-		this.userId = userId;
-	}
+    public String getAdminId() {
+        return adminId;
+    }
 
-	public Date getCreateTime() {
-		return createTime;
-	}
+    public void setAdminId(String adminId) {
+        this.adminId = adminId == null ? null : adminId.trim();
+    }
 
-	public void setCreateTime(Date createTime) {
-		this.createTime = createTime;
-	}
+    public String getUserId() {
+        return userId;
+    }
 
-	public int getDelMark() {
-		return delMark;
-	}
+    public void setUserId(String userId) {
+        this.userId = userId == null ? null : userId.trim();
+    }
 
-	public void setDelMark(int delMark) {
-		this.delMark = delMark;
-	}
-	
-	
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public Integer getDelMark() {
+        return delMark;
+    }
+
+    public void setDelMark(Integer delMark) {
+        this.delMark = delMark;
+    }
 }

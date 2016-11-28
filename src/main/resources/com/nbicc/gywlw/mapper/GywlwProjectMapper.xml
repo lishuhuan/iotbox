@@ -278,7 +278,7 @@
   </update>
   <update id="stopByProjectId" parameterType="java.lang.String" >
     update gywlw_project
-    set del_mark = 1
+    set del_mark = #{projectStatus,jdbcType=VARCHAR}
     where project_id = #{gywlwProjectId,jdbcType=VARCHAR}
   </update>
 </mapper>

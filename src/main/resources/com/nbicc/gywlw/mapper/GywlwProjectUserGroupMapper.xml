@@ -7,16 +7,47 @@
     <result column="user_id" property="userId" jdbcType="VARCHAR" />
     <result column="write_permission" property="writePermission" jdbcType="TINYINT" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
-
+  </resultMap>
+  <resultMap id="BaseResultMap0" type="com.nbicc.gywlw.Model.GywlwProjectUserGroup" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="project_id" property="projectId" jdbcType="VARCHAR" />
+    <result column="user_id" property="userId" jdbcType="VARCHAR" />
+    <result column="write_permission" property="writePermission" jdbcType="TINYINT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="user_phone" property="userPhone" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="BaseResultMap1" type="com.nbicc.gywlw.Model.GywlwProject" >
+    <id column="project_id" property="projectId" jdbcType="VARCHAR" />
+    <result column="project_name" property="projectName" jdbcType="VARCHAR" />
+    <result column="admin_id" property="adminId" jdbcType="VARCHAR" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="longitude" property="longitude" jdbcType="VARCHAR" />
+    <result column="latitude" property="latitude" jdbcType="VARCHAR" />
+    <result column="parent_text" property="parentText" jdbcType="VARCHAR" />
+    <result column="province" property="province" jdbcType="VARCHAR" />
+    <result column="city" property="city" jdbcType="VARCHAR" />
+    <result column="purchase_date" property="purchaseDate" jdbcType="VARCHAR" />
+    <result column="completion_date" property="completionDate" jdbcType="VARCHAR" />
+    <result column="install_date" property="installDate" jdbcType="VARCHAR" />
+    <result column="contact_name" property="contactName" jdbcType="VARCHAR" />
+    <result column="contact_phone" property="contactPhone" jdbcType="VARCHAR" />
+    <result column="customer_type" property="customerType" jdbcType="VARCHAR" />
+    <result column="firstparty" property="firstparty" jdbcType="VARCHAR" />
+    <result column="project_type" property="projectType" jdbcType="VARCHAR" />
+    <result column="project_desc" property="projectDesc" jdbcType="VARCHAR" />
+    <result column="write_permission" property="writePermission" jdbcType="TINYINT" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, project_id, user_id, write_permission, create_time
   </sql>
   <select id="selectByProjectId" resultMap="BaseResultMap" parameterType="com.nbicc.gywlw.Model.GywlwProjectUserGroup" >
   select
-  <include refid="Base_Column_List" />
-  from gywlw_project_user_group
-  where project_id = #{projectId,jdbcType=VARCHAR} and del_mark = 0
+  a.id, a.project_id, a.user_id, a.write_permission, a.create_time,b.user_phone
+  from gywlw_project_user_group a
+  LEFT JOIN gywlw_user b
+  ON a.user_id=b.user_id
+  where a.project_id = #{projectId,jdbcType=VARCHAR} and a.del_mark = 0
   ORDER BY create_time DESC
   LIMIT #{offset},#{limit}
 </select>
@@ -31,6 +62,16 @@
     <include refid="Base_Column_List" />
     from gywlw_project_user_group
     where user_id = #{userId,jdbcType=VARCHAR};
+  </select>
+  <select id="selectProjectByUserId" resultMap="BaseResultMap1" parameterType="java.lang.String" >
+    select
+    b.project_id, b.project_name, b.admin_id, b.content, b.create_time, b.longitude, b.latitude, b.parent_text,
+    b.province, city, b.purchase_date, b.completion_date, b.install_date, b.contact_name, b.contact_phone,
+    b.customer_type, b.firstparty, b.project_type, b.project_desc, a.write_permission
+    from gywlw_project_user_group a
+    LEFT JOIN gywlw_project b
+    ON a.project_id=b.project_id
+    where a.user_id = #{userId,jdbcType=VARCHAR};
   </select>
   <delete id="deleteByProjectIdAndUserId" parameterType="java.lang.String" >
     delete from gywlw_project_user_group
@@ -116,5 +157,9 @@
       create_time = #{createTime,jdbcType=TIMESTAMP},
       del_mark = #{delMark,jdbcType=TINYINT}
     where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="deleteByAddId" parameterType="java.lang.String" >
+    delete from gywlw_project_user_group
+    where user_id = #{addId,jdbcType=VARCHAR}
   </update>
 </mapper>

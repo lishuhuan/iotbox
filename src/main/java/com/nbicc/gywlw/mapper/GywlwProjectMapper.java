@@ -9,7 +9,8 @@ import java.util.List;
 public interface GywlwProjectMapper {
     int deleteByProjectId(String gywlwProjectId);
 
-    int stopByProjectId(String gywlwProjectId);
+    int stopByProjectId(@Param("gywlwProjectId") String gywlwProjectId,
+                        @Param("projectStatus")String projectStatus);
 
     int addProject(GywlwProject gywlwProject);
 

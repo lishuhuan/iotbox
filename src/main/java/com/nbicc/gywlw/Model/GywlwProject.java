@@ -41,7 +41,17 @@ public class GywlwProject {
 
     private String projectDesc;
 
+    private Byte writePermission;
+
     private Byte delMark;
+
+    public Byte getWritePermission() {
+        return writePermission;
+    }
+
+    public void setWritePermission(Byte writePermission) {
+        this.writePermission = writePermission;
+    }
 
     public String getProjectId() {
         return projectId;

@@ -105,7 +105,7 @@ public class UserService {
         ticket.setUserId(userId);
         ticket.setUserType(userType);
         Date date = new Date();
-        date.setTime(date.getTime() + 1000*3600*24);
+        date.setTime(date.getTime() + 1000*3600*24*30);
         ticket.setExpired(date);
         ticket.setStatus(0);
         ticket.setTicket(UUID.randomUUID().toString().replaceAll("-", ""));

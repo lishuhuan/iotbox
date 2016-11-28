@@ -41,9 +41,27 @@ public class ProjectService {
     private GywlwRegInfoMapper gywlwRegInfoMapper;
 
     public List<GywlwProject> projectList(String gywlwUserId, int offset, int limit, Byte projectStatus) {
-        return gywlwProjectMapper.selectByGywlwUserId(gywlwUserId, offset, limit, projectStatus);
+        List<GywlwProject> list = gywlwProjectMapper.selectByGywlwUserId(gywlwUserId, offset, limit, projectStatus);
+        System.out.println(gywlwUserId);
+        if(list.size()==0){
+            list = gywlwProjectUserGroupMapper.selectProjectByUserId(gywlwUserId);
+        }
+        for(GywlwProject project : list){
+            project.setWritePermission(Byte.parseByte("0"));
+            if(project.getAdminId().equals(gywlwUserId)){
+                project.setWritePermission(Byte.parseByte("1"));
+            }
+            GywlwProjectUserGroup gywlwProjectUserGroup = gywlwProjectUserGroupMapper.selectByProjectIdAndUserId(project.getProjectId(),gywlwUserId);
+            if(gywlwProjectUserGroup != null){
+                project.setWritePermission(gywlwProjectUserGroup.getWritePermission());
+            }
+        }
+        return list;
     }
 
+    public GywlwProject projectInfo(String projectId){
+        return gywlwProjectMapper.selectByGywlwProjectId(projectId);
+    }
     public String editProject(String projectId, String projectName, String parentText, String projectDesc,
                               String longitude, String latitude, String province, String city, String purchaseDate,
                               String completionDate, String installDate, String contactName, String contactPhone,
@@ -80,16 +98,12 @@ public class ProjectService {
         return gywlwProject.getProjectId();
     }
 
-    public void stopProject(String gywlwProjectId) {
-        gywlwProjectMapper.stopByProjectId(gywlwProjectId);
+    public void stopProject(String gywlwProjectId,String projectStatus) {
+        gywlwProjectMapper.stopByProjectId(gywlwProjectId,projectStatus);
     }
 
     public List<GywlwProjectUserGroup> projectMemberList(String projectId, int offset, int limit) {
         List<GywlwProjectUserGroup> list = gywlwProjectUserGroupMapper.selectByProjectId(projectId, offset, limit);
-
-        for (GywlwProjectUserGroup group : list) {
-            group.setUserName(gywlwUserMapper.selectByPrimaryKey(group.getUserId()).getUserName());
-        }
         return list;
 
     }

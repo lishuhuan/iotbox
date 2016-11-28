@@ -277,6 +277,17 @@
       del_mark = #{delMark,jdbcType=TINYINT}
     where device_id = #{deviceId,jdbcType=VARCHAR}
   </update>
+  <update id="updateByAddIdAndQuitId" parameterType="java.lang.String" >
+    update gywlw_device
+    <if test="mark == '0'">
+    set admin_id = #{addId,jdbcType=VARCHAR}
+    where admin_id = #{quitId,jdbcType=VARCHAR}
+    </if>
+    <if test="mark == '1'">
+      set factory_id = #{addId,jdbcType=VARCHAR}
+      where factory_id = #{quitId,jdbcType=VARCHAR}
+    </if>
+  </update>
   
   <select id="searchDeviceByFactory" resultMap="BaseResultMap" parameterType="java.lang.String" >
   	 select * from gywlw_device  where admin_id=#{adminId}

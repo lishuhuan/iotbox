@@ -1,5 +1,6 @@
 package com.nbicc.gywlw.mapper;
 
+import com.nbicc.gywlw.Model.GywlwProject;
 import com.nbicc.gywlw.Model.GywlwProjectUserGroup;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -17,6 +18,7 @@ public interface GywlwProjectUserGroupMapper {
     List<GywlwProjectUserGroup> selectByProjectId(@Param("projectId") String projectId,
                                                   @Param("offset") int offset,
                                                   @Param("limit") int limit);
+    List<GywlwProject> selectProjectByUserId(String userId);
 
     GywlwProjectUserGroup selectByProjectIdAndUserId(@Param("projectId") String projectId,
                                                      @Param("userId") String userId);
@@ -26,4 +28,6 @@ public interface GywlwProjectUserGroupMapper {
     int updateByPrimaryKeySelective(GywlwProjectUserGroup record);
 
     int updateByPrimaryKey(GywlwProjectUserGroup record);
+
+    int deleteByaddId(@Param("addId")String addId);
 }

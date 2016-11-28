@@ -75,6 +75,19 @@ public class UserController {
         }
     }
 
+    @RequestMapping(path = {"/user/projectinfo"}, method = {RequestMethod.GET})
+    @ResponseBody
+    public String projectInfo(@RequestParam(value = "project_id")String projectId) {
+        try {
+            GywlwProject gywlwProject = projectService.projectInfo(projectId);
+            return MyUtil.getJSONString(0,gywlwProject);
+        }catch (Exception e){
+            logger.error("获取项目列表失败" + e.getMessage());
+            return MyUtil.getJSONString(1, "获取项目列表失败");
+        }
+    }
+
+
     //编辑项目
     @RequestMapping(path = {"/user/editproject"}, method = {RequestMethod.POST})
     @ResponseBody
@@ -108,12 +121,18 @@ public class UserController {
         }
     }
 
-    //停用项目
+    //停用和启用项目
     @RequestMapping(path = {"/user/stopproject"}, method = {RequestMethod.POST})
     @ResponseBody
-    public String stopProject(@RequestParam("project_id") String projectId){
-        projectService.stopProject(projectId);
-        return MyUtil.getJSONString(0,"停用成功！");
+    public String stopProject(@RequestParam("project_id") String projectId,
+                              @RequestParam("project_status")String projectStatus){
+        try {
+            projectService.stopProject(projectId, projectStatus);
+            return MyUtil.getJSONString(0, "停用/启用成功！");
+        }catch (Exception e){
+            logger.error("停用启用失败" + e.getMessage());
+            return MyUtil.getJSONString(1, "停用启用失败");
+        }
     }
 
 

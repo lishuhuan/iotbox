@@ -59,7 +59,7 @@ public class LoginController {
             if( map.containsKey("ticket")) {
                 Cookie cookie = new Cookie("ticket", map.get("ticket").toString());
                 cookie.setPath("/");
-                cookie.setMaxAge(3600*24*5);
+                cookie.setMaxAge(3600*24*30);
                 response.addCookie(cookie);
                 return MyUtil.getJSONString(0, "成功");
             } else {

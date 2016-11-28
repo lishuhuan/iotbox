@@ -22,6 +22,9 @@ public class MessageService {
     private GywlwDeviceMapper gywlwDeviceMapper;
     @Autowired
     private GywlwProjectMapper gywlwProjectMapper;
+
+    @Autowired
+    private GywlwUserAdminGroupMapper gywlwUserAdminGroupMapper;
     @Autowired
     private GywlwProjectUserGroupMapper gywlwProjectUserGroupMapper;
 
@@ -74,21 +77,14 @@ public class MessageService {
         gywlwUserMapper.updateByPrimaryKeySelective(gywlwUser);
 
         //device table
-        List<GywlwDevice> list = gywlwDeviceMapper.selectByAdminId(quitId);
-        if(list != null) {
-            for (GywlwDevice device : list) {
-                GywlwDevice gywlwDevice = new GywlwDevice();
-                gywlwDevice.setDeviceId(device.getDeviceId());
-                gywlwDevice.setAdminId(addId);
-                gywlwDeviceMapper.updateByPrimaryKeySelective(gywlwDevice);
-            }
-        }
+        gywlwDeviceMapper.updateByaddIdAndQuitId(addId,quitId,"0");
 
         //user_admin_group
+        gywlwUserAdminGroupMapper.updateByaddIdAndQuitId(addId,quitId,"0");
 
         //project table
         List<GywlwProject> list1 = gywlwProjectMapper.selectByGywlwUserId1(quitId);
-        if(list != null) {
+        if(list1 != null) {
             for (GywlwProject project : list1) {
                 GywlwProject gywlw = new GywlwProject();
                 gywlw.setProjectId(project.getProjectId());
@@ -98,15 +94,7 @@ public class MessageService {
         }
 
         //project_user_group
-        List<GywlwProjectUserGroup> list2 = gywlwProjectUserGroupMapper.selectByUserId(quitId);
-        if(list != null){
-            for(GywlwProjectUserGroup group : list2){
-                GywlwProjectUserGroup gywlw = new GywlwProjectUserGroup();
-                gywlw.setId(group.getId());
-                gywlw.setUserId(addId);
-                gywlwProjectUserGroupMapper.updateByPrimaryKeySelective(gywlw);
-            }
-        }
+        gywlwProjectUserGroupMapper.deleteByaddId(addId);
 
     }
     public void changeFactoryAdmin(GywlwMessage gywlwMessage1){
@@ -122,17 +110,9 @@ public class MessageService {
         gywlwUserMapper.updateByPrimaryKeySelective(gywlwUser);
 
         //device table
-        List<GywlwDevice> list = gywlwDeviceMapper.selectByAdminId(quitId);
-        if(list != null) {
-            for (GywlwDevice device : list) {
-                GywlwDevice gywlwDevice = new GywlwDevice();
-                gywlwDevice.setDeviceId(device.getDeviceId());
-                gywlwDevice.setFactoryId(addId);
-                gywlwDeviceMapper.updateByPrimaryKeySelective(gywlwDevice);
-            }
-        }
+        gywlwDeviceMapper.updateByaddIdAndQuitId(addId,quitId,"1");
         //user_admin_group
-
+        gywlwUserAdminGroupMapper.updateByaddIdAndQuitId(addId,quitId,"1");
 
     }
 
