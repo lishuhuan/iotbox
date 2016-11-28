@@ -1,6 +1,7 @@
 package com.nbicc.gywlw.mapper;
 
 import com.nbicc.gywlw.Model.GywlwUser;
+import com.nbicc.gywlw.Model.GywlwUserAdminGroup;
 
 import java.util.List;
 
@@ -26,6 +27,13 @@ public interface GywlwUserMapper {
     GywlwUser selectByPhoneWithPsd(String phone);
 
     List<GywlwUser> searchUserByFactoy(@Param("factoryId") String factoryId,@Param("level") int level,@Param("name") String name);
+    
+    List<GywlwUser> getFactoryLimitUser(@Param("name") String name,@Param("id") String id);
+    
+    void addFactoryLimitUserDistribution(GywlwUserAdminGroup gywlwUserAdminGroup);
+    
+    void deleteFactoryLimitUserDistribution(@Param("factoryId") String factoryId,@Param("userId") String userId);
+    
     
 
 }

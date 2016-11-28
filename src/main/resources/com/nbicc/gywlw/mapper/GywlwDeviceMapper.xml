@@ -281,4 +281,18 @@
   <select id="searchDeviceByFactory" resultMap="BaseResultMap" parameterType="java.lang.String" >
   	 select * from gywlw_device  where admin_id=#{adminId}
   </select>
+  
+  <select id="getFactoryDevicelist" resultMap="BaseResultMap" parameterType="java.lang.String" >
+  	 select a.* from gywlw_device a
+  	 <if test="level == 0">
+  	 	where a.factory_id=#{factoryId}
+  	 </if>
+  	 <if test="level == 1">
+  	 	LEFT JOIN gywlw_user_admin_group b on b.admin_id=a.admin_id
+  	 	where b.user_id=#{factoryId}
+  	 </if>
+  	 <if test="deviceSn != null and deviceSn !=''">
+  	 	and a.device_sn like CONCAT('%','${deviceSn}','%')
+  	 </if>
+  </select>
 </mapper>
