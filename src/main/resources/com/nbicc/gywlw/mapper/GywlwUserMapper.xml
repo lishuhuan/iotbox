@@ -251,16 +251,39 @@
 		parameterType="java.lang.String">
 		select a.* from gywlw_user a
 		<if test="level == 0">
-			where a.parent_id=#{factoryId}
+			LEFT JOIN gywlw_device b on b.admin_id=a.user_id
+			where b.factory_id=#{factoryId}
 		</if>
 		<if test="level == 1">
-			LEFT JOIN gywlw_device b on b.admin_id=a.user_id
-			LEFT JOIN gywlw_device_admin_group c on c.device_id=b.device_id
-			where c.user_id=#{factoryId} AND c.del_mark = 0
+			LEFT JOIN gywlw_user_admin_group b on b.admin_id=a.user_id
+			where b.user_id=#{factoryId} AND b.del_mark = 0
 		</if>
 		<if test="name != null and name !=''">
 		 	and a.user_name like CONCAT('%','${name}','%')
 		</if>
 	</select>
+	
+	<select id="getFactoryLimitUser" resultMap="BaseResultMap"
+		parameterType="java.lang.String">
+		select * from gywlw_user where parent_id=#{id}
+		<if test="name != null and name !=''">
+		 	and user_name like CONCAT('%','${name}','%')
+		</if>
+	</select>
+	
+	<insert id="addFactoryLimitUserDistribution">
+		insert into gywlw_user_admin_group
+		(id, admin_id, user_id,
+		create_time, del_mark)
+		values (#{id,jdbcType=VARCHAR},
+		#{adminId,jdbcType=VARCHAR},
+		#{userId,jdbcType=VARCHAR},
+	    #{createTime,jdbcType=TIMESTAMP},
+		#{delMark,jdbcType=INTEGER})
+	</insert>
+	
+	<delete id="deleteFactoryLimitUserDistribution">
+		delete from gywlw_user_admin_group where admin_id=#{userId} and user_id=#{factoryId}
+	</delete>
 
 </mapper>

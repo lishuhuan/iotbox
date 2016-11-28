@@ -36,4 +36,6 @@ public interface GywlwDeviceMapper {
     
     public List<GywlwDevice> searchDeviceByFactory(String adminId);
     
+    public List<GywlwDevice> getFactoryDevicelist(@Param("factoryId") String factoryId, @Param("deviceSn") String deviceSn,@Param("level") int level);
+    
 }

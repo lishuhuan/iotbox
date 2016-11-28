@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.alibaba.fastjson.JSONObject;
 import com.nbicc.gywlw.Model.GywlwDevice;
 import com.nbicc.gywlw.Model.GywlwHistoryItem;
 import com.nbicc.gywlw.Model.GywlwUser;
@@ -18,7 +19,6 @@ import com.nbicc.gywlw.Model.HostHolder;
 import com.nbicc.gywlw.Service.ManufacturerService;
 import com.nbicc.gywlw.util.ResponseCode;
 
-import net.sf.json.JSONObject;
 
 @Controller
 public class ManufacturerController {
@@ -84,15 +84,61 @@ public class ManufacturerController {
         }
 	}
 	
-	@RequestMapping(path = { "/factory/AlarmDetail" }, method = { RequestMethod.POST })
+	@RequestMapping(path = { "/factory/alarmDetail" }, method = { RequestMethod.POST })
 	@ResponseBody
-	public JSONObject AlarmDetail(@RequestParam(value = "itemId") String deviceId) {
+	public JSONObject alarmDetail(@RequestParam(value = "itemId") String deviceId) {
 		try{
             GywlwHistoryItem item= manufacturerService.getAlarmDetail(deviceId);
             return ResponseCode.response(0, item);
         }catch (Exception e){
             logger.error("获取告警详情失败" + e.getMessage());
             return ResponseCode.response(1, "获取告警详情失败");
+        }
+	}
+	
+	@RequestMapping(path = { "/factory/factoryLimitUser" }, method = { RequestMethod.POST })
+	@ResponseBody
+	public JSONObject factoryLimitUser(@RequestParam(value = "name") String name) {
+		String id=hostHolder.getGywlwUser().getUserId();
+		try{
+           List<GywlwUser> list=manufacturerService.getFactoryLimitUser(name,id);
+            return ResponseCode.response(0, list);
+        }catch (Exception e){
+            logger.error("获取厂商受限用户失败" + e.getMessage());
+            return ResponseCode.response(1, "获取厂商受限用户失败");
+        }
+	}
+	
+	@RequestMapping(path = { "/factory/factoryLimitUserDistribution" }, method = { RequestMethod.POST })
+	@ResponseBody
+	public JSONObject factoryLimitUserDistribution(@RequestParam(value = "factoryId") String factoryId,
+												   @RequestParam(value = "userId") String userId,
+												   @RequestParam(value = "tag") String tag){
+		try{
+           boolean state=manufacturerService.editFactoryLimitUserDistribution(factoryId, userId, Integer.parseInt(tag));
+           if(state){
+        	   return ResponseCode.response(0, "");  
+           }
+           else{
+        	   return ResponseCode.response(2, "编辑失败");
+           }
+        }catch (Exception e){
+            logger.error("设置失败" + e.getMessage());
+            return ResponseCode.response(1, "设置失败");
+        }
+	}
+	
+	@RequestMapping(path = { "/factory/factoryDevicelist" }, method = { RequestMethod.POST })
+	@ResponseBody
+	public JSONObject factoryDevicelist(@RequestParam(value = "factoryId") String factoryId,
+										@RequestParam(value = "deviceSn") String deviceSn) {
+		int level=hostHolder.getGywlwUser().getDuserLevel();
+		try{
+            List<GywlwDevice> list = manufacturerService.getFactoryDevicelist(factoryId,deviceSn,level);
+            return ResponseCode.response(0, list);
+        }catch (Exception e){
+            logger.error("搜索设备失败" + e.getMessage());
+            return ResponseCode.response(1, "搜索设备失败");
         }
 	}
 	
