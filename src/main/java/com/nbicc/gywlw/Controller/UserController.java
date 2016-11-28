@@ -281,11 +281,14 @@ public class UserController {
                              @RequestParam("e_mail")String email,
                              @RequestParam("fixedphone")String fixedphone){
         try{
-            projectService.changeInfo(userName,companyName,sex,email,fixedphone);
+            int code = projectService.changeInfo(userName,companyName,sex,email,fixedphone);
             GywlwUser gywlwUser = projectService.searchUser(hostHolder.getGywlwUser().getUserPhone());
             hostHolder.setGywlwUser(gywlwUser);
-            return MyUtil.getJSONString(0,"修改成功");
-
+            if(code == 0) {
+                return MyUtil.getJSONString(0, "修改资料成功");
+            }else{
+                return MyUtil.getJSONString(1, "不能修改公司名");
+            }
         }catch (Exception e){
             logger.error("修改资料出错" + e.getMessage());
             return MyUtil.getJSONString(1, "修改资料出错!");

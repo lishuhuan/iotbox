@@ -31,7 +31,7 @@ public class GywlwUser {
 
     private Boolean delMark;
 
-    //记录用户以什么身份登录的
+    //记录用户以什么身份登录的,普通用户0，设备厂商1；
     private Byte userType;
 
     public Byte getUserType() {

@@ -156,7 +156,11 @@ public class ProjectService {
         return gywlwDeviceMapper.selectByDeviceId(deviceId);
     }
 
-    public void changeInfo(String userName, String companyName, String sex, String email, String fixedphone) {
+    public int changeInfo(String userName, String companyName, String sex, String email, String fixedphone) {
+        if(hostHolder.getGywlwUser().getUserType().equals("1") && hostHolder.getGywlwUser().getDuserLevel() == 0 &&
+                !companyName.equals("")){
+            return 1;
+        }
         GywlwUser gywlwUser = new GywlwUser();
         gywlwUser.setUserId(hostHolder.getGywlwUser().getUserId());
         gywlwUser.setUserName(userName);
@@ -165,6 +169,7 @@ public class ProjectService {
         gywlwUser.setUserFixedphone(fixedphone);
         gywlwUser.setUserSex(Boolean.parseBoolean(sex));
         gywlwUserMapper.updateByPrimaryKeySelective(gywlwUser);
+        return 0;
 
     }
 

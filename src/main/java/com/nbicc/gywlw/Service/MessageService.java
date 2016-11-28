@@ -51,10 +51,13 @@ public class MessageService {
         int messageType = gywlwMessage1.getMessageType();
         //转移管理员权限
         if(messageType == 1 && operate.equals("0")){
-            changeAdmin(gywlwMessage1);
+            if(hostHolder.getGywlwUser().getUserType() == 0){
+                changeAdmin(gywlwMessage1);
+            }else {
+                changeFactoryAdmin(gywlwMessage1);
+            }
+
         }
-
-
         return 0;
     }
 
@@ -106,6 +109,31 @@ public class MessageService {
         }
 
     }
+    public void changeFactoryAdmin(GywlwMessage gywlwMessage1){
+        String quitId = gywlwMessage1.getSendId();
+        String addId = gywlwMessage1.getReceiveId();
+        //user table
+        GywlwUser gywlwUser = new GywlwUser();
+        gywlwUser.setUserId(gywlwMessage1.getSendId());
+        gywlwUser.setDuserLevel(1);
+        gywlwUserMapper.updateByPrimaryKeySelective(gywlwUser);
+        gywlwUser.setUserId(gywlwMessage1.getReceiveId());
+        gywlwUser.setDuserLevel(0);
+        gywlwUserMapper.updateByPrimaryKeySelective(gywlwUser);
 
+        //device table
+        List<GywlwDevice> list = gywlwDeviceMapper.selectByAdminId(quitId);
+        if(list != null) {
+            for (GywlwDevice device : list) {
+                GywlwDevice gywlwDevice = new GywlwDevice();
+                gywlwDevice.setDeviceId(device.getDeviceId());
+                gywlwDevice.setFactoryId(addId);
+                gywlwDeviceMapper.updateByPrimaryKeySelective(gywlwDevice);
+            }
+        }
+        //user_admin_group
+
+
+    }
 
 }
