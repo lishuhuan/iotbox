@@ -3,6 +3,8 @@ package com.nbicc.gywlw.mapper;
 import com.nbicc.gywlw.Model.GywlwRegInfo;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 @Mapper
 public interface GywlwRegInfoMapper {
     int deleteByPrimaryKey(String regId);
@@ -12,6 +14,8 @@ public interface GywlwRegInfoMapper {
     int insertSelective(GywlwRegInfo record);
 
     GywlwRegInfo selectByPrimaryKey(String regId);
+
+    List<GywlwRegInfo> selectByPlcId(String plcId);
 
     int updateByPrimaryKeySelective(GywlwRegInfo record);
 

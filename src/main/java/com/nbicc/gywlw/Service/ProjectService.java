@@ -35,6 +35,10 @@ public class ProjectService {
     private GywlwMessageMapper gywlwMessageMapper;
     @Autowired
     private GywlwVariableMapper gywlwVariableMapper;
+    @Autowired
+    private GywlwPlcInfoMapper gywlwPlcInfoMapper;
+    @Autowired
+    private GywlwRegInfoMapper gywlwRegInfoMapper;
 
     public List<GywlwProject> projectList(String gywlwUserId, int offset, int limit, Byte projectStatus) {
         return gywlwProjectMapper.selectByGywlwUserId(gywlwUserId, offset, limit, projectStatus);
@@ -256,6 +260,31 @@ public class ProjectService {
         messageService.sendMessage(hostHolder.getGywlwUser().getUserId(),receiveId,content,messageType);
         return "转移权限消息发送成功";
     }
+
+    public List<GywlwPlcInfo> getPlcListByDeviceId(String deviceId){
+        return gywlwPlcInfoMapper.selectByDeviceId(deviceId);
+    }
+
+    public List<GywlwRegInfo> getRegListByPlcId(String plcId){
+        return gywlwRegInfoMapper.selectByPlcId(plcId);
+    }
+
+    public void bindRegAndVariable(String variableId,String regId, String deviceId, String projectId){
+        GywlwVariableRegGroup gywlwVariableRegGroup = new GywlwVariableRegGroup();
+        gywlwVariableRegGroup.setVariableId(variableId);
+        gywlwVariableRegGroup.setDeviceId(deviceId);
+        gywlwVariableRegGroup.setProjectId(projectId);
+        gywlwVariableRegGroup.setRegId(regId);
+        gywlwVariableRegGroupMapper.insertSelective(gywlwVariableRegGroup);
+    }
+
+    public void unbindRegAndVariable(String id){
+        GywlwVariableRegGroup gywlwVariableRegGroup = new GywlwVariableRegGroup();
+        gywlwVariableRegGroup.setId(Integer.parseInt(id));
+        gywlwVariableRegGroup.setDelMark(Byte.parseByte("1"));
+        gywlwVariableRegGroupMapper.updateByPrimaryKeySelective(gywlwVariableRegGroup);
+    }
+
 
 }
 

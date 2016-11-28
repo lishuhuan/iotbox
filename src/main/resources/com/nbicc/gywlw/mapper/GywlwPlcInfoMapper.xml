@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nbicc.gywlw.mapper.GywlwPlcInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.nbicc.gywlw.Model.GywlwPlcInfo" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="subdevice_id" property="subdeviceId" jdbcType="VARCHAR" />
+    <result column="device_id" property="deviceId" jdbcType="VARCHAR" />
+    <result column="plc_type" property="plcType" jdbcType="VARCHAR" />
+    <result column="plc_brand" property="plcBrand" jdbcType="VARCHAR" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="plc_name" property="plcName" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, subdevice_id, device_id, plc_type, plc_brand, content, plc_name
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from gywlw_plc_info
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByDeviceId" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from gywlw_plc_info
+    where device_id = #{deviceId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from gywlw_plc_info
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.nbicc.gywlw.Model.GywlwPlcInfo" >
+    insert into gywlw_plc_info (id, subdevice_id, device_id, 
+      plc_type, plc_brand, content, 
+      plc_name)
+    values (#{id,jdbcType=VARCHAR}, #{subdeviceId,jdbcType=VARCHAR}, #{deviceId,jdbcType=VARCHAR}, 
+      #{plcType,jdbcType=VARCHAR}, #{plcBrand,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR}, 
+      #{plcName,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.nbicc.gywlw.Model.GywlwPlcInfo" >
+    insert into gywlw_plc_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="subdeviceId != null" >
+        subdevice_id,
+      </if>
+      <if test="deviceId != null" >
+        device_id,
+      </if>
+      <if test="plcType != null" >
+        plc_type,
+      </if>
+      <if test="plcBrand != null" >
+        plc_brand,
+      </if>
+      <if test="content != null" >
+        content,
+      </if>
+      <if test="plcName != null" >
+        plc_name,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="subdeviceId != null" >
+        #{subdeviceId,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceId != null" >
+        #{deviceId,jdbcType=VARCHAR},
+      </if>
+      <if test="plcType != null" >
+        #{plcType,jdbcType=VARCHAR},
+      </if>
+      <if test="plcBrand != null" >
+        #{plcBrand,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null" >
+        #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="plcName != null" >
+        #{plcName,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.nbicc.gywlw.Model.GywlwPlcInfo" >
+    update gywlw_plc_info
+    <set >
+      <if test="subdeviceId != null" >
+        subdevice_id = #{subdeviceId,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceId != null" >
+        device_id = #{deviceId,jdbcType=VARCHAR},
+      </if>
+      <if test="plcType != null" >
+        plc_type = #{plcType,jdbcType=VARCHAR},
+      </if>
+      <if test="plcBrand != null" >
+        plc_brand = #{plcBrand,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null" >
+        content = #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="plcName != null" >
+        plc_name = #{plcName,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.nbicc.gywlw.Model.GywlwPlcInfo" >
+    update gywlw_plc_info
+    set subdevice_id = #{subdeviceId,jdbcType=VARCHAR},
+      device_id = #{deviceId,jdbcType=VARCHAR},
+      plc_type = #{plcType,jdbcType=VARCHAR},
+      plc_brand = #{plcBrand,jdbcType=VARCHAR},
+      content = #{content,jdbcType=VARCHAR},
+      plc_name = #{plcName,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

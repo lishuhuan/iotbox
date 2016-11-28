@@ -18,10 +18,16 @@
     content, permission
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
-    select 
+    select
     <include refid="Base_Column_List" />
     from gywlw_reg_info
     where reg_id = #{regId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByPlcId" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from gywlw_reg_info
+    where plc_id = #{plcId,jdbcType=VARCHAR}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
     delete from gywlw_reg_info

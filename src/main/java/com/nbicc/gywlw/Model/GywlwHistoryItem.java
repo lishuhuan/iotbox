@@ -42,6 +42,14 @@ public class GywlwHistoryItem {
     private String operator;
     private Double operand;
 
+    public String getPlcName() {
+        return plcName;
+    }
+
+    public void setPlcName(String plcName) {
+        this.plcName = plcName;
+    }
+
     public String getPlcId() {
         return plcId;
     }
