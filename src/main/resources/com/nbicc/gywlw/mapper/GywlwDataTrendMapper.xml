@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nbicc.gywlw.mapper.GywlwDataTrendMapper" >
+  <resultMap id="BaseResultMap" type="com.nbicc.gywlw.Model.GywlwDataTrend" >
+    <id column="trend_id" property="trendId" jdbcType="INTEGER" />
+    <result column="project_id" property="projectId" jdbcType="VARCHAR" />
+    <result column="create_user_id" property="createUserId" jdbcType="VARCHAR" />
+    <result column="device_id" property="deviceId" jdbcType="VARCHAR" />
+    <result column="reg_id" property="regId" jdbcType="VARCHAR" />
+    <result column="photo_name" property="photoName" jdbcType="VARCHAR" />
+    <result column="line_color" property="lineColor" jdbcType="VARCHAR" />
+    <result column="line_width" property="lineWidth" jdbcType="VARCHAR" />
+    <result column="start_date" property="startDate" jdbcType="TIMESTAMP" />
+    <result column="end_date" property="endDate" jdbcType="TIMESTAMP" />
+    <result column="reg_name" property="regName" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    a.*, reg_name
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from gywlw_data_trend
+    where trend_id = #{trendId,jdbcType=INTEGER}
+  </select>
+  <select id="selectByPhotoName" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from gywlw_data_trend a
+    LEFT JOIN gywlw_reg_info b
+    ON a.reg_id=b.reg_id
+    where photo_name = #{photoName,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from gywlw_data_trend
+    where trend_id = #{trendId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.nbicc.gywlw.Model.GywlwDataTrend" >
+    insert into gywlw_data_trend (project_id, create_user_id,
+      device_id, reg_id, photo_name, 
+      line_color, line_width, start_date, end_date)
+    values (#{projectId,jdbcType=VARCHAR}, #{createUserId,jdbcType=VARCHAR},
+      #{deviceId,jdbcType=VARCHAR}, #{regId,jdbcType=VARCHAR}, #{photoName,jdbcType=VARCHAR}, 
+      #{lineColor,jdbcType=VARCHAR}, #{lineWidth,jdbcType=VARCHAR}, #{startDate,jdbcType=TIMESTAMP},
+       #{endDate,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.nbicc.gywlw.Model.GywlwDataTrend" >
+    insert into gywlw_data_trend
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="projectId != null" >
+        project_id,
+      </if>
+      <if test="createUserId != null" >
+        create_user_id,
+      </if>
+      <if test="deviceId != null" >
+        device_id,
+      </if>
+      <if test="regId != null" >
+        reg_id,
+      </if>
+      <if test="photoName != null" >
+        photo_name,
+      </if>
+      <if test="lineColor != null" >
+        line_color,
+      </if>
+      <if test="lineWidth != null" >
+        line_width,
+      </if>
+      <if test="startDate != null" >
+        start_date,
+      </if>
+      <if test="endDate != null" >
+        end_date,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="projectId != null" >
+        #{projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="createUserId != null" >
+        #{createUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceId != null" >
+        #{deviceId,jdbcType=VARCHAR},
+      </if>
+      <if test="regId != null" >
+        #{regId,jdbcType=VARCHAR},
+      </if>
+      <if test="photoName != null" >
+        #{photoName,jdbcType=VARCHAR},
+      </if>
+      <if test="lineColor != null" >
+        #{lineColor,jdbcType=VARCHAR},
+      </if>
+      <if test="lineWidth != null" >
+        #{lineWidth,jdbcType=VARCHAR},
+      </if>
+      <if test="startDate != null" >
+        #{startDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endDate != null" >
+        #{endDate,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.nbicc.gywlw.Model.GywlwDataTrend" >
+    update gywlw_data_trend
+    <set >
+      <if test="projectId != null" >
+        project_id = #{projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="createUserId != null" >
+        create_user_id = #{createUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceId != null" >
+        device_id = #{deviceId,jdbcType=VARCHAR},
+      </if>
+      <if test="regId != null" >
+        reg_id = #{regId,jdbcType=VARCHAR},
+      </if>
+      <if test="photoName != null" >
+        photo_name = #{photoName,jdbcType=VARCHAR},
+      </if>
+      <if test="lineColor != null" >
+        line_color = #{lineColor,jdbcType=VARCHAR},
+      </if>
+      <if test="lineWidth != null" >
+        line_width = #{lineWidth,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where trend_id = #{trendId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.nbicc.gywlw.Model.GywlwDataTrend" >
+    update gywlw_data_trend
+    set project_id = #{projectId,jdbcType=VARCHAR},
+      create_user_id = #{createUserId,jdbcType=VARCHAR},
+      device_id = #{deviceId,jdbcType=VARCHAR},
+      reg_id = #{regId,jdbcType=VARCHAR},
+      photo_name = #{photoName,jdbcType=VARCHAR},
+      line_color = #{lineColor,jdbcType=VARCHAR},
+      line_width = #{lineWidth,jdbcType=VARCHAR}
+    where trend_id = #{trendId,jdbcType=INTEGER}
+  </update>
+</mapper>

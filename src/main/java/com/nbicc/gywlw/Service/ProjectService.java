@@ -2,12 +2,11 @@ package com.nbicc.gywlw.Service;
 
 import com.nbicc.gywlw.Model.*;
 import com.nbicc.gywlw.mapper.*;
+import com.nbicc.gywlw.util.MyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by BigMao on 2016/11/21.
@@ -39,6 +38,8 @@ public class ProjectService {
     private GywlwPlcInfoMapper gywlwPlcInfoMapper;
     @Autowired
     private GywlwRegInfoMapper gywlwRegInfoMapper;
+    @Autowired
+    private GywlwDataTrendMapper gywlwDataTrendMapper;
 
     public List<GywlwProject> projectList(String gywlwUserId, int offset, int limit, Byte projectStatus) {
         List<GywlwProject> list = gywlwProjectMapper.selectByGywlwUserId(gywlwUserId, offset, limit, projectStatus);
@@ -163,7 +164,8 @@ public class ProjectService {
         gywlwDevice.setExpiredRight(expiredRight);
         gywlwDeviceMapper.updateByPrimaryKeySelective(gywlwDevice);
         messageService.sendMessage(hostHolder.getGywlwUser().getUserId(),
-                gywlwDeviceMapper.selectByDeviceId(deviceId).getFactoryId(),"用户向您分配设备权限",Byte.parseByte("0"));
+                gywlwDeviceMapper.selectByDeviceId(deviceId).getFactoryId(),"用户向您分配设备权限",Byte.parseByte("0"),
+                "");
     }
 
     public GywlwDevice getDevice(String deviceId) {
@@ -201,7 +203,7 @@ public class ProjectService {
             gywlwUser.setUserId(hostHolder.getGywlwUser().getUserId());
             gywlwDevice1.setDeviceSn(deviceSn);
             if (mark == 0) {
-                if (!gywlwDevice.getAdminId().equals("")) {
+                if (gywlwDevice.getAdminId() != null && !gywlwDevice.getAdminId().equals("")) {
                     return "该唯一标识码已被用户管理员绑定";
                 }
                 gywlwUser.setUserLevel(0);
@@ -233,7 +235,7 @@ public class ProjectService {
             gywlwUser.setUserId(hostHolder.getGywlwUser().getUserId());
             gywlwDevice1.setDeviceSn(deviceSn);
             if (mark == 0) {
-                if (!gywlwDevice.getFactoryId().equals("")) {
+                if (gywlwDevice.getFactoryId() != null && !"".equals(gywlwDevice.getFactoryId())) {
                     return "该唯一标识码已被用户管理员绑定";
                 }
                 gywlwUser.setDuserLevel(0);
@@ -278,7 +280,7 @@ public class ProjectService {
         String receiveId = receive.getUserId();
         String content = hostHolder.getGywlwUser().getUserName() + "向你转移系统管理员权限";
         Byte messageType = 1;
-        messageService.sendMessage(hostHolder.getGywlwUser().getUserId(),receiveId,content,messageType);
+        messageService.sendMessage(hostHolder.getGywlwUser().getUserId(),receiveId,content,messageType,"");
         return "转移权限消息发送成功";
     }
 
@@ -304,6 +306,45 @@ public class ProjectService {
         gywlwVariableRegGroup.setId(Integer.parseInt(id));
         gywlwVariableRegGroup.setDelMark(Byte.parseByte("1"));
         gywlwVariableRegGroupMapper.updateByPrimaryKeySelective(gywlwVariableRegGroup);
+    }
+
+    public List<Map> getDataForTrend(String photoName){
+        List<Map> list = new ArrayList<>();
+        List<GywlwDataTrend> trends = gywlwDataTrendMapper.selectByPhotoName(photoName);
+        if(trends.size() != 0){
+            for(GywlwDataTrend gywlwDataTrend : trends){
+                String regId = gywlwDataTrend.getRegId();
+                Map<String,Object> map1 = new HashMap<>();
+                map1.put("info",gywlwDataTrend);
+                List<GywlwHistoryItem> historyItems = gywlwHistoryItemMapper.getDataForTrend(
+                        regId,gywlwDataTrend.getStartDate(),gywlwDataTrend.getEndDate());
+                map1.put("data",historyItems);
+                list.add(map1);
+            }
+        }
+        return list;
+    }
+
+    public void saveTrendInfo(ReceiveModel model){
+        try {
+            for (Variable variable : model.getVariables()) {
+                GywlwDataTrend gywlwDataTrend = new GywlwDataTrend();
+                gywlwDataTrend.setRegId(variable.getRegId());
+                gywlwDataTrend.setDeviceId(variable.getDeviceId());
+                gywlwDataTrend.setProjectId(model.getProjectId());
+                gywlwDataTrend.setCreateUserId(hostHolder.getGywlwUser().getUserId());
+                Date date = MyUtil.timeTransformToDate(model.getStartTime());
+                gywlwDataTrend.setStartDate(date);
+                Date date1 = MyUtil.timeTransformToDate(model.getEndTime());
+                gywlwDataTrend.setEndDate(date1);
+                gywlwDataTrend.setLineColor(variable.getColor());
+                gywlwDataTrend.setLineWidth(variable.getWidth());
+                gywlwDataTrend.setPhotoName(model.getPhotoName());
+                gywlwDataTrendMapper.insert(gywlwDataTrend);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
 

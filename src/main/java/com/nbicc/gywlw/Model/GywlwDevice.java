@@ -31,6 +31,14 @@ public class GywlwDevice {
 
     private Byte expiredRight;
 
+    public Byte getDeviceOnline() {
+        return deviceOnline;
+    }
+
+    public void setDeviceOnline(Byte deviceOnline) {
+        this.deviceOnline = deviceOnline;
+    }
+
     public Byte getExpiredRight() {
         return expiredRight;
     }

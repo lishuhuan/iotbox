@@ -12,6 +12,7 @@
     <result column="parent_text" property="parentText" jdbcType="VARCHAR" />
     <result column="province" property="province" jdbcType="VARCHAR" />
     <result column="city" property="city" jdbcType="VARCHAR" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
     <result column="purchase_date" property="purchaseDate" jdbcType="VARCHAR" />
     <result column="completion_date" property="completionDate" jdbcType="VARCHAR" />
     <result column="install_date" property="installDate" jdbcType="VARCHAR" />
@@ -24,7 +25,7 @@
   </resultMap>
   <sql id="Base_Column_List" >
     project_id, project_name, admin_id, content, create_time, longitude, latitude, parent_text, 
-    province, city, purchase_date, completion_date, install_date, contact_name, contact_phone, 
+    province, city, address, purchase_date, completion_date, install_date, contact_name, contact_phone,
     customer_type, firstparty, project_type, project_desc
   </sql>
   <select id="selectByGywlwUserId" resultMap="BaseResultMap" parameterType="com.nbicc.gywlw.Model.GywlwProject" >
@@ -55,14 +56,14 @@
     insert into gywlw_project (project_id, project_name, admin_id,
     content, create_time, longitude,
     latitude, parent_text, province,
-    city, purchase_date, completion_date,
+    city, address, purchase_date, completion_date,
     install_date, contact_name, contact_phone,
     customer_type, firstparty, project_type,
     project_desc)
     values (#{projectId,jdbcType=VARCHAR}, #{projectName,jdbcType=VARCHAR}, #{adminId,jdbcType=VARCHAR},
     #{content,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{longitude,jdbcType=TINYINT},
     #{latitude,jdbcType=TINYINT}, #{parentText,jdbcType=VARCHAR}, #{province,jdbcType=VARCHAR},
-    #{city,jdbcType=VARCHAR}, #{purchaseDate,jdbcType=VARCHAR}, #{completionDate,jdbcType=VARCHAR},
+    #{city,jdbcType=VARCHAR},#{address,jdbcType=VARCHAR}, #{purchaseDate,jdbcType=VARCHAR}, #{completionDate,jdbcType=VARCHAR},
     #{installDate,jdbcType=VARCHAR}, #{contactName,jdbcType=VARCHAR}, #{contactPhone,jdbcType=VARCHAR},
     #{customerType,jdbcType=VARCHAR}, #{firstparty,jdbcType=VARCHAR}, #{projectType,jdbcType=VARCHAR},
     #{projectDesc,jdbcType=VARCHAR})
@@ -99,6 +100,9 @@
       </if>
       <if test="city != null" >
         city,
+      </if>
+      <if test="address != null" >
+        address,
       </if>
       <if test="purchaseDate != null" >
         purchase_date,
@@ -162,6 +166,9 @@
       <if test="city != null" >
         #{city,jdbcType=VARCHAR},
       </if>
+      <if test="address != null" >
+        #{address,jdbcType=VARCHAR},
+      </if>
       <if test="purchaseDate != null" >
         #{purchaseDate,jdbcType=VARCHAR},
       </if>
@@ -224,6 +231,9 @@
       <if test="city != null" >
         city = #{city,jdbcType=VARCHAR},
       </if>
+      <if test="address != null" >
+        address = #{address,jdbcType=VARCHAR},
+      </if>
       <if test="purchaseDate != null" >
         purchase_date = #{purchaseDate,jdbcType=VARCHAR},
       </if>
@@ -265,6 +275,7 @@
       parent_text = #{parentText,jdbcType=VARCHAR},
       province = #{province,jdbcType=VARCHAR},
       city = #{city,jdbcType=VARCHAR},
+      address = #{address,jdbcType=VARCHAR},
       purchase_date = #{purchaseDate,jdbcType=VARCHAR},
       completion_date = #{completionDate,jdbcType=VARCHAR},
       install_date = #{installDate,jdbcType=VARCHAR},

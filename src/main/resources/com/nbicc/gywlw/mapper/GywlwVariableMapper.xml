@@ -5,6 +5,7 @@
     <id column="variable_id" property="variableId" jdbcType="VARCHAR" />
     <result column="project_id" property="projectId" jdbcType="VARCHAR" />
     <result column="variable_name" property="variableName" jdbcType="VARCHAR" />
+    <result column="last_connect" property="lastConnect" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
     variable_id, project_id, variable_name
@@ -17,9 +18,12 @@
   </select>
   <select id="selectByProjectId" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select
-    <include refid="Base_Column_List" />
-    from gywlw_variable
-    where project_id = #{projectId,jdbcType=VARCHAR}
+    a.variable_id, a.project_id, a.variable_name, MAX(b.item_time) last_connect
+    from gywlw_variable a
+    LEFT JOIN gywlw_history_item b
+    ON a.variable_name=b.variable_name
+    where a.project_id = #{projectId,jdbcType=VARCHAR}
+    GROUP BY a.variable_name
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
     delete from gywlw_variable

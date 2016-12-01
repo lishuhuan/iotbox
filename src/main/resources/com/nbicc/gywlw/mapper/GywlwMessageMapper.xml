@@ -9,9 +9,10 @@
     <result column="operation" jdbcType="TINYINT" property="operation" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="message_type" jdbcType="TINYINT" property="messageType" />
+    <result column="text" jdbcType="VARCHAR" property="text" />
   </resultMap>
   <sql id="Base_Column_List">
-    message_id, send_id, receive_id, content, operation, create_time, message_type
+    message_id, send_id, receive_id, content, operation, create_time, message_type, text
   </sql>
   <select id="selectByUserId" resultMap="BaseResultMap" parameterType="java.lang.String">
     select 
@@ -38,10 +39,10 @@
   <insert id="insert" parameterType="com.nbicc.gywlw.Model.GywlwMessage">
     insert into gywlw_message (message_id, send_id, receive_id, 
       content, operation, create_time, 
-      message_type)
+      message_type,text)
     values (#{messageId,jdbcType=INTEGER}, #{sendId,jdbcType=VARCHAR}, #{receiveId,jdbcType=VARCHAR}, 
       #{content,jdbcType=VARCHAR}, #{operation,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{messageType,jdbcType=TINYINT})
+      #{messageType,jdbcType=TINYINT},#{text,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.nbicc.gywlw.Model.GywlwMessage">
     insert into gywlw_message
@@ -113,6 +114,9 @@
       <if test="messageType != null">
         message_type = #{messageType,jdbcType=TINYINT},
       </if>
+      <if test="text != null">
+        text = #{text,jdbcType=VARCHAR},
+      </if>
     </set>
     where message_id = #{messageId,jdbcType=INTEGER}
   </update>
@@ -124,6 +128,7 @@
       operation = #{operation,jdbcType=TINYINT},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       message_type = #{messageType,jdbcType=TINYINT}
+      text = #{text,jdbcType=VARCHAR}
     where message_id = #{messageId,jdbcType=INTEGER}
   </update>
 </mapper>

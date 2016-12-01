@@ -52,14 +52,14 @@ public class LoginController {
     @ResponseBody
     public String login(@RequestParam(value = "phone") String phone,
                         @RequestParam(value = "password") String password,
-                        @RequestParam(value = "user_type", defaultValue = "1")String userType,
+                        @RequestParam(value = "user_type", defaultValue = "0")String userType,
                         HttpServletResponse response) {
         try {
             Map<String, Object> map = userService.login(phone, password,Byte.parseByte(userType));
             if( map.containsKey("ticket")) {
                 Cookie cookie = new Cookie("ticket", map.get("ticket").toString());
                 cookie.setPath("/");
-                cookie.setMaxAge(3600*24*30);
+                cookie.setMaxAge(3600*24*5);
                 response.addCookie(cookie);
                 return MyUtil.getJSONString(0, "成功");
             } else {

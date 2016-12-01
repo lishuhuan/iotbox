@@ -1,6 +1,9 @@
 package com.nbicc.gywlw.Service;
 
-import com.nbicc.gywlw.Model.*;
+import com.nbicc.gywlw.Model.GywlwMessage;
+import com.nbicc.gywlw.Model.GywlwProject;
+import com.nbicc.gywlw.Model.GywlwUser;
+import com.nbicc.gywlw.Model.HostHolder;
 import com.nbicc.gywlw.mapper.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,11 +30,13 @@ public class MessageService {
     private GywlwUserAdminGroupMapper gywlwUserAdminGroupMapper;
     @Autowired
     private GywlwProjectUserGroupMapper gywlwProjectUserGroupMapper;
+    @Autowired
+    private ManufacturerService manufacturerService;
 
     public List<GywlwMessage> messageList(){
         return gywlwMessageMapper.selectByUserId(hostHolder.getGywlwUser().getUserId());
     }
-    public void sendMessage(String sendId,String receiveId,String content,Byte messageType){
+    public void sendMessage(String sendId,String receiveId,String content,Byte messageType,String text){
         GywlwMessage gywlwMessage = new GywlwMessage();
         gywlwMessage.setContent(content);
         gywlwMessage.setMessageType(messageType);
@@ -53,13 +58,17 @@ public class MessageService {
         GywlwMessage gywlwMessage1 = gywlwMessageMapper.selectByMessageId(messageId);
         int messageType = gywlwMessage1.getMessageType();
         //转移管理员权限
-        if(messageType == 1 && operate.equals("0")){
+        if(messageType == 1 && "1".equals(operate)){
             if(hostHolder.getGywlwUser().getUserType() == 0){
                 changeAdmin(gywlwMessage1);
             }else {
                 changeFactoryAdmin(gywlwMessage1);
             }
-
+        }
+        //厂商管理员分配用户给受限用户
+        if(messageType == 2 && "1".equals(operate)){
+            boolean state=manufacturerService.editFactoryLimitUserDistribution(gywlwMessage1.getReceiveId(),
+                    gywlwMessage1.getText(), Integer.parseInt("0"));
         }
         return 0;
     }

@@ -241,6 +241,12 @@
    			and item_time between #{startTime} and #{endTime}
    		</if>
   </select>
+  <select id="getDataForTrend" resultMap="BaseResultMap" >
+    SELECT item_time,item_value
+    from gywlw_history_item
+    where reg_id=#{regId}
+    and item_time between #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP}
+  </select>
   
   <select id="getAlarmDetail" resultMap="BaseResultMap1" >
    		SELECT * from gywlw_history_item where item_id=#{itemId}

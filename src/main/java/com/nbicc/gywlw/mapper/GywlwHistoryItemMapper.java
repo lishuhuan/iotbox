@@ -4,6 +4,7 @@ import com.nbicc.gywlw.Model.GywlwHistoryItem;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 @Mapper
 public interface GywlwHistoryItemMapper {
@@ -29,5 +30,11 @@ public interface GywlwHistoryItemMapper {
     
     public GywlwHistoryItem getAlarmDetail(@Param("itemId") String itemId);
     
-    public List<GywlwHistoryItem> getDeviceAlarmlist(@Param("startTime") String startTime,@Param("endTime") String endTime,@Param("deviceId") String deviceId);
+    public List<GywlwHistoryItem> getDeviceAlarmlist(@Param("startTime") String startTime,
+                                                     @Param("endTime") String endTime,
+                                                     @Param("deviceId") String deviceId);
+
+    public List<GywlwHistoryItem> getDataForTrend(@Param("regId")String regId,
+                                                  @Param("startTime") Date startTime,
+                                                  @Param("endTime") Date endTime);
 }

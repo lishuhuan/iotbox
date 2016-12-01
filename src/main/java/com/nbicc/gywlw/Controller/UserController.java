@@ -7,10 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
@@ -422,6 +419,32 @@ public class UserController {
         }
     }
 
+    //趋势参数设置
+    @RequestMapping(path = {"/user/trendpicture"}, method = {RequestMethod.POST})
+    @ResponseBody
+    public String trendpicture(@RequestBody ReceiveModel model){
+        try {
+            projectService.saveTrendInfo(model);
+            return MyUtil.getJSONString(0, "ok");
+        }catch (Exception e){
+            logger.error("设置趋势出错" + e.getMessage());
+            return MyUtil.getJSONString(1, "设置趋势出错!");
+        }
+    }
+
+
+    //趋势数据输出
+    @RequestMapping(path = {"/user/getdata"}, method = {RequestMethod.GET})
+    @ResponseBody
+    public String dataForTrend(@RequestParam("photo_name")String photoName){
+        try {
+            List<Map> list = projectService.getDataForTrend(photoName);
+            return MyUtil.getJSONString(0, list);
+        }catch (Exception e){
+            logger.error("获取趋势数据失败" + e.getMessage());
+            return MyUtil.getJSONString(1, "获取趋势数据失败!");
+        }
+    }
 
 
 

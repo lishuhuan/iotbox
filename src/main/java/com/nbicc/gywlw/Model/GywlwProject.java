@@ -23,6 +23,8 @@ public class GywlwProject {
 
     private String city;
 
+    private String address;
+
     private String purchaseDate;
 
     private String completionDate;
@@ -44,6 +46,14 @@ public class GywlwProject {
     private Byte writePermission;
 
     private Byte delMark;
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
 
     public Byte getWritePermission() {
         return writePermission;
