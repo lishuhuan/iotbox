@@ -1,7 +1,14 @@
 package com.nbicc.gywlw.Controller;
 
-import java.util.List;
-
+import com.alibaba.fastjson.JSONObject;
+import com.nbicc.gywlw.Model.GywlwDevice;
+import com.nbicc.gywlw.Model.GywlwHistoryItem;
+import com.nbicc.gywlw.Model.GywlwUser;
+import com.nbicc.gywlw.Model.HostHolder;
+import com.nbicc.gywlw.Service.ManufacturerService;
+import com.nbicc.gywlw.Service.MessageService;
+import com.nbicc.gywlw.util.MyUtil;
+import com.nbicc.gywlw.util.ResponseCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,27 +18,23 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.alibaba.fastjson.JSONObject;
-import com.nbicc.gywlw.Model.GywlwDevice;
-import com.nbicc.gywlw.Model.GywlwHistoryItem;
-import com.nbicc.gywlw.Model.GywlwUser;
-import com.nbicc.gywlw.Model.HostHolder;
-import com.nbicc.gywlw.Service.ManufacturerService;
-import com.nbicc.gywlw.util.ResponseCode;
+import java.util.List;
 
 
 @Controller
 public class ManufacturerController {
 
 	 private static final Logger logger = LoggerFactory.getLogger(ManufacturerController.class);
-	
+
+	@Autowired
+	private MessageService messageService;
 	@Autowired
 	private HostHolder hostHolder;
 	
 	@Autowired
 	private ManufacturerService manufacturerService;
 
-	@RequestMapping(path = { "/factory/userlist" }, method = { RequestMethod.POST })
+	@RequestMapping(path = { "/factory/userlist" }, method = { RequestMethod.POST,RequestMethod.GET })
 	@ResponseBody
 	public JSONObject userlist(@RequestParam(value = "name") String name) {
 		try{
@@ -111,21 +114,22 @@ public class ManufacturerController {
 	
 	@RequestMapping(path = { "/factory/factoryLimitUserDistribution" }, method = { RequestMethod.POST })
 	@ResponseBody
-	public JSONObject factoryLimitUserDistribution(@RequestParam(value = "factoryId") String factoryId,
+	public String factoryLimitUserDistribution(@RequestParam(value = "factoryId") String factoryId,
 												   @RequestParam(value = "userId") String userId,
 												   @RequestParam(value = "tag") String tag){
-		try{
-           boolean state=manufacturerService.editFactoryLimitUserDistribution(factoryId, userId, Integer.parseInt(tag));
-           if(state){
-        	   return ResponseCode.response(0, "");  
-           }
-           else{
-        	   return ResponseCode.response(2, "编辑失败");
-           }
-        }catch (Exception e){
-            logger.error("设置失败" + e.getMessage());
-            return ResponseCode.response(1, "设置失败");
-        }
+		try {
+			if("0".equals(tag)) {
+				messageService.sendMessage(hostHolder.getGywlwUser().getUserId(), factoryId, "管理员向你分配客户",
+						Byte.parseByte("3"), userId);
+			}else if("1".equals(tag)){
+				boolean state=manufacturerService.editFactoryLimitUserDistribution(factoryId,
+						userId, Integer.parseInt("1"));
+			}
+			return MyUtil.getJSONString(0,"发送邀请成功");
+		}catch (Exception e){
+			logger.error("发送失败" + e.getMessage());
+			return MyUtil.getJSONString(1, "发送失败!");
+		}
 	}
 	
 	@RequestMapping(path = { "/factory/factoryDevicelist" }, method = { RequestMethod.POST })

@@ -32,6 +32,8 @@ public class MessageService {
     private GywlwProjectUserGroupMapper gywlwProjectUserGroupMapper;
     @Autowired
     private ManufacturerService manufacturerService;
+    @Autowired
+    private ProjectService projectService;
 
     public List<GywlwMessage> messageList(){
         return gywlwMessageMapper.selectByUserId(hostHolder.getGywlwUser().getUserId());
@@ -43,6 +45,7 @@ public class MessageService {
         gywlwMessage.setReceiveId(receiveId);
         gywlwMessage.setSendId(sendId);
         gywlwMessage.setOperation(Byte.parseByte("2"));
+        gywlwMessage.setText(text);
         gywlwMessageMapper.insertSelective(gywlwMessage);
     }
 
@@ -58,7 +61,7 @@ public class MessageService {
         GywlwMessage gywlwMessage1 = gywlwMessageMapper.selectByMessageId(messageId);
         int messageType = gywlwMessage1.getMessageType();
         //转移管理员权限
-        if(messageType == 1 && "1".equals(operate)){
+        if(messageType == 1 && "0".equals(operate)){
             if(hostHolder.getGywlwUser().getUserType() == 0){
                 changeAdmin(gywlwMessage1);
             }else {
@@ -66,10 +69,19 @@ public class MessageService {
             }
         }
         //厂商管理员分配用户给受限用户
-        if(messageType == 2 && "1".equals(operate)){
+        if(messageType == 2 && "0".equals(operate)){
             boolean state=manufacturerService.editFactoryLimitUserDistribution(gywlwMessage1.getReceiveId(),
                     gywlwMessage1.getText(), Integer.parseInt("0"));
         }
+
+        //用户系统管理员分配项目给受限用户
+        if(messageType == 3 && "0".equals(operate)){
+            String projectId = gywlwMessage1.getText().split(" ")[0];
+            String writePermission = gywlwMessage1.getText().split(" ")[1];
+            String msg = projectService.addProjectMember(projectId, gywlwMessage1.getReceiveId(),
+                    Byte.parseByte(writePermission));
+        }
+
         return 0;
     }
 

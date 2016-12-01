@@ -68,6 +68,9 @@
       <if test="messageType != null">
         message_type,
       </if>
+      <if test="text != null">
+        text,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="messageId != null">
@@ -90,6 +93,9 @@
       </if>
       <if test="messageType != null">
         #{messageType,jdbcType=TINYINT},
+      </if>
+      <if test="text != null">
+        #{text,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>

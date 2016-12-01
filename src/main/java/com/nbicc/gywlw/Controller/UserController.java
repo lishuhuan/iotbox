@@ -1,6 +1,7 @@
 package com.nbicc.gywlw.Controller;
 
 import com.nbicc.gywlw.Model.*;
+import com.nbicc.gywlw.Service.MessageService;
 import com.nbicc.gywlw.Service.ProjectService;
 import com.nbicc.gywlw.util.MyUtil;
 import org.slf4j.Logger;
@@ -23,6 +24,9 @@ public class UserController {
 
     @Autowired
     private ProjectService projectService;
+
+    @Autowired
+    private MessageService messageService;
 
     //项目列表
     @RequestMapping(path = {"/user/projectlist"}, method = {RequestMethod.GET})
@@ -168,12 +172,12 @@ public class UserController {
                                    @RequestParam("write_permission")String writePermission,
                                    @RequestParam("project_id")String projectId){
         try {
-
-            String msg = projectService.addProjectMember(projectId, userId, Byte.parseByte(writePermission));
-            return MyUtil.getJSONString(0,msg);
+            messageService.sendMessage(hostHolder.getGywlwUser().getUserId(),userId,"邀请你加入项目",
+                    Byte.parseByte("3"),projectId+" "+writePermission);
+            return MyUtil.getJSONString(0,"发送邀请成功");
         }catch (Exception e){
-            logger.error("添加项目成员失败" + e.getMessage());
-            return MyUtil.getJSONString(1, "添加项目成员失败!");
+            logger.error("发送失败" + e.getMessage());
+            return MyUtil.getJSONString(1, "发送失败!");
         }
     }
 
