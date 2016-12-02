@@ -45,7 +45,17 @@ public class GywlwProject {
 
     private Byte writePermission;
 
+    private String display;
+
     private Byte delMark;
+
+    public String getDisplay() {
+        return display;
+    }
+
+    public void setDisplay(String display) {
+        this.display = display;
+    }
 
     public String getAddress() {
         return address;

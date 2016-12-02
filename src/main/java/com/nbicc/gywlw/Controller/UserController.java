@@ -125,6 +125,19 @@ public class UserController {
         }
     }
 
+    @RequestMapping(path = "editdisplay", method = RequestMethod.POST)
+    @ResponseBody
+    public String editDisplay(@RequestParam("project_id")String projectId,
+                              @RequestParam("display")String display){
+        try {
+            projectService.editDisplay(projectId,display);
+            return MyUtil.getJSONString(0,"编辑成功");
+        }catch (Exception e){
+            logger.error("编辑显示失败" + e.getMessage());
+            return MyUtil.getJSONString(1, "编辑显示失败");
+        }
+
+    }
     //停用和启用项目
     @RequestMapping(path = {"/stopproject"}, method = {RequestMethod.POST})
     @ResponseBody
@@ -457,8 +470,8 @@ public class UserController {
     @RequestMapping(path = {"/projectlistbypage"}, method = {RequestMethod.GET})
     @ResponseBody
     public String projectListByPage(@RequestParam(value = "project_status", defaultValue = "0")String projectStatus,
-                                    @RequestParam(value = "page_num", required = false, defaultValue = "1")Integer pageNum,
-                                    @RequestParam(value = "page_size", required = false, defaultValue = "5")Integer pageSize) {
+                                    @RequestParam(value = "page_num", required = false, defaultValue = "2")Integer pageNum,
+                                    @RequestParam(value = "page_size", required = false, defaultValue = "3")Integer pageSize) {
         try {
             String localUserId = hostHolder.getGywlwUser().getUserId();
             List<GywlwProject> allProject = new ArrayList<>();

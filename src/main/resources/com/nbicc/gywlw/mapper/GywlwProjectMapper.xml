@@ -22,11 +22,12 @@
     <result column="firstparty" property="firstparty" jdbcType="VARCHAR" />
     <result column="project_type" property="projectType" jdbcType="VARCHAR" />
     <result column="project_desc" property="projectDesc" jdbcType="VARCHAR" />
+    <result column="display" property="display" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     project_id, project_name, admin_id, content, create_time, longitude, latitude, parent_text, 
     province, city, address, purchase_date, completion_date, install_date, contact_name, contact_phone,
-    customer_type, firstparty, project_type, project_desc
+    customer_type, firstparty, project_type, project_desc, display
   </sql>
   <select id="selectByGywlwUserId" resultMap="BaseResultMap" parameterType="com.nbicc.gywlw.Model.GywlwProject" >
     select
@@ -256,6 +257,9 @@
       </if>
       <if test="projectType != null" >
         project_type = #{projectType,jdbcType=VARCHAR},
+      </if>
+      <if test="display != null" >
+        display = #{display,jdbcType=VARCHAR},
       </if>
       <if test="projectDesc != null" >
         project_desc = #{projectDesc,jdbcType=VARCHAR},

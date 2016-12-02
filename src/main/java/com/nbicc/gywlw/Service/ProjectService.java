@@ -98,6 +98,12 @@ public class ProjectService {
         }
         return gywlwProject.getProjectId();
     }
+    public void editDisplay(String projectId, String display){
+        GywlwProject gywlwProject = new GywlwProject();
+        gywlwProject.setProjectId(projectId);
+        gywlwProject.setDisplay(display);
+        gywlwProjectMapper.updateByPrimaryKeySelective(gywlwProject);
+    }
 
     public void stopProject(String gywlwProjectId,String projectStatus) {
         gywlwProjectMapper.stopByProjectId(gywlwProjectId,projectStatus);
