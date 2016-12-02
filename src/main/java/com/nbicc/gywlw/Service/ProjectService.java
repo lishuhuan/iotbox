@@ -41,8 +41,8 @@ public class ProjectService {
     @Autowired
     private GywlwDataTrendMapper gywlwDataTrendMapper;
 
-    public List<GywlwProject> projectList(String gywlwUserId, int offset, int limit, Byte projectStatus) {
-        List<GywlwProject> list = gywlwProjectMapper.selectByGywlwUserId(gywlwUserId, offset, limit, projectStatus);
+    public List<GywlwProject> projectList(String gywlwUserId, Byte projectStatus) {
+        List<GywlwProject> list = gywlwProjectMapper.selectByGywlwUserId(gywlwUserId, projectStatus);
         System.out.println(gywlwUserId);
         if(list.size()==0){
             list = gywlwProjectUserGroupMapper.selectProjectByUserId(gywlwUserId);

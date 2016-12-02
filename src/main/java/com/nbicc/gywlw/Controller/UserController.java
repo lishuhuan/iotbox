@@ -1,5 +1,7 @@
 package com.nbicc.gywlw.Controller;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.nbicc.gywlw.Model.*;
 import com.nbicc.gywlw.Service.MessageService;
 import com.nbicc.gywlw.Service.ProjectService;
@@ -16,6 +18,7 @@ import java.util.*;
  * Created by BigMao on 2016/11/19.
  */
 @Controller
+@RequestMapping("/user")
 public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
@@ -29,13 +32,13 @@ public class UserController {
     private MessageService messageService;
 
     //项目列表
-    @RequestMapping(path = {"/user/projectlist"}, method = {RequestMethod.GET})
+    @RequestMapping(path = {"/projectlist"}, method = {RequestMethod.GET})
     @ResponseBody
     public String projectList(@RequestParam(value = "project_status", defaultValue = "0")String projectStatus) {
         try {
             String localUserId = hostHolder.getGywlwUser().getUserId();
             List<GywlwProject> allProject = new ArrayList<>();
-            allProject = projectService.projectList(localUserId,0,5,Byte.parseByte(projectStatus));
+            allProject = projectService.projectList(localUserId,Byte.parseByte(projectStatus));
             String returnString = MyUtil.getJSONString(0, allProject);
             return returnString;
         }catch (Exception e){
@@ -45,7 +48,7 @@ public class UserController {
     }
 
     //新增项目
-    @RequestMapping(path = {"/user/addproject"}, method = {RequestMethod.POST})
+    @RequestMapping(path = {"/addproject"}, method = {RequestMethod.POST})
     @ResponseBody
     public String addProject(@RequestParam("project_name") String projectName,
                           @RequestParam(value = "parent_text", defaultValue = "") String parentText,
@@ -76,7 +79,7 @@ public class UserController {
         }
     }
 
-    @RequestMapping(path = {"/user/projectinfo"}, method = {RequestMethod.GET})
+    @RequestMapping(path = {"/projectinfo"}, method = {RequestMethod.GET})
     @ResponseBody
     public String projectInfo(@RequestParam(value = "project_id")String projectId) {
         try {
@@ -90,7 +93,7 @@ public class UserController {
 
 
     //编辑项目
-    @RequestMapping(path = {"/user/editproject"}, method = {RequestMethod.POST})
+    @RequestMapping(path = {"/editproject"}, method = {RequestMethod.POST})
     @ResponseBody
     public String editProject(@RequestParam("project_id") String projectId,
                               @RequestParam("project_name") String projectName,
@@ -123,7 +126,7 @@ public class UserController {
     }
 
     //停用和启用项目
-    @RequestMapping(path = {"/user/stopproject"}, method = {RequestMethod.POST})
+    @RequestMapping(path = {"/stopproject"}, method = {RequestMethod.POST})
     @ResponseBody
     public String stopProject(@RequestParam("project_id") String projectId,
                               @RequestParam("project_status")String projectStatus){
@@ -138,7 +141,7 @@ public class UserController {
 
 
     //获取项目成员列表
-    @RequestMapping(path = {"/user/projectmemberlist"}, method = {RequestMethod.GET})
+    @RequestMapping(path = {"/projectmemberlist"}, method = {RequestMethod.GET})
     @ResponseBody
     public String projectMemberList(@RequestParam("project_id") String projectId){
         try {
@@ -153,7 +156,7 @@ public class UserController {
     }
 
     //搜索用户，限普通用户
-    @RequestMapping(path = {"/user/searchuser"}, method = {RequestMethod.GET})
+    @RequestMapping(path = {"/searchuser"}, method = {RequestMethod.GET})
     @ResponseBody
     public String searchUser(@RequestParam("user_phone") String userPhone){
         try{
@@ -166,7 +169,7 @@ public class UserController {
     }
 
     //添加项目成员
-    @RequestMapping(path = {"/user/addprojectmember"}, method = {RequestMethod.POST})
+    @RequestMapping(path = {"/addprojectmember"}, method = {RequestMethod.POST})
     @ResponseBody
     public String addProjectMember(@RequestParam("user_id") String userId,
                                    @RequestParam("write_permission")String writePermission,
@@ -182,7 +185,7 @@ public class UserController {
     }
 
     //删除项目成员
-    @RequestMapping(path = {"/user/deleteprojectmember"}, method = {RequestMethod.POST})
+    @RequestMapping(path = {"/deleteprojectmember"}, method = {RequestMethod.POST})
     @ResponseBody
     public String deleteProjectMember(@RequestParam("project_id")String projectId,
                                       @RequestParam("user_id")String userId){
@@ -199,7 +202,7 @@ public class UserController {
     //修改项目成员权限
 
     //项目关联变量组列表，并提供变量组搜索
-    @RequestMapping(path = {"/user/datainproject"}, method = {RequestMethod.GET})
+    @RequestMapping(path = {"/datainproject"}, method = {RequestMethod.GET})
     @ResponseBody
     public String dataInProject(@RequestParam("project_id")String projectId,
                                 @RequestParam(value = "variable_name",defaultValue = "ALL")String variableName){
@@ -214,7 +217,7 @@ public class UserController {
 
 
     //变量组中的数据详情
-    @RequestMapping(path = {"/user/historydata"}, method = {RequestMethod.GET})
+    @RequestMapping(path = {"/historydata"}, method = {RequestMethod.GET})
     @ResponseBody
     public String historyData(@RequestParam("project_id")String projectId,
                                 @RequestParam(value = "variable_name")String variableName){
@@ -228,7 +231,7 @@ public class UserController {
     }
 
     //告警列表,并提供变量组和日期查询
-    @RequestMapping(path = {"/user/warninglist"}, method = {RequestMethod.GET})
+    @RequestMapping(path = {"/warninglist"}, method = {RequestMethod.GET})
     @ResponseBody
     public String warningList(@RequestParam("project_id")String projectId,
                               @RequestParam(value = "variable_name", defaultValue = "ALL")String variableName,
@@ -247,7 +250,7 @@ public class UserController {
     }
 
     //设备列表，唯一识别码查询
-    @RequestMapping(path = {"/user/devicelist"}, method = {RequestMethod.GET})
+    @RequestMapping(path = {"/devicelist"}, method = {RequestMethod.GET})
     @ResponseBody
     public String deviceList(@RequestParam(value = "device_sn",defaultValue = "ALL")String deviceSn){
         try{
@@ -261,7 +264,7 @@ public class UserController {
 
 
     //对设备厂商权限分配
-    @RequestMapping(path = {"/user/setexpire"}, method = {RequestMethod.GET})
+    @RequestMapping(path = {"/setexpire"}, method = {RequestMethod.GET})
     @ResponseBody
     public String setExpire(@RequestParam(value = "expired_date",defaultValue = "0")String expiredDate,
                             @RequestParam("expired_right")String expiredRight,
@@ -280,7 +283,7 @@ public class UserController {
     }
 
     //查看用户资料
-    @RequestMapping(path = {"/user/userinfo"}, method = {RequestMethod.GET})
+    @RequestMapping(path = {"/userinfo"}, method = {RequestMethod.GET})
     @ResponseBody
     public String userInfo(){
         try {
@@ -293,7 +296,7 @@ public class UserController {
     }
 
     //修改资料
-    @RequestMapping(path = {"/user/changeinfo"}, method = {RequestMethod.POST})
+    @RequestMapping(path = {"/changeinfo"}, method = {RequestMethod.POST})
     @ResponseBody
     public String changeInfo(@RequestParam("user_name")String userName,
                              @RequestParam(value = "company_name",defaultValue = "")String companyName,
@@ -317,7 +320,7 @@ public class UserController {
 
 
     //绑定设备
-    @RequestMapping(path = {"/user/binddevice"}, method = {RequestMethod.POST})
+    @RequestMapping(path = {"/binddevice"}, method = {RequestMethod.POST})
     @ResponseBody
     public String bindDevvice(@RequestParam("device_sn")String deviceSn){
         try{
@@ -331,7 +334,7 @@ public class UserController {
     }
 
     //解绑设备
-    @RequestMapping(path = {"/user/unbinddevice"}, method = {RequestMethod.POST})
+    @RequestMapping(path = {"/unbinddevice"}, method = {RequestMethod.POST})
     @ResponseBody
     public String unbindDevvice(@RequestParam("device_sn")String deviceSn){
         try{
@@ -345,7 +348,7 @@ public class UserController {
     }
 
     //转移管理员权限
-    @RequestMapping(path = {"/user/giveadmin"}, method = {RequestMethod.POST})
+    @RequestMapping(path = {"/giveadmin"}, method = {RequestMethod.POST})
     @ResponseBody
     public String giveAdmin(@RequestParam("user_phone")String userPhone){
         try {
@@ -358,7 +361,7 @@ public class UserController {
     }
 
     //变量组列表
-    @RequestMapping(path = {"/user/variablelist"}, method = {RequestMethod.GET})
+    @RequestMapping(path = {"/variablelist"}, method = {RequestMethod.GET})
     @ResponseBody
     public String variableList(@RequestParam("project_id") String projectId){
         try{
@@ -371,7 +374,7 @@ public class UserController {
     }
 
     //plc列表
-    @RequestMapping(path = {"/user/plclist"}, method = {RequestMethod.GET})
+    @RequestMapping(path = {"/plclist"}, method = {RequestMethod.GET})
     @ResponseBody
     public String plcList(@RequestParam("device_id") String deviceId){
         try{
@@ -384,7 +387,7 @@ public class UserController {
     }
 
     //数据项列表
-    @RequestMapping(path = {"/user/reglist"}, method = {RequestMethod.GET})
+    @RequestMapping(path = {"/reglist"}, method = {RequestMethod.GET})
     @ResponseBody
     public String regList(@RequestParam("plc_id") String plcId){
         try{
@@ -411,7 +414,7 @@ public class UserController {
         }
     }
 
-    @RequestMapping(path = {"/user/unbindvariableandreg"}, method = {RequestMethod.POST})
+    @RequestMapping(path = {"/unbindvariableandreg"}, method = {RequestMethod.POST})
     @ResponseBody
     public String unbindVariableAndReg(@RequestParam("id")String id){
         try{
@@ -424,7 +427,7 @@ public class UserController {
     }
 
     //趋势参数设置
-    @RequestMapping(path = {"/user/trendpicture"}, method = {RequestMethod.POST})
+    @RequestMapping(path = {"/trendpicture"}, method = {RequestMethod.POST})
     @ResponseBody
     public String trendpicture(@RequestBody ReceiveModel model){
         try {
@@ -438,7 +441,7 @@ public class UserController {
 
 
     //趋势数据输出
-    @RequestMapping(path = {"/user/getdata"}, method = {RequestMethod.GET})
+    @RequestMapping(path = {"/getdata"}, method = {RequestMethod.GET})
     @ResponseBody
     public String dataForTrend(@RequestParam("photo_name")String photoName){
         try {
@@ -447,6 +450,25 @@ public class UserController {
         }catch (Exception e){
             logger.error("获取趋势数据失败" + e.getMessage());
             return MyUtil.getJSONString(1, "获取趋势数据失败!");
+        }
+    }
+
+    //项目列表,带分页
+    @RequestMapping(path = {"/projectlistbypage"}, method = {RequestMethod.GET})
+    @ResponseBody
+    public String projectListByPage(@RequestParam(value = "project_status", defaultValue = "0")String projectStatus,
+                                    @RequestParam(value = "page_num", required = false, defaultValue = "1")Integer pageNum,
+                                    @RequestParam(value = "page_size", required = false, defaultValue = "5")Integer pageSize) {
+        try {
+            String localUserId = hostHolder.getGywlwUser().getUserId();
+            List<GywlwProject> allProject = new ArrayList<>();
+            PageHelper.startPage(pageNum,pageSize);
+            allProject = projectService.projectList(localUserId,Byte.parseByte(projectStatus));
+            PageInfo<GywlwProject> pageInfo = new PageInfo<>(allProject);
+            return MyUtil.getJSONString(0, pageInfo);
+        }catch (Exception e){
+            logger.error("获取项目列表失败" + e.getMessage());
+            return MyUtil.getJSONString(1, "获取项目列表失败");
         }
     }
 

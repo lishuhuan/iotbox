@@ -22,6 +22,7 @@ import java.util.List;
 
 
 @Controller
+@RequestMapping("/factory")
 public class ManufacturerController {
 
 	 private static final Logger logger = LoggerFactory.getLogger(ManufacturerController.class);
@@ -34,7 +35,7 @@ public class ManufacturerController {
 	@Autowired
 	private ManufacturerService manufacturerService;
 
-	@RequestMapping(path = { "/factory/userlist" }, method = { RequestMethod.POST,RequestMethod.GET })
+	@RequestMapping(path = { "/userlist" }, method = { RequestMethod.POST,RequestMethod.GET })
 	@ResponseBody
 	public JSONObject userlist(@RequestParam(value = "name") String name) {
 		try{
@@ -49,7 +50,7 @@ public class ManufacturerController {
 	}
 	
 	
-	@RequestMapping(path = { "/factory/devicelist" }, method = { RequestMethod.POST })
+	@RequestMapping(path = { "/devicelist" }, method = { RequestMethod.POST })
 	@ResponseBody
 	public JSONObject devicelist(@RequestParam(value = "adminId") String adminId) {
 		try{
@@ -61,7 +62,7 @@ public class ManufacturerController {
         }
 	}
 	
-	@RequestMapping(path = { "/factory/deviceDatalist" }, method = { RequestMethod.POST })
+	@RequestMapping(path = { "/deviceDatalist" }, method = { RequestMethod.POST })
 	@ResponseBody
 	public JSONObject deviceDatalist(@RequestParam(value = "deviceId") String deviceId) {
 		try{
@@ -73,7 +74,7 @@ public class ManufacturerController {
         }
 	}
 	
-	@RequestMapping(path = { "/factory/deviceAlarmlist" }, method = { RequestMethod.POST })
+	@RequestMapping(path = { "/deviceAlarmlist" }, method = { RequestMethod.POST })
 	@ResponseBody
 	public JSONObject deviceAlarmlist(@RequestParam(value = "startTime") String startTime,
 									  @RequestParam(value = "endTime") String endTime,
@@ -87,7 +88,7 @@ public class ManufacturerController {
         }
 	}
 	
-	@RequestMapping(path = { "/factory/alarmDetail" }, method = { RequestMethod.POST })
+	@RequestMapping(path = { "/alarmDetail" }, method = { RequestMethod.POST })
 	@ResponseBody
 	public JSONObject alarmDetail(@RequestParam(value = "itemId") String deviceId) {
 		try{
@@ -99,7 +100,7 @@ public class ManufacturerController {
         }
 	}
 	
-	@RequestMapping(path = { "/factory/factoryLimitUser" }, method = { RequestMethod.POST })
+	@RequestMapping(path = { "/factoryLimitUser" }, method = { RequestMethod.POST })
 	@ResponseBody
 	public JSONObject factoryLimitUser(@RequestParam(value = "name") String name) {
 		String id=hostHolder.getGywlwUser().getUserId();
@@ -112,7 +113,7 @@ public class ManufacturerController {
         }
 	}
 	
-	@RequestMapping(path = { "/factory/factoryLimitUserDistribution" }, method = { RequestMethod.POST })
+	@RequestMapping(path = { "/factoryLimitUserDistribution" }, method = { RequestMethod.POST })
 	@ResponseBody
 	public String factoryLimitUserDistribution(@RequestParam(value = "factoryId") String factoryId,
 												   @RequestParam(value = "userId") String userId,
@@ -132,7 +133,7 @@ public class ManufacturerController {
 		}
 	}
 	
-	@RequestMapping(path = { "/factory/factoryDevicelist" }, method = { RequestMethod.POST })
+	@RequestMapping(path = { "/factoryDevicelist" }, method = { RequestMethod.POST })
 	@ResponseBody
 	public JSONObject factoryDevicelist(@RequestParam(value = "factoryId") String factoryId,
 										@RequestParam(value = "deviceSn") String deviceSn) {

@@ -34,7 +34,6 @@
     from gywlw_project
     where admin_id = #{gywlwUserId,jdbcType=VARCHAR} and del_mark = #{projectStatus,jdbcType=TINYINT}
     ORDER BY create_time DESC
-    LIMIT #{offset},#{limit}
   </select>
   <select id="selectByGywlwProjectId" resultMap="BaseResultMap" parameterType="com.nbicc.gywlw.Model.GywlwProject" >
     select

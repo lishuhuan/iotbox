@@ -18,8 +18,8 @@ public interface GywlwProjectMapper {
 
     GywlwProject selectByGywlwProjectId(String gywlwProjectId);
 
-    List<GywlwProject> selectByGywlwUserId(@Param("gywlwUserId") String gywlwUserId, @Param("offset") int offset,
-                                           @Param("limit") int limit, @Param("projectStatus") Byte projectStatus);
+    List<GywlwProject> selectByGywlwUserId(@Param("gywlwUserId") String gywlwUserId,
+                                           @Param("projectStatus") Byte projectStatus);
 
     List<GywlwProject> selectByGywlwUserId1(String gywlwUserId);
 
