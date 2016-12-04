@@ -156,11 +156,13 @@ public class ProjectService {
     }
 
     public List<GywlwHistoryItem> searchHistoryData(String projectId, String variableName) {
+        refreshData();
         return gywlwHistoryItemMapper.selectByVariableName(variableName, projectId);
 
     }
 
     public List<GywlwHistoryItem> warningList(String projectId, String variableName, String startTime, String endTime) {
+        refreshData();
         return gywlwHistoryItemMapper.selectwarning(projectId, variableName, startTime, endTime);
     }
 

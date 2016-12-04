@@ -26,6 +26,9 @@ public class ManufacturerService {
 	
 	@Autowired
 	private GywlwHistoryItemMapper gywlwHistoryItemMapper;
+
+	@Autowired
+	private ProjectService projectService;
 	
 	
 	public List<GywlwUser> searchUser(String factoryId,int level,String name){
@@ -37,16 +40,18 @@ public class ManufacturerService {
 	}
 	
 	public List<GywlwHistoryItem> getHistoryData(String deviceId){
+		projectService.refreshData();
 		return gywlwHistoryItemMapper.getHistoryData(deviceId);
 	}
 	
 	public List<GywlwHistoryItem> getDeviceAlarmlist(String startTime,String endTime,String deviceId){
-
+		projectService.refreshData();
 		return gywlwHistoryItemMapper.getDeviceAlarmlist(MyUtil.timeTransformToString(startTime),
 				MyUtil.timeTransformToString(endTime), deviceId);
 	}
 	
 	public GywlwHistoryItem getAlarmDetail(String itemId){
+		projectService.refreshData();
 		return gywlwHistoryItemMapper.getAlarmDetail(itemId);
 	}
 	
