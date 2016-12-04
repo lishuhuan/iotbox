@@ -228,6 +228,18 @@ public class UserController {
         }
     }
 
+    //告警规则列表
+    @RequestMapping(path = {"/warningruleslist"}, method = {RequestMethod.GET})
+    @ResponseBody
+    public String getWarningRulesList(@RequestParam("device_id")String deviceId){
+        try{
+            List<GywlwWarningRules> list = projectService.getWarningList(deviceId);
+            return MyUtil.getJSONString(0,list);
+        }catch (Exception e){
+            logger.error("查找规则列表出错" + e.getMessage());
+            return MyUtil.getJSONString(1, "查找规则列表出错!");
+        }
+    }
 
     //变量组中的数据详情
     @RequestMapping(path = {"/historydata"}, method = {RequestMethod.GET})
@@ -276,8 +288,9 @@ public class UserController {
     }
 
 
+
     //对设备厂商权限分配
-    @RequestMapping(path = {"/setexpire"}, method = {RequestMethod.GET})
+    @RequestMapping(path = {"/setexpire"}, method = {RequestMethod.POST})
     @ResponseBody
     public String setExpire(@RequestParam(value = "expired_date",defaultValue = "0")String expiredDate,
                             @RequestParam("expired_right")String expiredRight,
@@ -482,6 +495,18 @@ public class UserController {
         }catch (Exception e){
             logger.error("获取项目列表失败" + e.getMessage());
             return MyUtil.getJSONString(1, "获取项目列表失败");
+        }
+    }
+
+    @RequestMapping(path = {"/refresh"}, method = {RequestMethod.GET})
+    @ResponseBody
+    public String refreshData(){
+        try {
+            projectService.refreshData();
+            return "ok";
+        }catch (Exception e){
+            logger.error("refresh失败" + e.getMessage());
+            return MyUtil.getJSONString(1, "refresh失败");
         }
     }
 

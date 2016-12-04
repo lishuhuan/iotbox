@@ -11,9 +11,13 @@
     <result column="item_type" property="itemType" jdbcType="INTEGER" />
     <result column="item_value" property="itemValue" jdbcType="DOUBLE" />
     <result column="item_time" property="itemTime" jdbcType="TIMESTAMP" />
+    <result column="severity" property="severity" jdbcType="INTEGER" />
+    <result column="item_content" property="itemAlias" jdbcType="VARCHAR" />
   </resultMap>
   <resultMap id="BaseResultMap1" type="com.nbicc.gywlw.Model.GywlwHistoryItem" >
     <id column="item_id" property="itemId" jdbcType="INTEGER" />
+    <result column="reg_id" property="plcId" jdbcType="VARCHAR" />
+
     <result column="variable_name" property="variableName" jdbcType="VARCHAR" />
     <result column="plc_name" property="plcName" jdbcType="VARCHAR" />
     <result column="device_name" property="deviceName" jdbcType="VARCHAR" />
@@ -28,9 +32,13 @@
     <result column="operator" property="operator" jdbcType="VARCHAR" />
     <result column="operand" property="operand" jdbcType="DOUBLE" />
   </resultMap>
+  <resultMap id="BaseResultMap3" type="com.nbicc.gywlw.Model.GywlwHistoryItem" >
+    <id column="item_id" property="itemId" jdbcType="INTEGER" />
+    <result column="item_time" property="itemTime" jdbcType="TIMESTAMP" />
+  </resultMap>
   <sql id="Base_Column_List" >
     item_id, reg_id, plc_id, plc_name, device_id, project_id, variable_name, device_name, item_name, item_alias,
-    item_address, item_type, item_value, item_time, severity, item_content, del_mark
+    item_address, item_type, item_value, item_time, severity, item_content, del_mark, rule_id
   </sql>
   <select id="selectByVariableName" resultMap="BaseResultMap" parameterType="com.nbicc.gywlw.Model.GywlwHistoryItem" >
     select 
@@ -38,9 +46,15 @@
     from gywlw_history_item
     where variable_name = #{variableName,jdbcType=VARCHAR} AND project_id = #{projectId,jdbcType=VARCHAR}
   </select>
+  <select id="getLastTimeByPlcId" resultMap="BaseResultMap3" parameterType="java.lang.String">
+    select
+    item_id, MAX(item_time) item_time
+    from gywlw_history_item
+    where plc_id = #{plcId,jdbcType=VARCHAR}
+  </select>
   <select id="selectwarning" resultMap="BaseResultMap1" parameterType="com.nbicc.gywlw.Model.GywlwHistoryItem" >
     select
-    a.item_id,a.plc_name,a.device_name,a.item_type,a.item_content,a.item_time,a.variable_name,a.severity,a.item_name,a.item_alias,a.rule_id,b.rule_name,b.operator,b.operand
+    a.item_id,a.reg_id,a.plc_name,a.device_name,a.item_type,a.item_content,a.item_time,a.variable_name,a.severity,a.item_name,a.item_alias,a.rule_id,b.rule_name,b.operator,b.operand
     from gywlw_history_item a,gywlw_warning_rules b
     <if test="variableName != 'ALL'">
     where a.item_time BETWEEN #{startTime,jdbcType=TIMESTAMP} AND #{endTime,jdbcType=TIMESTAMP} and a.rule_id = b.rule_id and a.variable_name = #{variableName,jdbcType=VARCHAR} AND a.project_id = #{projectId,jdbcType=VARCHAR};
@@ -75,6 +89,12 @@
       </if>
       <if test="regId != null" >
         reg_id,
+      </if>
+      <if test="plcId != null" >
+        plc_id,
+      </if>
+      <if test="plcName != null" >
+        plc_name,
       </if>
       <if test="deviceId != null" >
         device_id,
@@ -115,6 +135,9 @@
       <if test="delMark != null" >
         del_mark,
       </if>
+      <if test="ruleId != null" >
+        rule_id,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="itemId != null" >
@@ -122,6 +145,12 @@
       </if>
       <if test="regId != null" >
         #{regId,jdbcType=VARCHAR},
+      </if>
+      <if test="plcId != null" >
+        #{plcId,jdbcType=VARCHAR},
+      </if>
+      <if test="plcName != null" >
+        #{plcName,jdbcType=VARCHAR},
       </if>
       <if test="deviceId != null" >
         #{deviceId,jdbcType=VARCHAR},
@@ -161,6 +190,9 @@
       </if>
       <if test="delMark != null" >
         #{delMark,jdbcType=TINYINT},
+      </if>
+      <if test="ruleId != null" >
+        #{ruleId,jdbcType=INTEGER},
       </if>
     </trim>
   </insert>
@@ -232,14 +264,17 @@
   </update>
   
    <select id="getHistoryData" resultMap="BaseResultMap1" >
-   		SELECT * from gywlw_history_item where device_id=#{deviceId}
+   		SELECT item_id, reg_id, plc_id, plc_name, device_id, project_id, variable_name, device_name, item_name, item_alias,
+    item_address, item_type, item_value, MAX(item_time) item_time, severity, item_content, del_mark, rule_id
+   		from gywlw_history_item where device_id=#{deviceId}
+   		GROUP BY item_name;
   </select>
   
   <select id="getDeviceAlarmlist" resultMap="BaseResultMap" >
-   		SELECT item_id,device_name,item_name,item_alias,item_type,item_value,item_time,variable_name from gywlw_history_item where device_id=#{deviceId} and item_type=0
-   		<if test="startTime != null and endTime !=null and startTime != '' and endTime !=''">
-   			and item_time between #{startTime} and #{endTime}
-   		</if>
+   		SELECT item_id,device_name,item_name,item_alias,item_type,item_value,item_time,variable_name,severity,item_content
+        from gywlw_history_item where device_id=#{deviceId}
+   		and item_time between #{startTime} and #{endTime}
+        and severity in (1,2);
   </select>
   <select id="getDataForTrend" resultMap="BaseResultMap" >
     SELECT item_time,item_value

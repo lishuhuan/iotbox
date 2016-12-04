@@ -37,4 +37,6 @@ public interface GywlwHistoryItemMapper {
     public List<GywlwHistoryItem> getDataForTrend(@Param("regId")String regId,
                                                   @Param("startTime") Date startTime,
                                                   @Param("endTime") Date endTime);
+
+    GywlwHistoryItem getLastTimeByPlcId(String plcId);
 }

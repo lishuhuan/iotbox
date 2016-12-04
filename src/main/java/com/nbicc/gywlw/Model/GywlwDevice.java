@@ -11,6 +11,8 @@ public class GywlwDevice {
 
     private String factoryId;
 
+    private String factoryName;
+
     private Date createTime;
 
     private String content;
@@ -30,6 +32,15 @@ public class GywlwDevice {
     private Byte delMark;
 
     private Byte expiredRight;
+
+
+    public String getFactoryName() {
+        return factoryName;
+    }
+
+    public void setFactoryName(String factoryName) {
+        this.factoryName = factoryName;
+    }
 
     public Byte getDeviceOnline() {
         return deviceOnline;

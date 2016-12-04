@@ -23,6 +23,12 @@
     from gywlw_reg_info
     where reg_id = #{regId,jdbcType=VARCHAR}
   </select>
+  <select id="selectByRegName" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from gywlw_reg_info
+    where reg_name = #{regName,jdbcType=VARCHAR}
+  </select>
   <select id="selectByPlcId" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select
     <include refid="Base_Column_List" />

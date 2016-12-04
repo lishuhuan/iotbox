@@ -1,12 +1,5 @@
 package com.nbicc.gywlw.Service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.nbicc.gywlw.Model.GywlwDevice;
 import com.nbicc.gywlw.Model.GywlwHistoryItem;
 import com.nbicc.gywlw.Model.GywlwUser;
@@ -14,6 +7,13 @@ import com.nbicc.gywlw.Model.GywlwUserAdminGroup;
 import com.nbicc.gywlw.mapper.GywlwDeviceMapper;
 import com.nbicc.gywlw.mapper.GywlwHistoryItemMapper;
 import com.nbicc.gywlw.mapper.GywlwUserMapper;
+import com.nbicc.gywlw.util.MyUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 public class ManufacturerService {
@@ -41,7 +41,9 @@ public class ManufacturerService {
 	}
 	
 	public List<GywlwHistoryItem> getDeviceAlarmlist(String startTime,String endTime,String deviceId){
-		return gywlwHistoryItemMapper.getDeviceAlarmlist(startTime, endTime, deviceId);
+
+		return gywlwHistoryItemMapper.getDeviceAlarmlist(MyUtil.timeTransformToString(startTime),
+				MyUtil.timeTransformToString(endTime), deviceId);
 	}
 	
 	public GywlwHistoryItem getAlarmDetail(String itemId){

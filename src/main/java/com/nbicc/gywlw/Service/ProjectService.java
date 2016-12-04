@@ -1,11 +1,16 @@
 package com.nbicc.gywlw.Service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.nbicc.gywlw.Dao.DBObjectRepository;
 import com.nbicc.gywlw.Model.*;
 import com.nbicc.gywlw.mapper.*;
+import com.nbicc.gywlw.util.HttpClientUtil;
 import com.nbicc.gywlw.util.MyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -40,6 +45,12 @@ public class ProjectService {
     private GywlwRegInfoMapper gywlwRegInfoMapper;
     @Autowired
     private GywlwDataTrendMapper gywlwDataTrendMapper;
+    @Autowired
+    private GywlwProjectDeviceGroupMapper gywlwProjectDeviceGroupMapper;
+    @Autowired
+    private GywlwWarningRulesMapper gywlwWarningRulesMapper;
+    @Autowired
+    private DBObjectRepository dBObjectRepository;
 
     public List<GywlwProject> projectList(String gywlwUserId, Byte projectStatus) {
         List<GywlwProject> list = gywlwProjectMapper.selectByGywlwUserId(gywlwUserId, projectStatus);
@@ -146,6 +157,7 @@ public class ProjectService {
 
     public List<GywlwHistoryItem> searchHistoryData(String projectId, String variableName) {
         return gywlwHistoryItemMapper.selectByVariableName(variableName, projectId);
+
     }
 
     public List<GywlwHistoryItem> warningList(String projectId, String variableName, String startTime, String endTime) {
@@ -157,11 +169,24 @@ public class ProjectService {
             List<GywlwDevice> list = gywlwDeviceMapper.selectByUserIdAndDeviceSnWithAdmin(
                     hostHolder.getGywlwUser().getUserId(), deviceSn);
             list.addAll(gywlwDeviceMapper.selectByUserIdAndDeviceSn(hostHolder.getGywlwUser().getUserId(), deviceSn));
+            for(GywlwDevice device:list){
+                if(device.getFactoryId() != null && !"".equals(device.getFactoryId())) {
+                    device.setFactoryName(gywlwUserMapper.selectByPrimaryKey(device.getFactoryId()).getUserName());
+                }
+            }
             return list;
         } else {
-            return gywlwDeviceMapper.selectByUserIdAndDeviceSn(hostHolder.getGywlwUser().getUserId(), deviceSn);
+            List<GywlwDevice> list = gywlwDeviceMapper.selectByUserIdAndDeviceSn(hostHolder.getGywlwUser().getUserId(),
+                    deviceSn);
+            for(GywlwDevice device:list){
+                if(device.getFactoryId() != null && !"".equals(device.getFactoryId())) {
+                    device.setFactoryName(gywlwUserMapper.selectByPrimaryKey(device.getFactoryId()).getUserName());
+                }
+            }
+            return list;
         }
     }
+
 
     public void setExpire(String deviceId, Date expiredDate, Byte expiredRight) {
         GywlwDevice gywlwDevice = new GywlwDevice();
@@ -305,6 +330,7 @@ public class ProjectService {
         gywlwVariableRegGroup.setProjectId(projectId);
         gywlwVariableRegGroup.setRegId(regId);
         gywlwVariableRegGroupMapper.insertSelective(gywlwVariableRegGroup);
+        operateDeviceToProject(deviceId,projectId);
     }
 
     public void unbindRegAndVariable(String id){
@@ -347,6 +373,110 @@ public class ProjectService {
                 gywlwDataTrend.setLineWidth(variable.getWidth());
                 gywlwDataTrend.setPhotoName(model.getPhotoName());
                 gywlwDataTrendMapper.insert(gywlwDataTrend);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public void operateDeviceToProject(String deviceId, String projectId){
+        GywlwProjectDeviceGroup gywlwProjectDeviceGroup = new GywlwProjectDeviceGroup();
+        gywlwProjectDeviceGroup.setProjectId(projectId);
+        gywlwProjectDeviceGroup.setDeviceId(deviceId);
+        gywlwProjectDeviceGroupMapper.insertSelective(gywlwProjectDeviceGroup);
+    }
+
+    public List<GywlwWarningRules> getWarningList(String deviceId){
+        return gywlwWarningRulesMapper.selectByDeviceId(deviceId);
+    }
+
+    public void refreshData(){
+        try {
+            List<String> list = new ArrayList<>();
+            list.add("D0001");
+            list.add("alarm1");
+     //       list.add("alarm2");
+            list.add("D0002");
+            List<GywlwDevice> devices = gywlwDeviceMapper.selectAll();
+            GywlwHistoryItem gywlwHistoryItem = new GywlwHistoryItem();
+            //对于每个盒子，找出它管理的plc，并按照plcid查找历史数据，告警数据
+            if (devices.size() != 0) {
+                for (GywlwDevice device : devices) {
+                    List<GywlwPlcInfo> plcinfos = gywlwPlcInfoMapper.selectByDeviceId(device.getDeviceId());
+                    if (plcinfos.size() != 0) {
+                        for (GywlwPlcInfo plcInfo : plcinfos) {
+                            Long timeStamp;
+                            GywlwHistoryItem his = gywlwHistoryItemMapper.getLastTimeByPlcId(plcInfo.getId());
+                            if(his == null) {
+                                System.out.println("null");
+                                timeStamp = 1480767339L;
+                            }else{
+                                timeStamp = his.getItemTime().getTime();
+                            }
+                            System.out.println(timeStamp);
+                            //设置参数
+                            JSONObject jsonObject = new JSONObject();
+                            jsonObject.put("deviceId", plcInfo.getSubdeviceId());//"0052000000000003"
+                            jsonObject.put("idList", list);
+                            jsonObject.put("timestamp", timeStamp);
+                            System.out.println("param");
+                            System.out.println(jsonObject);
+
+                            String str = HttpClientUtil.post(jsonObject);
+
+                            //handle response
+                            JSONObject json = new JSONObject();
+                            Map<String, Object> map1 = JSON.parseObject(str);
+                            List<Map> list1 = JSON.parseArray(map1.get("result_data").toString(), Map.class);
+                            Long time = 0L;
+                            int mark = 0;
+                            int k = 0;
+                            for (Map map : list1) {
+                                mark++;
+                                if(mark == 10){
+                                    break;
+                                }
+                                if (!time.equals((Long) map.get("timestamp")) && k != 0) {
+                             //       gywlwHistoryItem.setItemTime(MyUtil.timeTransformToDate(String.valueOf(time)));
+                                    SimpleDateFormat format =  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                    String d = format.format(time);
+                                    Date date=format.parse(d);
+                                    gywlwHistoryItem.setItemTime(date);
+                                    gywlwHistoryItemMapper.insertSelective(gywlwHistoryItem);
+                                }
+                                k = 1;
+                                gywlwHistoryItem.setDeviceId(device.getDeviceId());
+                                gywlwHistoryItem.setProjectId(gywlwProjectDeviceGroupMapper.selectByDeviceId(device.getDeviceId()).getProjectId());
+                                gywlwHistoryItem.setPlcId(plcInfo.getId());
+                                gywlwHistoryItem.setPlcName(plcInfo.getPlcName());
+                                if (map.get("D0001") != null) {
+                                    gywlwHistoryItem.setRegId(gywlwRegInfoMapper.selectByRegName("D0001").getRegId());
+                                    gywlwHistoryItem.setItemName("D0001");
+                                    gywlwHistoryItem.setItemValue(Double.valueOf((String) map.get("D0001")));
+                                }
+                                if (map.get("D0002") != null) {
+                                    gywlwHistoryItem.setRegId(gywlwRegInfoMapper.selectByRegName("D0002").getRegId());
+                                    gywlwHistoryItem.setItemName("D0002");
+                                    gywlwHistoryItem.setItemValue(Double.valueOf((String) map.get("D0002")));
+                                }
+                                if (map.get("alarm1") != null) {
+                                    gywlwHistoryItem.setSeverity(1);
+                                    String string = (String)map.get("alarm1");
+                                    int index = string.lastIndexOf(".");
+                                    gywlwHistoryItem.setRuleId(Integer.valueOf(string.substring(0,index-1)));
+                                }
+                                /*
+                                if (map.get("alarm2") != null) {
+                                    gywlwHistoryItem.setSeverity(2);
+                                    gywlwHistoryItem.setRuleId(Integer.valueOf((String)map.get("alarm2")));
+                                }
+                                */
+
+                                time = (Long) map.get("timestamp");
+                            }
+                        }
+                    }
+                }
             }
         }catch (Exception e){
             e.printStackTrace();

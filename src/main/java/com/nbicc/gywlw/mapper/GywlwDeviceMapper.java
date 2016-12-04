@@ -26,6 +26,8 @@ public interface GywlwDeviceMapper {
 
     GywlwDevice selectByDeviceId(String deviceId);
 
+    List<GywlwDevice> selectAll();
+
     int updateByDeviceSnSelective(GywlwDevice gywlwDevice);
 
     int updateByPrimaryKeySelective(GywlwDevice gywlwDevice);

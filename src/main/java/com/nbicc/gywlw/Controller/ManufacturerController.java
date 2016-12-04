@@ -62,10 +62,11 @@ public class ManufacturerController {
         }
 	}
 	
-	@RequestMapping(path = { "/deviceDatalist" }, method = { RequestMethod.POST })
+	@RequestMapping(path = { "/deviceDatalist" }, method = { RequestMethod.GET })
 	@ResponseBody
-	public JSONObject deviceDatalist(@RequestParam(value = "deviceId") String deviceId) {
+	public JSONObject deviceDatalist(@RequestParam(value = "device_id") String deviceId) {
 		try{
+
             List<GywlwHistoryItem> list = manufacturerService.getHistoryData(deviceId);
             return ResponseCode.response(0, list);
         }catch (Exception e){
@@ -76,8 +77,8 @@ public class ManufacturerController {
 	
 	@RequestMapping(path = { "/deviceAlarmlist" }, method = { RequestMethod.POST })
 	@ResponseBody
-	public JSONObject deviceAlarmlist(@RequestParam(value = "startTime") String startTime,
-									  @RequestParam(value = "endTime") String endTime,
+	public JSONObject deviceAlarmlist(@RequestParam(value = "startTime",defaultValue = "0") String startTime,
+									  @RequestParam(value = "endTime",defaultValue = "2480036920") String endTime,
 									  @RequestParam(value = "deviceId") String deviceId) {
 		try{
             List<GywlwHistoryItem> list = manufacturerService.getDeviceAlarmlist(startTime,endTime,deviceId);
