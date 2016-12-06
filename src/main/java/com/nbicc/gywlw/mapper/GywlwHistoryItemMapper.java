@@ -14,6 +14,9 @@ public interface GywlwHistoryItemMapper {
 
     int insertSelective(GywlwHistoryItem record);
 
+    int insertBatch(List<GywlwHistoryItem> list);
+    int insertBatch1(List<GywlwHistoryItem> list);
+
     List<GywlwHistoryItem> selectByVariableName(@Param("variableName") String variableName,
                                                 @Param("projectId")String projectId);
 

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class TestController {
     @Autowired
     InitDataForHistory initDataForHistory;
-    @RequestMapping(path = {"/insertdata"}, method = {RequestMethod.GET})
+    @RequestMapping(path = {"/insertdata"}, method = {RequestMethod.POST})
     @ResponseBody
     public String insertdata(){
         initDataForHistory.add();

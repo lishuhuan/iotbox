@@ -1,6 +1,7 @@
 package com.nbicc.gywlw.Model;
 
 import java.util.Date;
+import java.util.List;
 
 public class GywlwProject {
     private String projectId;
@@ -47,10 +48,20 @@ public class GywlwProject {
 
     private String display;
 
+    private List<String> display1;
+
     private Byte delMark;
 
     public String getDisplay() {
         return display;
+    }
+
+    public List<String> getDisplay1() {
+        return display1;
+    }
+
+    public void setDisplay1(List<String> display1) {
+        this.display1 = display1;
     }
 
     public void setDisplay(String display) {

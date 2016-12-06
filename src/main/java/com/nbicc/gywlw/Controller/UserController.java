@@ -32,7 +32,7 @@ public class UserController {
     private MessageService messageService;
 
     //项目列表
-    @RequestMapping(path = {"/projectlist"}, method = {RequestMethod.GET})
+    @RequestMapping(path = {"/projectlist"}, method = {RequestMethod.POST})
     @ResponseBody
     public String projectList(@RequestParam(value = "project_status", defaultValue = "0")String projectStatus) {
         try {
@@ -79,11 +79,15 @@ public class UserController {
         }
     }
 
-    @RequestMapping(path = {"/projectinfo"}, method = {RequestMethod.GET})
+    @RequestMapping(path = {"/projectinfo"}, method = {RequestMethod.POST})
     @ResponseBody
     public String projectInfo(@RequestParam(value = "project_id")String projectId) {
         try {
             GywlwProject gywlwProject = projectService.projectInfo(projectId);
+
+            String[] str = gywlwProject.getDisplay().split(",");
+            List<String> list = Arrays.asList(str);
+            gywlwProject.setDisplay1(list);
             return MyUtil.getJSONString(0,gywlwProject);
         }catch (Exception e){
             logger.error("获取项目列表失败" + e.getMessage());
@@ -154,7 +158,7 @@ public class UserController {
 
 
     //获取项目成员列表
-    @RequestMapping(path = {"/projectmemberlist"}, method = {RequestMethod.GET})
+    @RequestMapping(path = {"/projectmemberlist"}, method = {RequestMethod.POST})
     @ResponseBody
     public String projectMemberList(@RequestParam("project_id") String projectId){
         try {
@@ -169,7 +173,7 @@ public class UserController {
     }
 
     //搜索用户，限普通用户
-    @RequestMapping(path = {"/searchuser"}, method = {RequestMethod.GET})
+    @RequestMapping(path = {"/searchuser"}, method = {RequestMethod.POST})
     @ResponseBody
     public String searchUser(@RequestParam("user_phone") String userPhone){
         try{
@@ -215,7 +219,7 @@ public class UserController {
     //修改项目成员权限
 
     //项目关联变量组列表，并提供变量组搜索
-    @RequestMapping(path = {"/datainproject"}, method = {RequestMethod.GET})
+    @RequestMapping(path = {"/datainproject"}, method = {RequestMethod.POST})
     @ResponseBody
     public String dataInProject(@RequestParam("project_id")String projectId,
                                 @RequestParam(value = "variable_name",defaultValue = "ALL")String variableName){
@@ -229,7 +233,7 @@ public class UserController {
     }
 
     //告警规则列表
-    @RequestMapping(path = {"/warningruleslist"}, method = {RequestMethod.GET})
+    @RequestMapping(path = {"/warningruleslist"}, method = {RequestMethod.POST})
     @ResponseBody
     public String getWarningRulesList(@RequestParam("device_id")String deviceId){
         try{
@@ -242,7 +246,7 @@ public class UserController {
     }
 
     //变量组中的数据详情
-    @RequestMapping(path = {"/historydata"}, method = {RequestMethod.GET})
+    @RequestMapping(path = {"/historydata"}, method = {RequestMethod.POST})
     @ResponseBody
     public String historyData(@RequestParam("project_id")String projectId,
                                 @RequestParam(value = "variable_name")String variableName){
@@ -256,7 +260,7 @@ public class UserController {
     }
 
     //告警列表,并提供变量组和日期查询
-    @RequestMapping(path = {"/warninglist"}, method = {RequestMethod.GET})
+    @RequestMapping(path = {"/warninglist"}, method = {RequestMethod.POST})
     @ResponseBody
     public String warningList(@RequestParam("project_id")String projectId,
                               @RequestParam(value = "variable_name", defaultValue = "ALL")String variableName,
@@ -275,7 +279,7 @@ public class UserController {
     }
 
     //设备列表，唯一识别码查询
-    @RequestMapping(path = {"/devicelist"}, method = {RequestMethod.GET})
+    @RequestMapping(path = {"/devicelist"}, method = {RequestMethod.POST})
     @ResponseBody
     public String deviceList(@RequestParam(value = "device_sn",defaultValue = "ALL")String deviceSn){
         try{
@@ -309,7 +313,7 @@ public class UserController {
     }
 
     //查看用户资料
-    @RequestMapping(path = {"/userinfo"}, method = {RequestMethod.GET})
+    @RequestMapping(path = {"/userinfo"}, method = {RequestMethod.POST})
     @ResponseBody
     public String userInfo(){
         try {
@@ -387,7 +391,7 @@ public class UserController {
     }
 
     //变量组列表
-    @RequestMapping(path = {"/variablelist"}, method = {RequestMethod.GET})
+    @RequestMapping(path = {"/variablelist"}, method = {RequestMethod.POST})
     @ResponseBody
     public String variableList(@RequestParam("project_id") String projectId){
         try{
@@ -400,7 +404,7 @@ public class UserController {
     }
 
     //plc列表
-    @RequestMapping(path = {"/plclist"}, method = {RequestMethod.GET})
+    @RequestMapping(path = {"/plclist"}, method = {RequestMethod.POST})
     @ResponseBody
     public String plcList(@RequestParam("device_id") String deviceId){
         try{
@@ -413,7 +417,7 @@ public class UserController {
     }
 
     //数据项列表
-    @RequestMapping(path = {"/reglist"}, method = {RequestMethod.GET})
+    @RequestMapping(path = {"/reglist"}, method = {RequestMethod.POST})
     @ResponseBody
     public String regList(@RequestParam("plc_id") String plcId){
         try{
@@ -467,7 +471,7 @@ public class UserController {
 
 
     //趋势数据输出
-    @RequestMapping(path = {"/getdata"}, method = {RequestMethod.GET})
+    @RequestMapping(path = {"/getdata"}, method = {RequestMethod.POST})
     @ResponseBody
     public String dataForTrend(@RequestParam("photo_name")String photoName){
         try {
@@ -480,7 +484,7 @@ public class UserController {
     }
 
     //项目列表,带分页
-    @RequestMapping(path = {"/projectlistbypage"}, method = {RequestMethod.GET})
+    @RequestMapping(path = {"/projectlistbypage"}, method = {RequestMethod.POST})
     @ResponseBody
     public String projectListByPage(@RequestParam(value = "project_status", defaultValue = "0")String projectStatus,
                                     @RequestParam(value = "page_num", required = false, defaultValue = "2")Integer pageNum,
@@ -498,11 +502,11 @@ public class UserController {
         }
     }
 
-    @RequestMapping(path = {"/refresh"}, method = {RequestMethod.GET})
+    @RequestMapping(path = {"/refresh"}, method = {RequestMethod.POST})
     @ResponseBody
     public String refreshData(){
         try {
-            projectService.refreshData();
+            projectService.refresh();
             return "ok";
         }catch (Exception e){
             logger.error("refresh失败" + e.getMessage());

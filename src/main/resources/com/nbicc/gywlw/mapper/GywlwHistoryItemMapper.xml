@@ -42,9 +42,10 @@
   </sql>
   <select id="selectByVariableName" resultMap="BaseResultMap" parameterType="com.nbicc.gywlw.Model.GywlwHistoryItem" >
     select 
-    item_id,plc_name,device_name,item_name,item_alias,item_type,item_value,item_time,variable_name
-    from gywlw_history_item
-    where variable_name = #{variableName,jdbcType=VARCHAR} AND project_id = #{projectId,jdbcType=VARCHAR}
+    a.item_id,a.plc_name,d.device_name,a.item_name,a.item_alias,a.item_type,a.item_value,a.item_time,b.variable_name
+    from gywlw_history_item a,gywlw_variable b,gywlw_variable_reg_group c, gywlw_device d
+    where b.variable_name = #{variableName,jdbcType=VARCHAR} AND b.project_id = #{projectId,jdbcType=VARCHAR} AND c.variable_id = b.variable_id and c.reg_id = a.reg_id and a.device_id=d.device_id
+    ORDER BY a.item_time DESC ;
   </select>
   <select id="getLastTimeByPlcId" resultMap="BaseResultMap3" parameterType="java.lang.String">
     select
@@ -57,11 +58,12 @@
     a.item_id,a.reg_id,a.plc_name,a.device_name,a.item_type,a.item_content,a.item_time,a.variable_name,a.severity,a.item_name,a.item_alias,a.rule_id,b.rule_name,b.operator,b.operand
     from gywlw_history_item a,gywlw_warning_rules b
     <if test="variableName != 'ALL'">
-    where a.item_time BETWEEN #{startTime,jdbcType=TIMESTAMP} AND #{endTime,jdbcType=TIMESTAMP} and a.rule_id = b.rule_id and a.variable_name = #{variableName,jdbcType=VARCHAR} AND a.project_id = #{projectId,jdbcType=VARCHAR};
+    where a.item_time BETWEEN #{startTime,jdbcType=TIMESTAMP} AND #{endTime,jdbcType=TIMESTAMP} and a.rule_id = b.rule_id and a.variable_name = #{variableName,jdbcType=VARCHAR} AND a.project_id = #{projectId,jdbcType=VARCHAR}
    </if>
     <if test="variableName == 'ALL'">
-    where a.item_time BETWEEN #{startTime,jdbcType=TIMESTAMP} AND #{endTime,jdbcType=TIMESTAMP} and a.rule_id = b.rule_id AND a.project_id = #{projectId,jdbcType=VARCHAR};
+    where a.item_time BETWEEN #{startTime,jdbcType=TIMESTAMP} AND #{endTime,jdbcType=TIMESTAMP} and a.rule_id = b.rule_id AND a.project_id = #{projectId,jdbcType=VARCHAR}
     </if>
+    ORDER BY a.item_time DESC ;
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from gywlw_history_item
@@ -80,6 +82,34 @@
       #{itemType,jdbcType=INTEGER}, #{itemValue,jdbcType=DOUBLE}, #{itemTime,jdbcType=TIMESTAMP}, 
       #{severity,jdbcType=INTEGER}, #{itemContent,jdbcType=VARCHAR}, #{delMark,jdbcType=TINYINT}
       )
+  </insert>
+  <insert id="insertBatch" parameterType="java.util.List" >
+    insert into gywlw_history_item (device_id,item_content,
+    item_name,item_time,item_value,plc_id,plc_name,project_id,
+    reg_id,rule_id,severity
+    )
+    values
+    <foreach collection ="list" item="a" index= "index" separator =",">
+    (#{a.deviceId,jdbcType=VARCHAR},#{a.itemContent,jdbcType=VARCHAR},
+    #{a.itemName,jdbcType=VARCHAR},#{a.itemTime,jdbcType=TIMESTAMP},#{a.itemValue,jdbcType=DOUBLE},
+    #{a.plcId,jdbcType=VARCHAR},#{a.plcName,jdbcType=VARCHAR},#{a.projectId,jdbcType=VARCHAR},
+    #{a.regId,jdbcType=VARCHAR}, #{a.ruleId,jdbcType=INTEGER},#{a.severity,jdbcType=INTEGER}
+    )
+    </foreach>
+  </insert>
+  <insert id="insertBatch1" parameterType="java.util.List" >
+    insert into gywlw_history_item (device_id,
+    item_name,item_time,item_value,plc_id,plc_name,project_id,
+    reg_id
+    )
+    values
+    <foreach collection ="list" item="b" index= "index" separator =",">
+      (#{b.deviceId,jdbcType=VARCHAR},
+      #{b.itemName,jdbcType=VARCHAR},#{b.itemTime,jdbcType=TIMESTAMP},#{b.itemValue,jdbcType=DOUBLE},
+      #{b.plcId,jdbcType=VARCHAR},#{b.plcName,jdbcType=VARCHAR},#{b.projectId,jdbcType=VARCHAR},
+      #{b.regId,jdbcType=VARCHAR}
+      )
+    </foreach>
   </insert>
   <insert id="insertSelective" parameterType="com.nbicc.gywlw.Model.GywlwHistoryItem" >
     insert into gywlw_history_item
@@ -274,13 +304,15 @@
    		SELECT item_id,device_name,item_name,item_alias,item_type,item_value,item_time,variable_name,severity,item_content
         from gywlw_history_item where device_id=#{deviceId}
    		and item_time between #{startTime} and #{endTime}
-        and severity in (1,2);
+        and severity in (1,2)
+        ORDER BY item_time DESC ;
   </select>
   <select id="getDataForTrend" resultMap="BaseResultMap" >
     SELECT item_time,item_value
     from gywlw_history_item
     where reg_id=#{regId}
     and item_time between #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP}
+    ORDER BY item_time DESC ;
   </select>
   
   <select id="getAlarmDetail" resultMap="BaseResultMap1" >

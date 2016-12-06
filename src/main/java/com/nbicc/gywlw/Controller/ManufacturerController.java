@@ -61,10 +61,10 @@ public class ManufacturerController {
             return ResponseCode.response(1, "搜索设备失败");
         }
 	}
-	
-	@RequestMapping(path = { "/deviceDatalist" }, method = { RequestMethod.GET })
+	//设备实时数据
+	@RequestMapping(path = { "/deviceDatalist" }, method = { RequestMethod.POST })
 	@ResponseBody
-	public JSONObject deviceDatalist(@RequestParam(value = "device_id") String deviceId) {
+	public JSONObject deviceDatalist(@RequestParam(value = "deviceId") String deviceId) {
 		try{
 
             List<GywlwHistoryItem> list = manufacturerService.getHistoryData(deviceId);
@@ -74,7 +74,8 @@ public class ManufacturerController {
             return ResponseCode.response(1, "获取数据失败");
         }
 	}
-	
+
+	//设备实时告警
 	@RequestMapping(path = { "/deviceAlarmlist" }, method = { RequestMethod.POST })
 	@ResponseBody
 	public JSONObject deviceAlarmlist(@RequestParam(value = "startTime",defaultValue = "0") String startTime,

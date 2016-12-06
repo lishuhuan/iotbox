@@ -22,7 +22,7 @@ public class GywlwConfiguration extends WebMvcConfigurerAdapter{
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(passportInterceptor);
         registry.addInterceptor(loginRequiredInterceptor).
-                addPathPatterns("/123/*");
+                addPathPatterns("/user/*");
         super.addInterceptors(registry);
     }
 }

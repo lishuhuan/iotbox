@@ -69,7 +69,13 @@ public class MyUtil {
         Date date=format.parse(d);
         return date;
     }
-
+    public static Date timeTransformToDateNo1000(String time) throws ParseException {
+        SimpleDateFormat format =  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        Long time1=Long.parseLong(time);
+        String d = format.format(time1);
+        Date date=format.parse(d);
+        return date;
+    }
 
 
     public static String MD5(String key) {

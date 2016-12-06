@@ -24,7 +24,7 @@ public class MessageController {
     @Autowired
     private MessageService messageService;
 
-    @RequestMapping(path = {"/message/list"}, method = {RequestMethod.GET})
+    @RequestMapping(path = {"/message/list"}, method = {RequestMethod.POST})
     @ResponseBody
     public String messageList(){
         try {

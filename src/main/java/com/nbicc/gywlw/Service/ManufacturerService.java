@@ -40,18 +40,18 @@ public class ManufacturerService {
 	}
 	
 	public List<GywlwHistoryItem> getHistoryData(String deviceId){
-		projectService.refreshData();
+		projectService.refresh();
 		return gywlwHistoryItemMapper.getHistoryData(deviceId);
 	}
 	
 	public List<GywlwHistoryItem> getDeviceAlarmlist(String startTime,String endTime,String deviceId){
-		projectService.refreshData();
+		projectService.refresh();
 		return gywlwHistoryItemMapper.getDeviceAlarmlist(MyUtil.timeTransformToString(startTime),
 				MyUtil.timeTransformToString(endTime), deviceId);
 	}
 	
 	public GywlwHistoryItem getAlarmDetail(String itemId){
-		projectService.refreshData();
+		projectService.refresh();
 		return gywlwHistoryItemMapper.getAlarmDetail(itemId);
 	}
 	
