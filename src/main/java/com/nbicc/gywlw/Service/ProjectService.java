@@ -397,11 +397,12 @@ public class ProjectService {
 
     public void refreshData(){
         try {
-            List<String> list = new ArrayList<>();
-            list.add("D0001");
+//            List<String> list = new ArrayList<>();
+        /*    list.add("D0001");
             list.add("alarm1");
             list.add("alarm2");
-            list.add("D0002");
+            list.add("D0002");*/
+
             List<GywlwDevice> devices = gywlwDeviceMapper.selectAll();
             GywlwHistoryItem gywlwHistoryItem = new GywlwHistoryItem();
             //对于每个盒子，找出它管理的plc，并按照plcid查找历史数据，告警数据
@@ -420,6 +421,15 @@ public class ProjectService {
                                 timeStamp = his.getItemTime().getTime();
                             }
                             System.out.println("timeStamp:   "+timeStamp);
+                            List<String> list = new ArrayList<>();
+                            List<GywlwRegInfo> reglists = gywlwRegInfoMapper.selectByPlcId(plcInfo.getId());
+                            if(reglists.size() == 0){
+                                continue;
+                            }else{
+                                for(GywlwRegInfo reg: reglists){
+                                    list.add(reg.getRegName());
+                                }
+                            }
                             //设置参数
                             JSONObject jsonObject = new JSONObject();
                             jsonObject.put("deviceId", plcInfo.getSubdeviceId());//"0052000000000003"
@@ -436,7 +446,7 @@ public class ProjectService {
                             List<Map> list1 = JSON.parseArray(map1.get("result_data").toString(), Map.class);
                             System.out.println("list1.size():"+MyUtil.getJSONString(0,list1));
                             if(list1.size()!=0) {
-                                handler(list1, device, plcInfo);
+                                handler(list1, device, plcInfo, list);
                             }
                         }
                     }
@@ -447,13 +457,13 @@ public class ProjectService {
         }
     }
 
-    public void handler(List<Map> list1,GywlwDevice device,GywlwPlcInfo plcInfo) throws ParseException {
+    public void handler(List<Map> list1,GywlwDevice device,GywlwPlcInfo plcInfo,List<String> regList) throws ParseException {
         DataModel dataModel = new DataModel();
         Long time = 0L;
         List<DataModel> list = new ArrayList<>();
         int k = 0;
         for(Map map : list1){
-            if(k>300){
+            if(k>600){
                 break;
             }
             if(!time.equals(map.get("timestamp")) && k != 0){
@@ -470,13 +480,19 @@ public class ProjectService {
                 dataModel.setAlarm2("alarm2");
                 dataModel.setAlarm2Value((String) map.get("alarm2"));
             }
-            if(map.get("D0001")!=null){
+            /*if(map.get("D0001")!=null){
                 dataModel.setName("D0001");
                 dataModel.setValue(Double.parseDouble((String) map.get("D0001")));
             }
             if(map.get("D0002")!=null){
                 dataModel.setName("D0002");
                 dataModel.setValue(Double.parseDouble((String) map.get("D0002")));
+            }*/
+            for(String info : regList){
+                if(map.get(info)!=null){
+                    dataModel.setName(info);
+                    dataModel.setValue(Double.parseDouble((String) map.get(info)));
+                }
             }
             time = (Long) map.get("timestamp");
         }
@@ -488,7 +504,7 @@ public class ProjectService {
 
         for(DataModel model :list){
             GywlwHistoryItem gywlwHistoryItem = new GywlwHistoryItem();
-            addItem(model,gywlwHistoryItem,device,plcInfo);
+            addItem(model,gywlwHistoryItem,device,plcInfo,regList);
             if(model.getAlarm1()!=null){
                 gywlwHistoryItem.setSeverity(1);
                 String string = model.getAlarm1Value();
@@ -498,7 +514,7 @@ public class ProjectService {
                 historyItems.add(gywlwHistoryItem);
                 gywlwHistoryItem = new GywlwHistoryItem();
                 //防止被alarm2修改
-                addItem(model,gywlwHistoryItem,device,plcInfo);
+                addItem(model,gywlwHistoryItem,device,plcInfo,regList);
             }
             if(model.getAlarm2()!=null){
                 gywlwHistoryItem.setSeverity(2);
@@ -523,14 +539,14 @@ public class ProjectService {
 
     }
 
-    public void addItem(DataModel model, GywlwHistoryItem gywlwHistoryItem,GywlwDevice device,GywlwPlcInfo plcInfo) throws ParseException {
+    public void addItem(DataModel model, GywlwHistoryItem gywlwHistoryItem,GywlwDevice device,GywlwPlcInfo plcInfo,List<String> regList) throws ParseException {
         Date date = MyUtil.timeTransformToDateNo1000(String.valueOf(model.getTime()));
         gywlwHistoryItem.setItemTime(date);
         gywlwHistoryItem.setDeviceId(device.getDeviceId());
         gywlwHistoryItem.setProjectId(gywlwProjectDeviceGroupMapper.selectByDeviceId(device.getDeviceId()).getProjectId());
         gywlwHistoryItem.setPlcId(plcInfo.getId());
         gywlwHistoryItem.setPlcName(plcInfo.getPlcName());
-        if("D0002".equals(model.getName())) {
+        /*if("D0002".equals(model.getName())) {
             gywlwHistoryItem.setRegId(gywlwRegInfoMapper.selectByRegName("D0002").getRegId());
             gywlwHistoryItem.setItemName("D0002");
             gywlwHistoryItem.setItemValue(model.getValue());
@@ -538,6 +554,13 @@ public class ProjectService {
             gywlwHistoryItem.setRegId(gywlwRegInfoMapper.selectByRegName("D0001").getRegId());
             gywlwHistoryItem.setItemName("D0001");
             gywlwHistoryItem.setItemValue(model.getValue());
+        }*/
+        for(String info : regList){
+            if(info.equals(model.getName())){
+                gywlwHistoryItem.setRegId(gywlwRegInfoMapper.selectByRegName(info).getRegId());
+                gywlwHistoryItem.setItemName(info);
+                gywlwHistoryItem.setItemValue(model.getValue());
+            }
         }
 
     }

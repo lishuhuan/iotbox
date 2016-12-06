@@ -66,7 +66,6 @@ public class ManufacturerController {
 	@ResponseBody
 	public JSONObject deviceDatalist(@RequestParam(value = "deviceId") String deviceId) {
 		try{
-
             List<GywlwHistoryItem> list = manufacturerService.getHistoryData(deviceId);
             return ResponseCode.response(0, list);
         }catch (Exception e){

@@ -17,7 +17,6 @@
   <resultMap id="BaseResultMap1" type="com.nbicc.gywlw.Model.GywlwHistoryItem" >
     <id column="item_id" property="itemId" jdbcType="INTEGER" />
     <result column="reg_id" property="plcId" jdbcType="VARCHAR" />
-
     <result column="variable_name" property="variableName" jdbcType="VARCHAR" />
     <result column="plc_name" property="plcName" jdbcType="VARCHAR" />
     <result column="device_name" property="deviceName" jdbcType="VARCHAR" />
@@ -295,8 +294,8 @@
   
    <select id="getHistoryData" resultMap="BaseResultMap1" >
    		SELECT item_id, reg_id, plc_id, plc_name, device_id, project_id, variable_name, device_name, item_name, item_alias,
-    item_address, item_type, item_value, MAX(item_time) item_time, severity, item_content, del_mark, rule_id
-   		from gywlw_history_item where device_id=#{deviceId}
+    item_address, item_type, item_value, item_time, severity, item_content, del_mark, rule_id
+   		from (select * from gywlw_history_item where device_id = #{deviceId,jdbcType=VARCHAR} order by item_time desc) t
    		GROUP BY item_name;
   </select>
   

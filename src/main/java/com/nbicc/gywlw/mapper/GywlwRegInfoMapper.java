@@ -19,6 +19,7 @@ public interface GywlwRegInfoMapper {
 
     List<GywlwRegInfo> selectByPlcId(String plcId);
 
+
     int updateByPrimaryKeySelective(GywlwRegInfo record);
 
     int updateByPrimaryKey(GywlwRegInfo record);
