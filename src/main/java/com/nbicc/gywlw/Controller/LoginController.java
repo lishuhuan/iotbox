@@ -1,6 +1,7 @@
 package com.nbicc.gywlw.Controller;
 
 
+import com.alibaba.fastjson.JSONObject;
 import com.nbicc.gywlw.Service.UserService;
 import com.nbicc.gywlw.util.MyUtil;
 import org.slf4j.Logger;
@@ -15,7 +16,7 @@ import java.util.Map;
 
 
 /**
- * Created by BigMao on 2016/11/17.
+ * Created by fangdong on 2016/11/17.
  */
 @Controller
 public class LoginController {
@@ -23,36 +24,55 @@ public class LoginController {
     @Autowired
     private UserService userService;
 
-    @RequestMapping(path = {"/reg"}, method = {RequestMethod.GET, RequestMethod.POST})
+    //注册
+    @RequestMapping(path = {"/reg"}, method = {RequestMethod.POST})
     @ResponseBody
-    public String reg(@RequestParam("user_name") String username,
-                      @RequestParam("password") String password,
-                      @RequestParam("phone") String phone,
-                      @RequestParam(value = "sms_code",defaultValue = "0") String smsCode,
-                      @RequestParam("company_name") String companyName,
-                      HttpServletResponse response) {
+    public JSONObject reg(@RequestParam("user_name") String username,
+                          @RequestParam("password") String password,
+                          @RequestParam("phone") String phone,
+                          @RequestParam(value = "sms_code",defaultValue = "0") String smsCode,  //unfinished
+                          @RequestParam("company_name") String companyName,
+                          HttpServletResponse response) {
         try {
-            Map<String, Object> map = userService.register(username, password, phone, companyName);
+            Map<String, Object> map = userService.register(username, password, phone, companyName,smsCode);
             if (map.containsKey("ticket")) {
                 Cookie cookie = new Cookie("ticket", map.get("ticket").toString());
                 cookie.setPath("/");
                 response.addCookie(cookie);
-                return MyUtil.getJSONString(0, "注册成功");
+                return MyUtil.response(0, "注册成功");
             } else {
-                return MyUtil.getJSONString(1, map);
+                return MyUtil.response(1, map);
             }
 
         } catch (Exception e) {
             logger.error("注册异常" + e.getMessage());
-            return MyUtil.getJSONString(1, "注册异常");
+            return MyUtil.response(1, "注册异常");
         }
     }
 
-    @RequestMapping(path = {"/login"}, method = {RequestMethod.GET, RequestMethod.POST})
+    //发送短信验证码
+    @RequestMapping(path = {"/sendsms"},method = {RequestMethod.POST})
     @ResponseBody
-    public String login(@RequestParam(value = "phone") String phone,
+    public JSONObject sendSms(@RequestParam(value = "phone") String phone){
+        try{
+            if(phone.length() != 11){
+                return MyUtil.response(1,"手机号不正确");
+            }else{
+                userService.sendSms(phone);
+                return MyUtil.response(0,"OK!");
+            }
+        }catch (Exception e){
+            logger.error("发送验证码失败" + e.getMessage());
+            return MyUtil.response(1, "发送验证码失败");
+        }
+    }
+
+    //登录
+    @RequestMapping(path = {"/login"}, method = {RequestMethod.POST})
+    @ResponseBody
+    public JSONObject login(@RequestParam(value = "phone") String phone,
                         @RequestParam(value = "password") String password,
-                        @RequestParam(value = "user_type", defaultValue = "0")String userType,
+                        @RequestParam(value = "user_type", defaultValue = "0")String userType,  //默认以普通用户登录0
                         HttpServletResponse response) {
         try {
             Map<String, Object> map = userService.login(phone, password,Byte.parseByte(userType));
@@ -61,21 +81,21 @@ public class LoginController {
                 cookie.setPath("/");
                 cookie.setMaxAge(3600*24*5);
                 response.addCookie(cookie);
-                return MyUtil.getJSONString(0, "成功");
+                return MyUtil.response(0, "成功");
             } else {
-                return MyUtil.getJSONString(1, map);
+                return MyUtil.response(1, map);
             }
 
         }catch (Exception e){
             logger.error("登录异常 " + e.getMessage());
-            return MyUtil.getJSONString(1, "登录异常");
+            return MyUtil.response(1, "登录异常");
         }
     }
 
     @RequestMapping(path = {"/logout"}, method = {RequestMethod.GET, RequestMethod.POST})
     public String logout(@CookieValue("ticket") String ticket) {
         userService.logout(ticket);
-        return "redirect:/";  //返回首页
+        return "redirect:/login";  //返回登录界面
     }
 
 }

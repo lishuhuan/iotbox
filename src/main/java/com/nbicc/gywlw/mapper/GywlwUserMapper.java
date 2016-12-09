@@ -2,11 +2,10 @@ package com.nbicc.gywlw.mapper;
 
 import com.nbicc.gywlw.Model.GywlwUser;
 import com.nbicc.gywlw.Model.GywlwUserAdminGroup;
-
-import java.util.List;
-
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 @Mapper
 public interface GywlwUserMapper {
@@ -22,8 +21,10 @@ public interface GywlwUserMapper {
 
     int updateByPrimaryKey(GywlwUser record);
 
+    //不包含密码，通常使用
     GywlwUser selectByPhone(String phone);
 
+    //包含密码敏感信息，仅作验证密码时可用
     GywlwUser selectByPhoneWithPsd(String phone);
 
     List<GywlwUser> searchUserByFactoy(@Param("factoryId") String factoryId,@Param("level") int level,@Param("name") String name);
