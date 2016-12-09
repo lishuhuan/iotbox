@@ -30,7 +30,7 @@ public class RedisAPI {
 	            config.setMaxWaitMillis(1000 * 100);
 
 	          //  config.setTestOnBorrow(true);
-	            pool = new JedisPool(config, "121.40.65.146", 6379,10000,"admin");
+	            pool = new JedisPool(config, "120.55.171.132", 6379,10000);
 	        }  
 	        return pool;  
 	    }  

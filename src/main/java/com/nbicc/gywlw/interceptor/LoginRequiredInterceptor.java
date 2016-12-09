@@ -1,6 +1,7 @@
 package com.nbicc.gywlw.interceptor;
 
 import com.nbicc.gywlw.Model.HostHolder;
+import com.nbicc.gywlw.util.MyException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -22,8 +23,9 @@ public class LoginRequiredInterceptor implements HandlerInterceptor{
     @Override
     public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o) throws Exception {
         if(hostHolder.getGywlwUser() == null){
-            httpServletResponse.sendRedirect("/login/");
-            return false;
+//            httpServletResponse.sendRedirect("/login/");
+//            return false;
+            throw new MyException("请登录");
         }
         return true;
     }

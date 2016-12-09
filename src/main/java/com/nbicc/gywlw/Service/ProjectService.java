@@ -444,7 +444,7 @@ public class ProjectService {
                             JSONObject json = new JSONObject();
                             Map<String, Object> map1 = JSON.parseObject(str);
                             List<Map> list1 = JSON.parseArray(map1.get("result_data").toString(), Map.class);
-                            System.out.println("list1.size():"+MyUtil.getJSONString(0,list1));
+                            System.out.println("list1.size():"+MyUtil.response(0,list1));
                             if(list1.size()!=0) {
                                 handler(list1, device, plcInfo, list);
                             }

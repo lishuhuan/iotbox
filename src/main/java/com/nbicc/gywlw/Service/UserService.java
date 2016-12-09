@@ -162,4 +162,27 @@ public class UserService {
         System.out.println(rsp.getBody());
     }
 
+    //修改密码 By Sms or Oldpsd
+    public int changePsd(String phone, String code, String newPassword,int mark){
+        //mark==0 通过短信修改密码
+        if(mark == 0) {
+            RedisAPI redisAPI = new RedisAPI();
+            if (redisAPI.get(phone) == null || !code.equals(redisAPI.get(phone))) {
+                return -1;
+            }
+        }
+        //mark==1 通过old密码修改密码
+        if(mark == 1) {
+            if(!MyUtil.MD5(code).equals(gywlwUserMapper.selectByPhoneWithPsd(phone).getUserPsd())){
+                return -1;
+            }
+        }
+        GywlwUser gywlwUser = new GywlwUser();
+        gywlwUser.setUserId(gywlwUserMapper.selectByPhone(phone).getUserId());
+        gywlwUser.setUserPsd(MyUtil.MD5(newPassword));
+        gywlwUserMapper.updateByPrimaryKeySelective(gywlwUser);
+        return 0;
+    }
+
+
 }

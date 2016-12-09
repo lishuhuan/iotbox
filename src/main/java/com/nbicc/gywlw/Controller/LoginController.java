@@ -3,6 +3,7 @@ package com.nbicc.gywlw.Controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.nbicc.gywlw.Service.UserService;
+import com.nbicc.gywlw.util.MyException;
 import com.nbicc.gywlw.util.MyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +69,7 @@ public class LoginController {
     }
 
     //登录
-    @RequestMapping(path = {"/login"}, method = {RequestMethod.POST})
+    @RequestMapping(path = {"/login"}, method = {RequestMethod.POST,RequestMethod.GET})
     @ResponseBody
     public JSONObject login(@RequestParam(value = "phone") String phone,
                         @RequestParam(value = "password") String password,
@@ -91,11 +92,48 @@ public class LoginController {
             return MyUtil.response(1, "登录异常");
         }
     }
+    //忘记密码
+    @RequestMapping(path = {"/forgetpsd"}, method = {RequestMethod.POST})
+    @ResponseBody
+    public JSONObject forgetPsd(@RequestParam("phone")String phone,
+                                @RequestParam("sms_code")String smsCode,
+                                @RequestParam("new_password")String newPassword){
+        try{
+            int resultCode = userService.changePsd(phone,smsCode,newPassword,0);
+            if(resultCode == -1){
+                return MyUtil.response(1,"验证码错误");
+            }
+            return MyUtil.response(0,"修改密码成功");
+        }catch (Exception e){
+            logger.error("修改密码异常 " + e.getMessage());
+            return MyUtil.response(1, "修改密码异常");
+        }
+    }
+
+    //修改密码（通过旧密码）
+    @RequestMapping(path = {"/changepsd"}, method = {RequestMethod.POST})
+    @ResponseBody
+    public JSONObject changePsd(@RequestParam("phone")String phone,
+                                @RequestParam("old_password")String oldPassword,
+                                @RequestParam("new_password")String newPassword){
+        try{
+            int resultCode = userService.changePsd(phone,oldPassword,newPassword,1);
+            if(resultCode == -1){
+                return MyUtil.response(1,"密码错误");
+            }
+            return MyUtil.response(0,"修改密码成功");
+        }catch (Exception e){
+            logger.error("修改密码异常 " + e.getMessage());
+            return MyUtil.response(1, "修改密码异常");
+        }
+    }
+
 
     @RequestMapping(path = {"/logout"}, method = {RequestMethod.GET, RequestMethod.POST})
-    public String logout(@CookieValue("ticket") String ticket) {
+    public String logout(@CookieValue("ticket") String ticket) throws MyException {
         userService.logout(ticket);
-        return "redirect:/login";  //返回登录界面
+//        return "redirect:/error";  //返回登录界面
+        throw new MyException("请重新登录");
     }
 
 }
