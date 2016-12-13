@@ -16,8 +16,12 @@ public interface GywlwVariableMapper {
 
     GywlwVariable selectByPrimaryKey(String variableId);
 
+    GywlwVariable selectByProjectIdAndVariableName(@Param("projectId") String projectId,
+                                                   @Param("variableName")String variableName);
+
     List<GywlwVariable> selectByProjectId(@Param("projectId") String projectId,
                                           @Param("variableName")String variableName);
+    List<GywlwVariable> selectByProjectIdWithoutTime(String projectId);
 
     int updateByPrimaryKeySelective(GywlwVariable record);
 

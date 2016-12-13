@@ -10,6 +10,8 @@ public class GywlwProjectUserGroup {
 
     private String projectId;
 
+    private String projectName;
+
     private String userId;
 
     private Byte writePermission;
@@ -17,6 +19,14 @@ public class GywlwProjectUserGroup {
     private Date createTime;
 
     private Byte delMark;
+
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
 
     public String getUserPhone() {
         return userPhone;

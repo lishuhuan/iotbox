@@ -133,7 +133,8 @@ public class UserController {
         }
     }
 
-    @RequestMapping(path = "editdisplay", method = RequestMethod.POST)
+    //修改项目模块可见权限
+    @RequestMapping(path = "/editdisplay", method = RequestMethod.POST)
     @ResponseBody
     public JSONObject editDisplay(@RequestParam("project_id")String projectId,
                               @RequestParam("display")String display){
@@ -144,7 +145,6 @@ public class UserController {
             logger.error("编辑显示失败" + e.getMessage());
             return MyUtil.response(1, "编辑显示失败");
         }
-
     }
     //停用和启用项目
     @RequestMapping(path = {"/stopproject"}, method = {RequestMethod.POST})
@@ -160,7 +160,7 @@ public class UserController {
         }
     }
 
-    //停用和启用项目
+    //删除项目
     @RequestMapping(path = {"/deleteproject"}, method = {RequestMethod.POST})
     @ResponseBody
     public JSONObject deleteProject(@RequestParam("project_id") String projectId){
@@ -180,7 +180,7 @@ public class UserController {
     public JSONObject projectMemberList(@RequestParam("project_id") String projectId){
         try {
             List<GywlwProjectUserGroup> allProjectMember = new ArrayList<GywlwProjectUserGroup>();
-            allProjectMember = projectService.projectMemberList(projectId,0,5);
+            allProjectMember = projectService.projectMemberList(projectId);
             return MyUtil.response(0, allProjectMember);
         }catch (Exception e){
             logger.error("获取项目成员列表失败" + e.getMessage());
@@ -194,10 +194,13 @@ public class UserController {
     public JSONObject searchUser(@RequestParam("user_phone") String userPhone){
         try{
             GywlwUser User = projectService.searchUser(userPhone);
+            if(User == null){
+                return MyUtil.response(1, "搜不到该用户！");
+            }
             return MyUtil.response(0, User);
         }catch (Exception e){
             logger.error("搜索用户失败" + e.getMessage());
-            return MyUtil.response(1, "搜不到该用户！");
+            return MyUtil.response(1, "搜索该用户失败！");
         }
     }
 
@@ -231,8 +234,18 @@ public class UserController {
         }
     }
 
-
     //修改项目成员权限
+    @RequestMapping(path = {"/editprojectmember"}, method = {RequestMethod.POST})
+    @ResponseBody
+    public JSONObject addProjectMember(@RequestBody List<MemberPermission> list){
+        try {
+            projectService.editMemberPermission(list);
+            return MyUtil.response(0,"修改权限成功");
+        }catch (Exception e){
+            logger.error("修改项目成员权限失败" + e.getMessage());
+            return MyUtil.response(1, "修改项目成员权限失败!");
+        }
+    }
 
     //项目关联变量组列表，并提供变量组搜索
     @RequestMapping(path = {"/datainproject"}, method = {RequestMethod.POST})
@@ -422,13 +435,26 @@ public class UserController {
         }
     }
 
-    //变量组列表
+    //变量组列表,带最近联系时间
     @RequestMapping(path = {"/variablelist"}, method = {RequestMethod.POST})
     @ResponseBody
     public JSONObject variableList(@RequestParam("project_id") String projectId,
                                    @RequestParam(value = "variable_name",defaultValue = "ALL") String variableName){
         try{
             List<GywlwVariable> list = projectService.variableList(projectId,variableName);
+            return MyUtil.response(0,list);
+        }catch (Exception e){
+            logger.error("获取变量组列表失败1" + e.getMessage());
+            return MyUtil.response(1, "获取变量组列表失败!");
+        }
+    }
+
+    //变量组列表,不带最近联系时间
+    @RequestMapping(path = {"/variablelistwithouttime"}, method = {RequestMethod.POST})
+    @ResponseBody
+    public JSONObject variableList(@RequestParam("project_id") String projectId){
+        try{
+            List<GywlwVariable> list = projectService.variableListWithoutTime(projectId);
             return MyUtil.response(0,list);
         }catch (Exception e){
             logger.error("获取变量组列表失败" + e.getMessage());
@@ -442,7 +468,10 @@ public class UserController {
     public JSONObject addVariable(@RequestParam("project_id")String projectId,
                                   @RequestParam("variable_name")String variableName){
         try{
-            projectService.addVariable(projectId,variableName);
+            int mark = projectService.addVariable(projectId,variableName);
+            if(mark == -1){
+                return MyUtil.response(1,"变量组名重复");
+            }
             return MyUtil.response(0,"OK");
         }catch (Exception e){
             logger.error("新建变量组失败" + e.getMessage());

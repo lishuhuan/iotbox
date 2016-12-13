@@ -49,7 +49,6 @@
   ON a.user_id=b.user_id
   where a.project_id = #{projectId,jdbcType=VARCHAR} and a.del_mark = 0
   ORDER BY create_time DESC
-  LIMIT #{offset},#{limit}
 </select>
   <select id="selectByProjectIdAndUserId" resultMap="BaseResultMap" parameterType="com.nbicc.gywlw.Model.GywlwProjectUserGroup" >
     select

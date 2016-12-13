@@ -27,6 +27,14 @@
     ORDER BY b.item_time DESC) t
     GROUP BY t.variable_name
   </select>
+  <select id="selectByProjectIdWithoutTime" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select * from gywlw_variable
+    where project_id = #{projectId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByProjectIdAndVariableName" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select * from gywlw_variable
+    where project_id = #{projectId,jdbcType=VARCHAR} and variable_name = #{variableName,jdbcType=VARCHAR};
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
     delete from gywlw_variable
     where variable_id = #{variableId,jdbcType=VARCHAR}

@@ -15,9 +15,8 @@ public interface GywlwProjectUserGroupMapper {
 
     int insertSelective(GywlwProjectUserGroup record);
 
-    List<GywlwProjectUserGroup> selectByProjectId(@Param("projectId") String projectId,
-                                                  @Param("offset") int offset,
-                                                  @Param("limit") int limit);
+    List<GywlwProjectUserGroup> selectByProjectId(@Param("projectId") String projectId);
+
     List<GywlwProject> selectProjectByUserId(String userId);
 
     GywlwProjectUserGroup selectByProjectIdAndUserId(@Param("projectId") String projectId,

@@ -56,6 +56,7 @@ public class ProjectService {
         if(list.size()==0){
             list = gywlwProjectUserGroupMapper.selectProjectByUserId(gywlwUserId);
         }
+        //设置权限
         for(GywlwProject project : list){
             project.setWritePermission(Byte.parseByte("0"));
             if(project.getAdminId().equals(gywlwUserId)){
@@ -107,6 +108,7 @@ public class ProjectService {
         }
         return gywlwProject.getProjectId();
     }
+
     public void editDisplay(String projectId, String display){
         GywlwProject gywlwProject = new GywlwProject();
         gywlwProject.setProjectId(projectId);
@@ -122,10 +124,13 @@ public class ProjectService {
         gywlwProjectMapper.deleteByProjectId(gywlwProjectId);
     }
 
-    public List<GywlwProjectUserGroup> projectMemberList(String projectId, int offset, int limit) {
-        List<GywlwProjectUserGroup> list = gywlwProjectUserGroupMapper.selectByProjectId(projectId, offset, limit);
+    public List<GywlwProjectUserGroup> projectMemberList(String projectId) {
+        List<GywlwProjectUserGroup> list = gywlwProjectUserGroupMapper.selectByProjectId(projectId);
+        String projectName = gywlwProjectMapper.selectByGywlwProjectId(projectId).getProjectName();
+        for(GywlwProjectUserGroup gywlwProjectUserGroup:list){
+            gywlwProjectUserGroup.setProjectName(projectName);
+        }
         return list;
-
     }
 
     public GywlwUser searchUser(String userPhone) {
@@ -150,19 +155,35 @@ public class ProjectService {
         gywlwProjectUserGroupMapper.deleteByProjectIdAndUserId(projectId, userId);
     }
 
+    public void editMemberPermission(List<MemberPermission> list){
+        GywlwProjectUserGroup gywlwProjectUserGroup = new GywlwProjectUserGroup();
+        for(MemberPermission memberPermission : list){
+            gywlwProjectUserGroup.setId(memberPermission.getId());
+            gywlwProjectUserGroup.setWritePermission(memberPermission.getWritePermission());
+            gywlwProjectUserGroupMapper.updateByPrimaryKeySelective(gywlwProjectUserGroup);
+        }
+    }
+
     public List<GywlwVariableRegGroup> searchDataInProject(String projectId) {
         return gywlwVariableRegGroupMapper.selectByProjectIdAndVariableId(projectId);
     }
     public List<GywlwVariable> variableList(String projectId,String variableName){
         return gywlwVariableMapper.selectByProjectId(projectId,variableName);
     }
+    public List<GywlwVariable> variableListWithoutTime(String projectId){
+        return gywlwVariableMapper.selectByProjectIdWithoutTime(projectId);
+    }
 
-    public void addVariable(String projectId, String variableName){
+    public int addVariable(String projectId, String variableName){
+        if(gywlwVariableMapper.selectByProjectIdAndVariableName(projectId,variableName) != null){
+            return -1;
+        };
         GywlwVariable gywlwVariable = new GywlwVariable();
         gywlwVariable.setProjectId(projectId);
         gywlwVariable.setVariableName(variableName);
         gywlwVariable.setVariableId(UUID.randomUUID().toString().replaceAll("-",""));
         gywlwVariableMapper.insert(gywlwVariable);
+        return 0;
     }
 
     public void deleteVariable(String variableId){
