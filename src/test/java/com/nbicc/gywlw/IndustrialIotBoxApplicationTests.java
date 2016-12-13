@@ -1,13 +1,18 @@
 package com.nbicc.gywlw;
 
 import com.nbicc.gywlw.Service.UserService;
+import com.taobao.api.ApiException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
-import static org.junit.Assert.assertArrayEquals;
+
+import java.util.Map;
+
+import static org.junit.Assert.assertTrue;
+
 /**
  *
  * @author   fangdong
@@ -28,16 +33,11 @@ public class IndustrialIotBoxApplicationTests {
 	private UserService userService;
 
 	@Test
-	public void UserServiceTest(){
-		assertArrayEquals(
-				new Object[]{
+	public void RegisterTest() throws ApiException {
+		String smsCode = userService.sendSms("13000001111");
+		Map<String,Object> map = userService.register("测试233","123","13000001111","company2",smsCode);
+		assertTrue("have ticket? ",map.containsKey("ticket"));
 
-				},
-				new Object[]{
-
-				}
-
-		);
 	}
 
 

@@ -2,6 +2,7 @@ package com.nbicc.gywlw.Service;
 
 import com.nbicc.gywlw.Dao.LoginTicketDAO;
 import com.nbicc.gywlw.Model.GywlwUser;
+import com.nbicc.gywlw.Model.HostHolder;
 import com.nbicc.gywlw.Model.LoginTicket;
 import com.nbicc.gywlw.mapper.GywlwUserMapper;
 import com.nbicc.gywlw.util.MyUtil;
@@ -34,6 +35,9 @@ public class UserService {
 
     @Autowired
     private LoginTicketDAO loginTicketDAO;
+
+    @Autowired
+    private HostHolder hostHolder;
 
     //注册
     public Map<String, Object> register(String username, String password, String phone, String companyName, String sms) {
@@ -132,11 +136,11 @@ public class UserService {
     }
 
     public void logout(String ticket) {
-        loginTicketDAO.updateStatus(ticket, 1);
+        loginTicketDAO.delete(ticket);
     }
 
     //短信验证码发送
-    public void sendSms(String phone) throws ApiException {
+    public String sendSms(String phone) throws ApiException {
         Random random = new Random();
         String str = String.valueOf(random.nextInt(9999)%(9999-1000+1) + 1000);
         JedisPool pool = RedisAPI.getPool();
@@ -160,6 +164,7 @@ public class UserService {
         req.setSmsTemplateCode("SMS_33675301");
         AlibabaAliqinFcSmsNumSendResponse rsp = client.execute(req);
         System.out.println(rsp.getBody());
+        return str;
     }
 
     //修改密码 By Sms or Oldpsd
@@ -173,7 +178,7 @@ public class UserService {
         }
         //mark==1 通过old密码修改密码
         if(mark == 1) {
-            if(!MyUtil.MD5(code).equals(gywlwUserMapper.selectByPhoneWithPsd(phone).getUserPsd())){
+            if(!MyUtil.MD5(code).equals(gywlwUserMapper.selectByPhoneWithPsd(hostHolder.getGywlwUser().getUserPhone()).getUserPsd())){
                 return -1;
             }
         }

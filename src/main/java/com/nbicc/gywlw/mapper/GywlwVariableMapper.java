@@ -2,6 +2,7 @@ package com.nbicc.gywlw.mapper;
 
 import com.nbicc.gywlw.Model.GywlwVariable;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -15,7 +16,8 @@ public interface GywlwVariableMapper {
 
     GywlwVariable selectByPrimaryKey(String variableId);
 
-    List<GywlwVariable> selectByProjectId(String projectId);
+    List<GywlwVariable> selectByProjectId(@Param("projectId") String projectId,
+                                          @Param("variableName")String variableName);
 
     int updateByPrimaryKeySelective(GywlwVariable record);
 

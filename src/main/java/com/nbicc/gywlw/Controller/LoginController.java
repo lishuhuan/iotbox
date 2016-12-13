@@ -110,23 +110,7 @@ public class LoginController {
         }
     }
 
-    //修改密码（通过旧密码）
-    @RequestMapping(path = {"/changepsd"}, method = {RequestMethod.POST})
-    @ResponseBody
-    public JSONObject changePsd(@RequestParam("phone")String phone,
-                                @RequestParam("old_password")String oldPassword,
-                                @RequestParam("new_password")String newPassword){
-        try{
-            int resultCode = userService.changePsd(phone,oldPassword,newPassword,1);
-            if(resultCode == -1){
-                return MyUtil.response(1,"密码错误");
-            }
-            return MyUtil.response(0,"修改密码成功");
-        }catch (Exception e){
-            logger.error("修改密码异常 " + e.getMessage());
-            return MyUtil.response(1, "修改密码异常");
-        }
-    }
+
 
 
     @RequestMapping(path = {"/logout"}, method = {RequestMethod.GET, RequestMethod.POST})

@@ -118,6 +118,10 @@ public class ProjectService {
         gywlwProjectMapper.stopByProjectId(gywlwProjectId,projectStatus);
     }
 
+    public void deleteProject(String gywlwProjectId) {
+        gywlwProjectMapper.deleteByProjectId(gywlwProjectId);
+    }
+
     public List<GywlwProjectUserGroup> projectMemberList(String projectId, int offset, int limit) {
         List<GywlwProjectUserGroup> list = gywlwProjectUserGroupMapper.selectByProjectId(projectId, offset, limit);
         return list;
@@ -146,11 +150,23 @@ public class ProjectService {
         gywlwProjectUserGroupMapper.deleteByProjectIdAndUserId(projectId, userId);
     }
 
-    public List<GywlwVariableRegGroup> searchDataInProject(String projectId, String variableName) {
-        return gywlwVariableRegGroupMapper.selectByProjectIdAndVariableName(projectId, variableName);
+    public List<GywlwVariableRegGroup> searchDataInProject(String projectId) {
+        return gywlwVariableRegGroupMapper.selectByProjectIdAndVariableId(projectId);
     }
-    public List<GywlwVariable> variableList(String projectId){
-        return gywlwVariableMapper.selectByProjectId(projectId);
+    public List<GywlwVariable> variableList(String projectId,String variableName){
+        return gywlwVariableMapper.selectByProjectId(projectId,variableName);
+    }
+
+    public void addVariable(String projectId, String variableName){
+        GywlwVariable gywlwVariable = new GywlwVariable();
+        gywlwVariable.setProjectId(projectId);
+        gywlwVariable.setVariableName(variableName);
+        gywlwVariable.setVariableId(UUID.randomUUID().toString().replaceAll("-",""));
+        gywlwVariableMapper.insert(gywlwVariable);
+    }
+
+    public void deleteVariable(String variableId){
+        gywlwVariableMapper.deleteByPrimaryKey(variableId);
     }
 
     public List<GywlwHistoryItem> searchHistoryData(String projectId, String variableName) {
@@ -293,7 +309,11 @@ public class ProjectService {
             }
         }
 
-    public String giveAdmin(String userPhone){
+    public String giveAdmin(String userPhone,String password){
+        if(!MyUtil.MD5(password).equals(gywlwUserMapper.selectByPhoneWithPsd(hostHolder.getGywlwUser().getUserPhone()).getUserPsd())){
+            return "密码错误";
+        }
+
         //限制只能转移权限给一个人，只一次
         GywlwMessage msg = new GywlwMessage();
         msg.setMessageType(Byte.parseByte("1"));
@@ -379,6 +399,7 @@ public class ProjectService {
         }
     }
 
+    //当变量组绑定数据项时，将盒子与项目绑定
     public void operateDeviceToProject(String deviceId, String projectId){
         GywlwProjectDeviceGroup gywlwProjectDeviceGroup = new GywlwProjectDeviceGroup();
         gywlwProjectDeviceGroup.setProjectId(projectId);

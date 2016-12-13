@@ -17,13 +17,15 @@
     where variable_id = #{variableId,jdbcType=VARCHAR}
   </select>
   <select id="selectByProjectId" resultMap="BaseResultMap" parameterType="java.lang.String" >
-    select
-    a.variable_id, a.project_id, a.variable_name, MAX(b.item_time) last_connect
-    from gywlw_variable a
-    LEFT JOIN gywlw_history_item b
-    ON a.variable_name=b.variable_name
-    where a.project_id = #{projectId,jdbcType=VARCHAR}
-    GROUP BY a.variable_name
+    SELECT * from
+    (select a.variable_id, a.project_id, a.variable_name, b.item_time last_connect
+    from gywlw_variable a, gywlw_history_item b, gywlw_variable_reg_group c
+    where a.project_id = #{projectId,jdbcType=VARCHAR} and a.variable_id=c.variable_id and c.reg_id=b.reg_id
+    <if test="variableName != 'ALL'">
+    and  a.variable_name = #{variableName,jdbcType=VARCHAR}
+    </if>
+    ORDER BY b.item_time DESC) t
+    GROUP BY t.variable_name
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
     delete from gywlw_variable

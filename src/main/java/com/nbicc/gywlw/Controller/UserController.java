@@ -6,6 +6,7 @@ import com.github.pagehelper.PageInfo;
 import com.nbicc.gywlw.Model.*;
 import com.nbicc.gywlw.Service.MessageService;
 import com.nbicc.gywlw.Service.ProjectService;
+import com.nbicc.gywlw.Service.UserService;
 import com.nbicc.gywlw.util.MyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,10 +33,13 @@ public class UserController {
     @Autowired
     private MessageService messageService;
 
+    @Autowired
+    private UserService userService;
+
     //项目列表
     @RequestMapping(path = {"/projectlist"}, method = {RequestMethod.POST})
     @ResponseBody
-    public JSONObject projectList(@RequestParam(value = "project_status", defaultValue = "0")String projectStatus) {
+    public JSONObject projectList(@RequestParam(value = "project_status", defaultValue = "1")String projectStatus) {
         try {
             String localUserId = hostHolder.getGywlwUser().getUserId();
             List<GywlwProject> allProject = new ArrayList<>();
@@ -156,6 +160,19 @@ public class UserController {
         }
     }
 
+    //停用和启用项目
+    @RequestMapping(path = {"/deleteproject"}, method = {RequestMethod.POST})
+    @ResponseBody
+    public JSONObject deleteProject(@RequestParam("project_id") String projectId){
+        try {
+            projectService.deleteProject(projectId);
+            return MyUtil.response(0, "删除项目成功！");
+        }catch (Exception e){
+            logger.error("删除项目失败" + e.getMessage());
+            return MyUtil.response(1, "删除项目失败");
+        }
+    }
+
 
     //获取项目成员列表
     @RequestMapping(path = {"/projectmemberlist"}, method = {RequestMethod.POST})
@@ -220,10 +237,9 @@ public class UserController {
     //项目关联变量组列表，并提供变量组搜索
     @RequestMapping(path = {"/datainproject"}, method = {RequestMethod.POST})
     @ResponseBody
-    public JSONObject dataInProject(@RequestParam("project_id")String projectId,
-                                @RequestParam(value = "variable_name",defaultValue = "ALL")String variableName){
+    public JSONObject dataInProject(@RequestParam("project_id")String projectId){
         try{
-            List<GywlwVariableRegGroup> list = projectService.searchDataInProject(projectId,variableName);
+            List<GywlwVariableRegGroup> list = projectService.searchDataInProject(projectId);
             return MyUtil.response(0,list);
         }catch (Exception e){
             logger.error("未查到相关数据（变量组）" + e.getMessage());
@@ -347,6 +363,22 @@ public class UserController {
         }
     }
 
+    //修改密码（通过旧密码）
+    @RequestMapping(path = {"/changepsd"}, method = {RequestMethod.POST})
+    @ResponseBody
+    public JSONObject changePsd(@RequestParam("old_password")String oldPassword,
+                                @RequestParam("new_password")String newPassword){
+        try{
+            int resultCode = userService.changePsd("",oldPassword,newPassword,1);
+            if(resultCode == -1){
+                return MyUtil.response(1,"密码错误");
+            }
+            return MyUtil.response(0,"修改密码成功");
+        }catch (Exception e){
+            logger.error("修改密码异常 " + e.getMessage());
+            return MyUtil.response(1, "修改密码异常");
+        }
+    }
 
     //绑定设备
     @RequestMapping(path = {"/binddevice"}, method = {RequestMethod.POST})
@@ -379,9 +411,10 @@ public class UserController {
     //转移管理员权限
     @RequestMapping(path = {"/giveadmin"}, method = {RequestMethod.POST})
     @ResponseBody
-    public JSONObject giveAdmin(@RequestParam("user_phone")String userPhone){
+    public JSONObject giveAdmin(@RequestParam("user_phone")String userPhone,
+                                @RequestParam("password")String password){
         try {
-            String msg = projectService.giveAdmin(userPhone);
+            String msg = projectService.giveAdmin(userPhone,password);
             return MyUtil.response(0, msg);
         }catch (Exception e){
             logger.error("转移管理员权限出错" + e.getMessage());
@@ -392,13 +425,41 @@ public class UserController {
     //变量组列表
     @RequestMapping(path = {"/variablelist"}, method = {RequestMethod.POST})
     @ResponseBody
-    public JSONObject variableList(@RequestParam("project_id") String projectId){
+    public JSONObject variableList(@RequestParam("project_id") String projectId,
+                                   @RequestParam(value = "variable_name",defaultValue = "ALL") String variableName){
         try{
-            List<GywlwVariable> list = projectService.variableList(projectId);
+            List<GywlwVariable> list = projectService.variableList(projectId,variableName);
             return MyUtil.response(0,list);
         }catch (Exception e){
             logger.error("获取变量组列表失败" + e.getMessage());
             return MyUtil.response(1, "获取变量组列表失败!");
+        }
+    }
+
+    //新建变量组
+    @RequestMapping(path = {"/addvariable"}, method = {RequestMethod.POST})
+    @ResponseBody
+    public JSONObject addVariable(@RequestParam("project_id")String projectId,
+                                  @RequestParam("variable_name")String variableName){
+        try{
+            projectService.addVariable(projectId,variableName);
+            return MyUtil.response(0,"OK");
+        }catch (Exception e){
+            logger.error("新建变量组失败" + e.getMessage());
+            return MyUtil.response(1, "新建变量组失败!");
+        }
+    }
+
+    //删除变量组
+    @RequestMapping(path = {"/deletevariable"}, method = {RequestMethod.POST})
+    @ResponseBody
+    public JSONObject addVariable(@RequestParam("variable_id")String variableId){
+        try{
+            projectService.deleteVariable(variableId);
+            return MyUtil.response(0,"OK");
+        }catch (Exception e){
+            logger.error("删除变量组失败" + e.getMessage());
+            return MyUtil.response(1, "删除变量组失败!");
         }
     }
 
@@ -438,7 +499,7 @@ public class UserController {
             projectService.bindRegAndVariable(variableId,regId,deviceId,projectId);
             return MyUtil.response(0,"绑定成功");
         }catch (Exception e){
-            logger.error("绑定失败（variableandreg）" + e.getMessage());
+            logger.error("绑定失败（variableAndReg）" + e.getMessage());
             return MyUtil.response(1, "绑定失败!");
         }
     }
