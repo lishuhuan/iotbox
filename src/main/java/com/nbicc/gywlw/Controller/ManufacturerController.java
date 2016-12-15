@@ -1,10 +1,9 @@
 package com.nbicc.gywlw.Controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.nbicc.gywlw.Model.GywlwDevice;
-import com.nbicc.gywlw.Model.GywlwHistoryItem;
-import com.nbicc.gywlw.Model.GywlwUser;
-import com.nbicc.gywlw.Model.HostHolder;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.nbicc.gywlw.Model.*;
 import com.nbicc.gywlw.Service.ManufacturerService;
 import com.nbicc.gywlw.Service.MessageService;
 import com.nbicc.gywlw.util.MyUtil;
@@ -47,6 +46,25 @@ public class ManufacturerController {
             return MyUtil.response(1, "搜索用户失败");
         }
 	}
+
+	//by page
+	@RequestMapping(path = { "/userlistbypage" }, method = { RequestMethod.POST,RequestMethod.GET })
+	@ResponseBody
+	public JSONObject userlistByPage(@RequestParam(value = "name") String name,
+									 @RequestParam(value = "page_num", defaultValue = "1")Integer pageNum,
+									 @RequestParam(value = "page_size", defaultValue = "6")Integer pageSize) {
+		try{
+			String id=hostHolder.getGywlwUser().getUserId();
+			int level=hostHolder.getGywlwUser().getDuserLevel();
+			PageHelper.startPage(pageNum,pageSize);
+			List<GywlwUser> list = manufacturerService.searchUser(id,level,name);
+			PageInfo<GywlwUser> pageInfo = new PageInfo<>(list);
+			return MyUtil.response(0, pageInfo);
+		}catch (Exception e){
+			logger.error("搜索用户失败" + e.getMessage());
+			return MyUtil.response(1, "搜索用户失败");
+		}
+	}
 	
 	
 	@RequestMapping(path = { "/devicelist" }, method = { RequestMethod.POST })
@@ -60,6 +78,24 @@ public class ManufacturerController {
             return MyUtil.response(1, "搜索设备失败");
         }
 	}
+
+	//by page
+	@RequestMapping(path = { "/devicelistbypage" }, method = { RequestMethod.POST })
+	@ResponseBody
+	public JSONObject devicelist(@RequestParam(value = "adminId") String adminId,
+								 @RequestParam(value = "page_num", defaultValue = "1")Integer pageNum,
+								 @RequestParam(value = "page_size", defaultValue = "6")Integer pageSize) {
+		try{
+			PageHelper.startPage(pageNum,pageSize);
+			List<GywlwDevice> list = manufacturerService.searchDevice(adminId);
+			PageInfo<GywlwDevice> pageInfo = new PageInfo<>(list);
+			return MyUtil.response(0, pageInfo);
+		}catch (Exception e){
+			logger.error("搜索设备失败" + e.getMessage());
+			return MyUtil.response(1, "搜索设备失败");
+		}
+	}
+
 	//设备实时数据
 	@RequestMapping(path = { "/deviceDatalist" }, method = { RequestMethod.POST })
 	@ResponseBody
@@ -71,6 +107,23 @@ public class ManufacturerController {
             logger.error("获取数据失败" + e.getMessage());
             return MyUtil.response(1, "获取数据失败");
         }
+	}
+
+	//设备实时数据 by page
+	@RequestMapping(path = { "/deviceDatalistbypage" }, method = { RequestMethod.POST })
+	@ResponseBody
+	public JSONObject deviceDatalistByPage(@RequestParam(value = "deviceId") String deviceId,
+										   @RequestParam(value = "page_num", defaultValue = "1")Integer pageNum,
+										   @RequestParam(value = "page_size", defaultValue = "6")Integer pageSize) {
+		try{
+			PageHelper.startPage(pageNum,pageSize);
+			List<GywlwHistoryItem> list = manufacturerService.getHistoryData(deviceId);
+			PageInfo<GywlwHistoryItem> pageInfo = new PageInfo<>(list);
+			return MyUtil.response(0, pageInfo);
+		}catch (Exception e){
+			logger.error("获取数据失败" + e.getMessage());
+			return MyUtil.response(1, "获取数据失败");
+		}
 	}
 
 	//设备实时告警
@@ -86,6 +139,25 @@ public class ManufacturerController {
             logger.error("获取告警失败" + e.getMessage());
             return MyUtil.response(1, "获取告警失败");
         }
+	}
+
+	//设备实时告警 by page
+	@RequestMapping(path = { "/deviceAlarmlistbypage" }, method = { RequestMethod.POST })
+	@ResponseBody
+	public JSONObject deviceAlarmlistByPage(@RequestParam(value = "startTime",defaultValue = "0") String startTime,
+									 		@RequestParam(value = "endTime",defaultValue = "2480036920") String endTime,
+									  		@RequestParam(value = "deviceId") String deviceId,
+											@RequestParam(value = "page_num", defaultValue = "1")Integer pageNum,
+											@RequestParam(value = "page_size", defaultValue = "6")Integer pageSize		) {
+		try{
+			PageHelper.startPage(pageNum,pageSize);
+			List<GywlwHistoryItem> list = manufacturerService.getDeviceAlarmlist(startTime,endTime,deviceId);
+			PageInfo<GywlwHistoryItem> pageInfo = new PageInfo<>(list);
+			return MyUtil.response(0, pageInfo);
+		}catch (Exception e){
+			logger.error("获取告警失败" + e.getMessage());
+			return MyUtil.response(1, "获取告警失败");
+		}
 	}
 	
 	@RequestMapping(path = { "/alarmDetail" }, method = { RequestMethod.POST })
@@ -111,6 +183,24 @@ public class ManufacturerController {
             logger.error("获取厂商受限用户失败" + e.getMessage());
             return MyUtil.response(1, "获取厂商受限用户失败");
         }
+	}
+
+	//by page
+	@RequestMapping(path = { "/factoryLimitUserbypage" }, method = { RequestMethod.POST })
+	@ResponseBody
+	public JSONObject factoryLimitUserByPage(@RequestParam(value = "name") String name,
+											 @RequestParam(value = "page_num", defaultValue = "1")Integer pageNum,
+											 @RequestParam(value = "page_size", defaultValue = "6")Integer pageSize) {
+		String id=hostHolder.getGywlwUser().getUserId();
+		try{
+			PageHelper.startPage(pageNum,pageSize);
+			List<GywlwUser> list=manufacturerService.getFactoryLimitUser(name,id);
+			PageInfo<GywlwUser> pageInfo = new PageInfo<>(list);
+			return MyUtil.response(0, pageInfo);
+		}catch (Exception e){
+			logger.error("获取厂商受限用户失败" + e.getMessage());
+			return MyUtil.response(1, "获取厂商受限用户失败");
+		}
 	}
 	
 	@RequestMapping(path = { "/factoryLimitUserDistribution" }, method = { RequestMethod.POST })
@@ -145,6 +235,25 @@ public class ManufacturerController {
             logger.error("搜索设备失败" + e.getMessage());
             return MyUtil.response(1, "搜索设备失败");
         }
+	}
+
+	//by page
+	@RequestMapping(path = { "/factoryDevicelistbypage" }, method = { RequestMethod.POST })
+	@ResponseBody
+	public JSONObject factoryDevicelistByPage(@RequestParam(value = "factoryId") String factoryId,
+											  @RequestParam(value = "deviceSn") String deviceSn,
+											  @RequestParam(value = "page_num", defaultValue = "1")Integer pageNum,
+											  @RequestParam(value = "page_size", defaultValue = "6")Integer pageSize ) {
+		int level=hostHolder.getGywlwUser().getDuserLevel();
+		try{
+			PageHelper.startPage(pageNum,pageSize);
+			List<GywlwDevice> list = manufacturerService.getFactoryDevicelist(factoryId,deviceSn,level);
+			PageInfo<GywlwDevice> pageInfo = new PageInfo<>(list);
+			return MyUtil.response(0, pageInfo);
+		}catch (Exception e){
+			logger.error("搜索设备失败" + e.getMessage());
+			return MyUtil.response(1, "搜索设备失败");
+		}
 	}
 	
 	

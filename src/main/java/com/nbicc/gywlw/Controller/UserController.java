@@ -51,6 +51,25 @@ public class UserController {
         }
     }
 
+    //项目列表,带分页
+    @RequestMapping(path = {"/projectlistbypage"}, method = {RequestMethod.POST})
+    @ResponseBody
+    public JSONObject projectListByPage(@RequestParam(value = "project_status", defaultValue = "0")String projectStatus,
+                                        @RequestParam(value = "page_num", defaultValue = "1")Integer pageNum,
+                                        @RequestParam(value = "page_size", defaultValue = "6")Integer pageSize) {
+        try {
+            String localUserId = hostHolder.getGywlwUser().getUserId();
+            List<GywlwProject> allProject = new ArrayList<>();
+            PageHelper.startPage(pageNum,pageSize);
+            allProject = projectService.projectList(localUserId,Byte.parseByte(projectStatus));
+            PageInfo<GywlwProject> pageInfo = new PageInfo<>(allProject);
+            return MyUtil.response(0, pageInfo);
+        }catch (Exception e){
+            logger.error("获取项目列表失败" + e.getMessage());
+            return MyUtil.response(1, "获取项目列表失败");
+        }
+    }
+
     //新增项目
     @RequestMapping(path = {"/addproject"}, method = {RequestMethod.POST})
     @ResponseBody
@@ -146,6 +165,7 @@ public class UserController {
             return MyUtil.response(1, "编辑显示失败");
         }
     }
+
     //停用和启用项目
     @RequestMapping(path = {"/stopproject"}, method = {RequestMethod.POST})
     @ResponseBody
@@ -182,6 +202,24 @@ public class UserController {
             List<GywlwProjectUserGroup> allProjectMember = new ArrayList<GywlwProjectUserGroup>();
             allProjectMember = projectService.projectMemberList(projectId);
             return MyUtil.response(0, allProjectMember);
+        }catch (Exception e){
+            logger.error("获取项目成员列表失败" + e.getMessage());
+            return MyUtil.response(1, "获取项目成员列表失败");
+        }
+    }
+
+    //获取项目成员列表by page
+    @RequestMapping(path = {"/projectmemberlistbypage"}, method = {RequestMethod.POST})
+    @ResponseBody
+    public JSONObject projectMemberListByPage(@RequestParam("project_id") String projectId,
+                                              @RequestParam(value = "page_num",defaultValue = "1")Integer pageNum,
+                                              @RequestParam(value = "page_size",defaultValue = "0")Integer pageSize){
+        try {
+            List<GywlwProjectUserGroup> allProjectMember = new ArrayList<GywlwProjectUserGroup>();
+            PageHelper.startPage(pageNum,pageSize);
+            allProjectMember = projectService.projectMemberList(projectId);
+            PageInfo<GywlwProjectUserGroup> pageInfo = new PageInfo<>(allProjectMember);
+            return MyUtil.response(0, pageInfo);
         }catch (Exception e){
             logger.error("获取项目成员列表失败" + e.getMessage());
             return MyUtil.response(1, "获取项目成员列表失败");
@@ -260,6 +298,23 @@ public class UserController {
         }
     }
 
+    //项目关联变量组列表，并提供变量组搜索by page
+    @RequestMapping(path = {"/datainprojectbypage"}, method = {RequestMethod.POST})
+    @ResponseBody
+    public JSONObject dataInProjectByPage(@RequestParam("project_id")String projectId,
+                                          @RequestParam(value = "page_num", defaultValue = "1")Integer pageNum,
+                                          @RequestParam(value = "page_size", defaultValue = "6")Integer pageSize){
+        try{
+            PageHelper.startPage(pageNum,pageSize);
+            List<GywlwVariableRegGroup> list = projectService.searchDataInProject(projectId);
+            PageInfo<GywlwVariableRegGroup> pageInfo = new PageInfo<>(list);
+            return MyUtil.response(0, pageInfo);
+        }catch (Exception e){
+            logger.error("未查到相关数据（变量组）" + e.getMessage());
+            return MyUtil.response(1, "未查到相关数据!");
+        }
+    }
+
     //告警规则列表
     @RequestMapping(path = {"/warningruleslist"}, method = {RequestMethod.POST})
     @ResponseBody
@@ -267,6 +322,23 @@ public class UserController {
         try{
             List<GywlwWarningRules> list = projectService.getWarningList(deviceId);
             return MyUtil.response(0,list);
+        }catch (Exception e){
+            logger.error("查找规则列表出错" + e.getMessage());
+            return MyUtil.response(1, "查找规则列表出错!");
+        }
+    }
+
+    //告警规则列表
+    @RequestMapping(path = {"/warningruleslistbypage"}, method = {RequestMethod.POST})
+    @ResponseBody
+    public JSONObject getWarningRulesListByPage(@RequestParam("device_id")String deviceId,
+                                                @RequestParam(value = "page_num", defaultValue = "1")Integer pageNum,
+                                                @RequestParam(value = "page_size", defaultValue = "6")Integer pageSize){
+        try{
+            PageHelper.startPage(pageNum,pageSize);
+            List<GywlwWarningRules> list = projectService.getWarningList(deviceId);
+            PageInfo<GywlwWarningRules> pageInfo = new PageInfo<>(list);
+            return MyUtil.response(0, pageInfo);
         }catch (Exception e){
             logger.error("查找规则列表出错" + e.getMessage());
             return MyUtil.response(1, "查找规则列表出错!");
@@ -281,6 +353,24 @@ public class UserController {
         try{
             List<GywlwHistoryItem> list = projectService.searchHistoryData(projectId,variableName);
             return MyUtil.response(0,list);
+        }catch (Exception e){
+            logger.error("未查到相关数据详情" + e.getMessage());
+            return MyUtil.response(1, "未查到相关数据详情!");
+        }
+    }
+
+    //变量组中的数据详情
+    @RequestMapping(path = {"/historydatabypage"}, method = {RequestMethod.POST})
+    @ResponseBody
+    public JSONObject historyDataByPage(@RequestParam("project_id")String projectId,
+                                        @RequestParam(value = "variable_name")String variableName,
+                                        @RequestParam(value = "page_num", defaultValue = "1")Integer pageNum,
+                                        @RequestParam(value = "page_size", defaultValue = "6")Integer pageSize ){
+        try{
+            PageHelper.startPage(pageNum,pageSize);
+            List<GywlwHistoryItem> list = projectService.searchHistoryData(projectId,variableName);
+            PageInfo<GywlwHistoryItem> pageInfo = new PageInfo<>(list);
+            return MyUtil.response(0, pageInfo);
         }catch (Exception e){
             logger.error("未查到相关数据详情" + e.getMessage());
             return MyUtil.response(1, "未查到相关数据详情!");
@@ -306,6 +396,29 @@ public class UserController {
         }
     }
 
+    //告警列表,并提供变量组和日期查询
+    @RequestMapping(path = {"/warninglistbypage"}, method = {RequestMethod.POST})
+    @ResponseBody
+    public JSONObject warningListByPage(@RequestParam("project_id")String projectId,
+                                        @RequestParam(value = "variable_name", defaultValue = "ALL")String variableName,
+                                        @RequestParam(value = "start_time",defaultValue = "0")String startTimeString,
+                                        @RequestParam(value = "end_time", defaultValue = "2480036920")String endTimeString,
+                                        @RequestParam(value = "page_num", defaultValue = "1")Integer pageNum,
+                                        @RequestParam(value = "page_size", defaultValue = "6")Integer pageSize ){
+        try{
+            //将时间戳转化成date格式的字符串
+            String startTime = MyUtil.timeTransformToString(startTimeString);
+            String endTime = MyUtil.timeTransformToString(endTimeString);
+            PageHelper.startPage(pageNum,pageSize);
+            List<GywlwHistoryItem> list = projectService.warningList(projectId,variableName,startTime,endTime);
+            PageInfo<GywlwHistoryItem> pageInfo = new PageInfo<>(list);
+            return MyUtil.response(0, pageInfo);
+        }catch (Exception e){
+            logger.error("未查到告警数据详情" + e.getMessage());
+            return MyUtil.response(1, "未查到告警数据详情!");
+        }
+    }
+
     //设备列表，唯一识别码查询
     @RequestMapping(path = {"/devicelist"}, method = {RequestMethod.POST})
     @ResponseBody
@@ -319,6 +432,22 @@ public class UserController {
         }
     }
 
+    //设备列表，唯一识别码查询 by page
+    @RequestMapping(path = {"/devicelistbypage"}, method = {RequestMethod.POST})
+    @ResponseBody
+    public JSONObject deviceListByPage(@RequestParam(value = "device_sn",defaultValue = "ALL")String deviceSn,
+                                       @RequestParam(value = "page_num", defaultValue = "1")Integer pageNum,
+                                       @RequestParam(value = "page_size", defaultValue = "6")Integer pageSize){
+        try{
+            PageHelper.startPage(pageNum,pageSize);
+            List<GywlwDevice> list = projectService.getDeviceList(deviceSn);
+            PageInfo<GywlwDevice> pageInfo = new PageInfo<>(list);
+            return MyUtil.response(0, pageInfo);
+        }catch (Exception e){
+            logger.error("未查到设备列表" + e.getMessage());
+            return MyUtil.response(1, "未查到设备列表!");
+        }
+    }
 
 
     //对设备厂商权限分配
@@ -449,13 +578,48 @@ public class UserController {
         }
     }
 
+    //变量组列表,带最近联系时间 by page
+    @RequestMapping(path = {"/variablelistbypage"}, method = {RequestMethod.POST})
+    @ResponseBody
+    public JSONObject variableListByPage(@RequestParam("project_id") String projectId,
+                                         @RequestParam(value = "variable_name",defaultValue = "ALL") String variableName,
+                                         @RequestParam(value = "page_num", defaultValue = "1")Integer pageNum,
+                                         @RequestParam(value = "page_size", defaultValue = "6")Integer pageSize){
+        try{
+            PageHelper.startPage(pageNum,pageSize);
+            List<GywlwVariable> list = projectService.variableList(projectId,variableName);
+            PageInfo<GywlwVariable> pageInfo = new PageInfo<>(list);
+            return MyUtil.response(0, pageInfo);
+        }catch (Exception e){
+            logger.error("获取变量组列表失败1" + e.getMessage());
+            return MyUtil.response(1, "获取变量组列表失败!");
+        }
+    }
+
     //变量组列表,不带最近联系时间
     @RequestMapping(path = {"/variablelistwithouttime"}, method = {RequestMethod.POST})
     @ResponseBody
-    public JSONObject variableList(@RequestParam("project_id") String projectId){
+    public JSONObject variableListWT(@RequestParam("project_id") String projectId){
         try{
             List<GywlwVariable> list = projectService.variableListWithoutTime(projectId);
             return MyUtil.response(0,list);
+        }catch (Exception e){
+            logger.error("获取变量组列表失败" + e.getMessage());
+            return MyUtil.response(1, "获取变量组列表失败!");
+        }
+    }
+
+    //变量组列表,不带最近联系时间 by page
+    @RequestMapping(path = {"/variablelistwithouttimebypage"}, method = {RequestMethod.POST})
+    @ResponseBody
+    public JSONObject variableListWTByPage(@RequestParam("project_id") String projectId,
+                                         @RequestParam(value = "page_num", defaultValue = "1")Integer pageNum,
+                                         @RequestParam(value = "page_size", defaultValue = "6")Integer pageSize){
+        try{
+            PageHelper.startPage(pageNum,pageSize);
+            List<GywlwVariable> list = projectService.variableListWithoutTime(projectId);
+            PageInfo<GywlwVariable> pageInfo = new PageInfo<>(list);
+            return MyUtil.response(0, pageInfo);
         }catch (Exception e){
             logger.error("获取变量组列表失败" + e.getMessage());
             return MyUtil.response(1, "获取变量组列表失败!");
@@ -505,6 +669,23 @@ public class UserController {
         }
     }
 
+    //plc列表 by page
+    @RequestMapping(path = {"/plclistbypage"}, method = {RequestMethod.POST})
+    @ResponseBody
+    public JSONObject plcListByPage(@RequestParam("device_id") String deviceId,
+                              @RequestParam(value = "page_num", defaultValue = "1")Integer pageNum,
+                              @RequestParam(value = "page_size", defaultValue = "6")Integer pageSize){
+        try{
+            PageHelper.startPage(pageNum,pageSize);
+            List<GywlwPlcInfo> list = projectService.getPlcListByDeviceId(deviceId);
+            PageInfo<GywlwPlcInfo> pageInfo = new PageInfo<>(list);
+            return MyUtil.response(0, pageInfo);
+        }catch (Exception e){
+            logger.error("获取plc列表失败" + e.getMessage());
+            return MyUtil.response(1, "获取plc列表失败!");
+        }
+    }
+
     //数据项列表
     @RequestMapping(path = {"/reglist"}, method = {RequestMethod.POST})
     @ResponseBody
@@ -512,6 +693,23 @@ public class UserController {
         try{
             List<GywlwRegInfo> list = projectService.getRegListByPlcId(plcId);
             return MyUtil.response(0,list);
+        }catch (Exception e){
+            logger.error("获取数据项列表失败" + e.getMessage());
+            return MyUtil.response(1, "获取数据项列表失败!");
+        }
+    }
+
+    //数据项列表 by page
+    @RequestMapping(path = {"/reglistbypage"}, method = {RequestMethod.POST})
+    @ResponseBody
+    public JSONObject regListByPage(@RequestParam("plc_id") String plcId,
+                                    @RequestParam(value = "page_num", defaultValue = "1")Integer pageNum,
+                                    @RequestParam(value = "page_size", defaultValue = "6")Integer pageSize){
+        try{
+            PageHelper.startPage(pageNum,pageSize);
+            List<GywlwRegInfo> list = projectService.getRegListByPlcId(plcId);
+            PageInfo<GywlwRegInfo> pageInfo = new PageInfo<>(list);
+            return MyUtil.response(0, pageInfo);
         }catch (Exception e){
             logger.error("获取数据项列表失败" + e.getMessage());
             return MyUtil.response(1, "获取数据项列表失败!");
@@ -572,24 +770,23 @@ public class UserController {
         }
     }
 
-    //项目列表,带分页
-    @RequestMapping(path = {"/projectlistbypage"}, method = {RequestMethod.POST})
+    //趋势数据输出 by page
+    @RequestMapping(path = {"/getdatabypage"}, method = {RequestMethod.POST})
     @ResponseBody
-    public JSONObject projectListByPage(@RequestParam(value = "project_status", defaultValue = "0")String projectStatus,
-                                    @RequestParam(value = "page_num", required = false, defaultValue = "2")Integer pageNum,
-                                    @RequestParam(value = "page_size", required = false, defaultValue = "3")Integer pageSize) {
+    public JSONObject dataForTrendByPage(@RequestParam("photo_name")String photoName,
+                                         @RequestParam(value = "page_num", defaultValue = "1")Integer pageNum,
+                                         @RequestParam(value = "page_size", defaultValue = "6")Integer pageSize){
         try {
-            String localUserId = hostHolder.getGywlwUser().getUserId();
-            List<GywlwProject> allProject = new ArrayList<>();
             PageHelper.startPage(pageNum,pageSize);
-            allProject = projectService.projectList(localUserId,Byte.parseByte(projectStatus));
-            PageInfo<GywlwProject> pageInfo = new PageInfo<>(allProject);
+            List<Map> list = projectService.getDataForTrend(photoName);
+            PageInfo<Map> pageInfo = new PageInfo<>(list);
             return MyUtil.response(0, pageInfo);
         }catch (Exception e){
-            logger.error("获取项目列表失败" + e.getMessage());
-            return MyUtil.response(1, "获取项目列表失败");
+            logger.error("获取趋势数据失败" + e.getMessage());
+            return MyUtil.response(1, "获取趋势数据失败!");
         }
     }
+
 
     @RequestMapping(path = {"/refresh"}, method = {RequestMethod.POST})
     @ResponseBody
