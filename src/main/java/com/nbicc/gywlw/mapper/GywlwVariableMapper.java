@@ -10,6 +10,8 @@ import java.util.List;
 public interface GywlwVariableMapper {
     int deleteByPrimaryKey(String variableId);
 
+    int deleteByProjectId(String projectId);
+
     int insert(GywlwVariable record);
 
     int insertSelective(GywlwVariable record);

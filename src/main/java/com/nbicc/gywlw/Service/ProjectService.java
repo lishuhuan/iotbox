@@ -50,6 +50,7 @@ public class ProjectService {
     private GywlwWarningRulesMapper gywlwWarningRulesMapper;
 
 
+
     public List<GywlwProject> projectList(String gywlwUserId, Byte projectStatus) {
         List<GywlwProject> list = gywlwProjectMapper.selectByGywlwUserId(gywlwUserId, projectStatus);
         System.out.println(gywlwUserId);
@@ -120,8 +121,13 @@ public class ProjectService {
         gywlwProjectMapper.stopByProjectId(gywlwProjectId,projectStatus);
     }
 
+    //删除所有与项目相关的
     public void deleteProject(String gywlwProjectId) {
-        gywlwProjectMapper.deleteByProjectId(gywlwProjectId);
+        gywlwProjectDeviceGroupMapper.deleteByProjectId(gywlwProjectId);
+        gywlwProjectUserGroupMapper.deleteByProjectIdAndUserId(gywlwProjectId,"ALL");
+        gywlwVariableMapper.deleteByProjectId(gywlwProjectId);
+        gywlwVariableRegGroupMapper.deleteByProjectId(gywlwProjectId);
+        gywlwProjectMapper.deleteByProjectId(gywlwProjectId);//因为foreign key约束，所以project表最后删
     }
 
     public List<GywlwProjectUserGroup> projectMemberList(String projectId) {

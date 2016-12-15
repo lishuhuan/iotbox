@@ -1,9 +1,6 @@
 package com.nbicc.gywlw.Service;
 
-import com.nbicc.gywlw.Model.GywlwMessage;
-import com.nbicc.gywlw.Model.GywlwProject;
-import com.nbicc.gywlw.Model.GywlwUser;
-import com.nbicc.gywlw.Model.HostHolder;
+import com.nbicc.gywlw.Model.*;
 import com.nbicc.gywlw.mapper.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,7 +37,12 @@ public class MessageService {
     }
     public void sendMessage(String sendId,String receiveId,String content,Byte messageType,String text){
         GywlwMessage gywlwMessage = new GywlwMessage();
-        gywlwMessage.setContent(content);
+        String content1 = content;
+        if(messageType == 3){
+            String[] list = text.split(" ");
+            content1 =content + " \"" + gywlwProjectMapper.selectByGywlwProjectId(list[0]).getProjectName() + "\"";
+        }
+        gywlwMessage.setContent("\"" + gywlwUserMapper.selectByPrimaryKey(sendId).getUserName() + "\"" + content1);
         gywlwMessage.setMessageType(messageType);
         gywlwMessage.setReceiveId(receiveId);
         gywlwMessage.setSendId(sendId);
@@ -79,7 +81,8 @@ public class MessageService {
             String projectId = gywlwMessage1.getText().split(" ")[0];
             String writePermission = gywlwMessage1.getText().split(" ")[1];
             String msg = projectService.addProjectMember(projectId, gywlwMessage1.getReceiveId(),
-                    Byte.parseByte(writePermission));
+                        Byte.parseByte(writePermission));
+
         }
 
         return 0;

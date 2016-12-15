@@ -26,6 +26,10 @@
     delete from gywlw_variable_reg_group
     where id = #{id,jdbcType=INTEGER}
   </delete>
+  <delete id="deleteByProjectId" parameterType="java.lang.String" >
+    delete from gywlw_variable_reg_group
+    where project_id = #{projectId,jdbcType=INTEGER}
+  </delete>
   <insert id="insert" parameterType="com.nbicc.gywlw.Model.GywlwVariableRegGroup" >
     insert into gywlw_variable_reg_group (id, variable_id, reg_id, 
       device_id, project_id, del_mark

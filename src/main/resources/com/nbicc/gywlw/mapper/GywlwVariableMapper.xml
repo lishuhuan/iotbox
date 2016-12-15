@@ -39,6 +39,10 @@
     delete from gywlw_variable
     where variable_id = #{variableId,jdbcType=VARCHAR}
   </delete>
+  <delete id="deleteByProjectId" parameterType="java.lang.String" >
+    delete from gywlw_variable
+    where project_id = #{projectId,jdbcType=VARCHAR}
+  </delete>
   <insert id="insert" parameterType="com.nbicc.gywlw.Model.GywlwVariable" >
     insert into gywlw_variable (variable_id, project_id, variable_name
       )

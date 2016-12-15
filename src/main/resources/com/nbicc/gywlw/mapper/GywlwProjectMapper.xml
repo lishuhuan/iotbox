@@ -23,11 +23,12 @@
     <result column="project_type" property="projectType" jdbcType="VARCHAR" />
     <result column="project_desc" property="projectDesc" jdbcType="VARCHAR" />
     <result column="display" property="display" jdbcType="VARCHAR" />
+    <result column="del_mark" property="delMark" jdbcType="TINYINT" />
   </resultMap>
   <sql id="Base_Column_List" >
     project_id, project_name, admin_id, content, create_time, longitude, latitude, parent_text, 
     province, city, address, purchase_date, completion_date, install_date, contact_name, contact_phone,
-    customer_type, firstparty, project_type, project_desc, display
+    customer_type, firstparty, project_type, project_desc, display, del_mark
   </sql>
   <select id="selectByGywlwUserId" resultMap="BaseResultMap" parameterType="com.nbicc.gywlw.Model.GywlwProject" >
     select
@@ -50,7 +51,7 @@
   </select>
   <delete id="deleteByProjectId" parameterType="java.lang.String" >
     delete from gywlw_project
-    where project_id = #{gywlwProjectId},jdbcType=VARCHAR}
+    where project_id = #{gywlwProjectId,jdbcType=VARCHAR}
   </delete>
   <insert id="addProject" parameterType="com.nbicc.gywlw.Model.GywlwProject" >
     insert into gywlw_project (project_id, project_name, admin_id,

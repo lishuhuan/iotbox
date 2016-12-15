@@ -237,7 +237,7 @@ public class UserController {
     //修改项目成员权限
     @RequestMapping(path = {"/editprojectmember"}, method = {RequestMethod.POST})
     @ResponseBody
-    public JSONObject addProjectMember(@RequestBody List<MemberPermission> list){
+    public JSONObject editProjectMember(@RequestBody List<MemberPermission> list){
         try {
             projectService.editMemberPermission(list);
             return MyUtil.response(0,"修改权限成功");

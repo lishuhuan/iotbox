@@ -9,6 +9,8 @@ import java.util.List;
 public interface GywlwVariableRegGroupMapper {
     int deleteByPrimaryKey(Integer id);
 
+    int deleteByProjectId(String projectId);
+
     int insert(GywlwVariableRegGroup record);
 
     int insertSelective(GywlwVariableRegGroup record);

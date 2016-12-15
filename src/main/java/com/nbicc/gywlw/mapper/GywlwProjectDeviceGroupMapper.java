@@ -7,6 +7,8 @@ import org.apache.ibatis.annotations.Mapper;
 public interface GywlwProjectDeviceGroupMapper {
     int deleteByPrimaryKey(String id);
 
+    int deleteByProjectId(String projectId);
+
     int insert(GywlwProjectDeviceGroup record);
 
     int insertSelective(GywlwProjectDeviceGroup record);
