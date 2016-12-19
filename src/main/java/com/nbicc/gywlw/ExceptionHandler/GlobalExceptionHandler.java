@@ -1,6 +1,7 @@
-package com.nbicc.gywlw.util;
+package com.nbicc.gywlw.ExceptionHandler;
 
-import com.nbicc.gywlw.Model.ErrorInfo;
+import com.alibaba.fastjson.JSONObject;
+import com.nbicc.gywlw.util.MyUtil;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -23,4 +24,14 @@ public class GlobalExceptionHandler {
         r.setUrl(req.getRequestURL().toString());
         return r;
     }
+
+
+    @ExceptionHandler(value = Exception.class)
+    @ResponseBody
+    public JSONObject defaultErrorHandler(HttpServletRequest req, Exception e) {
+        e.printStackTrace();
+        System.out.println("GlobalDefaultExceptionHandler");
+        return MyUtil.response(-2,"错误");
+    }
+
 }

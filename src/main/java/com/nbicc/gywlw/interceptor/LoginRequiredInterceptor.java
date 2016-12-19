@@ -1,7 +1,7 @@
 package com.nbicc.gywlw.interceptor;
 
 import com.nbicc.gywlw.Model.HostHolder;
-import com.nbicc.gywlw.util.MyException;
+import com.nbicc.gywlw.ExceptionHandler.MyException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;

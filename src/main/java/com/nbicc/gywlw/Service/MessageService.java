@@ -35,6 +35,7 @@ public class MessageService {
     public List<GywlwMessage> messageList(){
         return gywlwMessageMapper.selectByUserId(hostHolder.getGywlwUser().getUserId());
     }
+
     public void sendMessage(String sendId,String receiveId,String content,Byte messageType,String text){
         GywlwMessage gywlwMessage = new GywlwMessage();
         String content1 = content;
@@ -121,6 +122,7 @@ public class MessageService {
         gywlwProjectUserGroupMapper.deleteByaddId(addId);
 
     }
+
     public void changeFactoryAdmin(GywlwMessage gywlwMessage1){
         String quitId = gywlwMessage1.getSendId();
         String addId = gywlwMessage1.getReceiveId();

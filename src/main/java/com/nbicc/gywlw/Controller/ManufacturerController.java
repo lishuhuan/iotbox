@@ -69,7 +69,7 @@ public class ManufacturerController {
 	
 	@RequestMapping(path = { "/devicelist" }, method = { RequestMethod.POST })
 	@ResponseBody
-	public JSONObject devicelist(@RequestParam(value = "adminId") String adminId) {
+	public JSONObject devicelist(@RequestParam(value = "admin_id") String adminId) {
 		try{
             List<GywlwDevice> list = manufacturerService.searchDevice(adminId);
             return MyUtil.response(0, list);
@@ -82,7 +82,7 @@ public class ManufacturerController {
 	//by page
 	@RequestMapping(path = { "/devicelistbypage" }, method = { RequestMethod.POST })
 	@ResponseBody
-	public JSONObject devicelist(@RequestParam(value = "adminId") String adminId,
+	public JSONObject devicelist(@RequestParam(value = "admin_id") String adminId,
 								 @RequestParam(value = "page_num", defaultValue = "1")Integer pageNum,
 								 @RequestParam(value = "page_size", defaultValue = "6")Integer pageSize) {
 		try{
@@ -97,7 +97,7 @@ public class ManufacturerController {
 	}
 
 	//设备实时数据
-	@RequestMapping(path = { "/deviceDatalist" }, method = { RequestMethod.POST })
+	@RequestMapping(path = { "/devicedatalist" }, method = { RequestMethod.POST })
 	@ResponseBody
 	public JSONObject deviceDatalist(@RequestParam(value = "deviceId") String deviceId) {
 		try{
@@ -110,7 +110,7 @@ public class ManufacturerController {
 	}
 
 	//设备实时数据 by page
-	@RequestMapping(path = { "/deviceDatalistbypage" }, method = { RequestMethod.POST })
+	@RequestMapping(path = { "/devicedatalistbypage" }, method = { RequestMethod.POST })
 	@ResponseBody
 	public JSONObject deviceDatalistByPage(@RequestParam(value = "deviceId") String deviceId,
 										   @RequestParam(value = "page_num", defaultValue = "1")Integer pageNum,
@@ -127,11 +127,11 @@ public class ManufacturerController {
 	}
 
 	//设备实时告警
-	@RequestMapping(path = { "/deviceAlarmlist" }, method = { RequestMethod.POST })
+	@RequestMapping(path = { "/devicealarmlist" }, method = { RequestMethod.POST })
 	@ResponseBody
-	public JSONObject deviceAlarmlist(@RequestParam(value = "startTime",defaultValue = "0") String startTime,
-									  @RequestParam(value = "endTime",defaultValue = "2480036920") String endTime,
-									  @RequestParam(value = "deviceId") String deviceId) {
+	public JSONObject deviceAlarmlist(@RequestParam(value = "start_time",defaultValue = "0") String startTime,
+									  @RequestParam(value = "end_time",defaultValue = "2480036920") String endTime,
+									  @RequestParam(value = "device_id") String deviceId) {
 		try{
             List<GywlwHistoryItem> list = manufacturerService.getDeviceAlarmlist(startTime,endTime,deviceId);
             return MyUtil.response(0, list);
@@ -142,11 +142,11 @@ public class ManufacturerController {
 	}
 
 	//设备实时告警 by page
-	@RequestMapping(path = { "/deviceAlarmlistbypage" }, method = { RequestMethod.POST })
+	@RequestMapping(path = { "/devicealarmlistbypage" }, method = { RequestMethod.POST })
 	@ResponseBody
-	public JSONObject deviceAlarmlistByPage(@RequestParam(value = "startTime",defaultValue = "0") String startTime,
-									 		@RequestParam(value = "endTime",defaultValue = "2480036920") String endTime,
-									  		@RequestParam(value = "deviceId") String deviceId,
+	public JSONObject deviceAlarmlistByPage(@RequestParam(value = "start_time",defaultValue = "0") String startTime,
+									 		@RequestParam(value = "end_time",defaultValue = "2480036920") String endTime,
+									  		@RequestParam(value = "device_id") String deviceId,
 											@RequestParam(value = "page_num", defaultValue = "1")Integer pageNum,
 											@RequestParam(value = "page_size", defaultValue = "6")Integer pageSize		) {
 		try{
@@ -160,9 +160,9 @@ public class ManufacturerController {
 		}
 	}
 	
-	@RequestMapping(path = { "/alarmDetail" }, method = { RequestMethod.POST })
+	@RequestMapping(path = { "/alarmdetail" }, method = { RequestMethod.POST })
 	@ResponseBody
-	public JSONObject alarmDetail(@RequestParam(value = "itemId") String deviceId) {
+	public JSONObject alarmDetail(@RequestParam(value = "item_id") String deviceId) {
 		try{
             GywlwHistoryItem item= manufacturerService.getAlarmDetail(deviceId);
             return MyUtil.response(0, item);
@@ -172,7 +172,7 @@ public class ManufacturerController {
         }
 	}
 	
-	@RequestMapping(path = { "/factoryLimitUser" }, method = { RequestMethod.POST })
+	@RequestMapping(path = { "/factorylimituser" }, method = { RequestMethod.POST })
 	@ResponseBody
 	public JSONObject factoryLimitUser(@RequestParam(value = "name") String name) {
 		String id=hostHolder.getGywlwUser().getUserId();
@@ -186,7 +186,7 @@ public class ManufacturerController {
 	}
 
 	//by page
-	@RequestMapping(path = { "/factoryLimitUserbypage" }, method = { RequestMethod.POST })
+	@RequestMapping(path = { "/factorylimituserbypage" }, method = { RequestMethod.POST })
 	@ResponseBody
 	public JSONObject factoryLimitUserByPage(@RequestParam(value = "name") String name,
 											 @RequestParam(value = "page_num", defaultValue = "1")Integer pageNum,
@@ -203,10 +203,10 @@ public class ManufacturerController {
 		}
 	}
 	
-	@RequestMapping(path = { "/factoryLimitUserDistribution" }, method = { RequestMethod.POST })
+	@RequestMapping(path = { "/factoryLimituserdistribution" }, method = { RequestMethod.POST })
 	@ResponseBody
-	public JSONObject factoryLimitUserDistribution(@RequestParam(value = "factoryId") String factoryId,
-												   @RequestParam(value = "userId") String userId,
+	public JSONObject factoryLimitUserDistribution(@RequestParam(value = "factory_id") String factoryId,
+												   @RequestParam(value = "user_id") String userId,
 												   @RequestParam(value = "tag") String tag){
 		try {
 			if("0".equals(tag)) {
@@ -223,10 +223,10 @@ public class ManufacturerController {
 		}
 	}
 	
-	@RequestMapping(path = { "/factoryDevicelist" }, method = { RequestMethod.POST })
+	@RequestMapping(path = { "/factorydevicelist" }, method = { RequestMethod.POST })
 	@ResponseBody
-	public JSONObject factoryDevicelist(@RequestParam(value = "factoryId") String factoryId,
-										@RequestParam(value = "deviceSn") String deviceSn) {
+	public JSONObject factoryDevicelist(@RequestParam(value = "factory_id") String factoryId,
+										@RequestParam(value = "device_sn") String deviceSn) {
 		int level=hostHolder.getGywlwUser().getDuserLevel();
 		try{
             List<GywlwDevice> list = manufacturerService.getFactoryDevicelist(factoryId,deviceSn,level);
@@ -238,10 +238,10 @@ public class ManufacturerController {
 	}
 
 	//by page
-	@RequestMapping(path = { "/factoryDevicelistbypage" }, method = { RequestMethod.POST })
+	@RequestMapping(path = { "/factorydevicelistbypage" }, method = { RequestMethod.POST })
 	@ResponseBody
-	public JSONObject factoryDevicelistByPage(@RequestParam(value = "factoryId") String factoryId,
-											  @RequestParam(value = "deviceSn") String deviceSn,
+	public JSONObject factoryDevicelistByPage(@RequestParam(value = "factory_id") String factoryId,
+											  @RequestParam(value = "device_sn") String deviceSn,
 											  @RequestParam(value = "page_num", defaultValue = "1")Integer pageNum,
 											  @RequestParam(value = "page_size", defaultValue = "6")Integer pageSize ) {
 		int level=hostHolder.getGywlwUser().getDuserLevel();

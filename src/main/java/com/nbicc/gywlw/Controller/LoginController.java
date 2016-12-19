@@ -3,7 +3,7 @@ package com.nbicc.gywlw.Controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.nbicc.gywlw.Service.UserService;
-import com.nbicc.gywlw.util.MyException;
+import com.nbicc.gywlw.ExceptionHandler.MyException;
 import com.nbicc.gywlw.util.MyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,5 +1,6 @@
 package com.nbicc.gywlw;
 
+import com.nbicc.gywlw.Model.GywlwHistoryItem;
 import com.nbicc.gywlw.Model.GywlwProject;
 import com.nbicc.gywlw.Service.ProjectService;
 import com.nbicc.gywlw.Service.UserService;
@@ -14,6 +15,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -33,11 +35,9 @@ import static org.junit.Assert.assertTrue;
 @Transactional
 @TransactionConfiguration(transactionManager = "transactionManager", defaultRollback = true)
 public class IndustrialIotBoxApplicationTests {
-
 //	@Test
 //	public void contextLoads() {
 //	}
-
 	@Autowired
 	private UserService userService;
 	@Resource
@@ -52,8 +52,20 @@ public class IndustrialIotBoxApplicationTests {
 
 	@Test
 	public void ProjectListTest(){
-		List<GywlwProject> list = projectService.projectList("1",Byte.parseByte("0"));
+		List<GywlwProject> list = projectService.projectList("2",Byte.parseByte("0"));
+		System.out.println("first query: " + list.size() + "  time: " + new Date().getTime());
 		assertNotNull(list);
+		List<GywlwProject> list2 = projectService.projectList("2",Byte.parseByte("0"));
+		System.out.println("second query: " + list2.size() + "  time: " + new Date().getTime());
+	}
+
+	@Test
+	public void DataListTest(){
+		List<GywlwHistoryItem> list = projectService.searchHistoryData("var1","1");
+		System.out.println("first query: " + list.size() + "  time: " + new Date().getTime());
+		assertNotNull(list);
+		List<GywlwHistoryItem> list2 = projectService.searchHistoryData("var1","1");
+		System.out.println("second query: " + list2.size() + "  time: " + new Date().getTime());
 	}
 
 

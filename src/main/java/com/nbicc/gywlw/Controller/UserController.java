@@ -102,6 +102,7 @@ public class UserController {
         }
     }
 
+    //项目信息
     @RequestMapping(path = {"/projectinfo"}, method = {RequestMethod.POST})
     @ResponseBody
     public JSONObject projectInfo(@RequestParam(value = "project_id")String projectId) {
@@ -328,7 +329,7 @@ public class UserController {
         }
     }
 
-    //告警规则列表
+    //告警规则列表by page
     @RequestMapping(path = {"/warningruleslistbypage"}, method = {RequestMethod.POST})
     @ResponseBody
     public JSONObject getWarningRulesListByPage(@RequestParam("device_id")String deviceId,
@@ -359,7 +360,7 @@ public class UserController {
         }
     }
 
-    //变量组中的数据详情
+    //变量组中的数据详情by page
     @RequestMapping(path = {"/historydatabypage"}, method = {RequestMethod.POST})
     @ResponseBody
     public JSONObject historyDataByPage(@RequestParam("project_id")String projectId,
@@ -396,7 +397,7 @@ public class UserController {
         }
     }
 
-    //告警列表,并提供变量组和日期查询
+    //告警列表,并提供变量组和日期查询by page
     @RequestMapping(path = {"/warninglistbypage"}, method = {RequestMethod.POST})
     @ResponseBody
     public JSONObject warningListByPage(@RequestParam("project_id")String projectId,
