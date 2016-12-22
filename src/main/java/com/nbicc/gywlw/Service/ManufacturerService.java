@@ -8,6 +8,8 @@ import com.nbicc.gywlw.mapper.GywlwDeviceMapper;
 import com.nbicc.gywlw.mapper.GywlwHistoryItemMapper;
 import com.nbicc.gywlw.mapper.GywlwUserMapper;
 import com.nbicc.gywlw.util.MyUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,8 @@ import java.util.UUID;
 
 @Service
 public class ManufacturerService {
+
+	private static final Logger logger = LoggerFactory.getLogger(ManufacturerService.class);
 	
 	@Autowired
 	private GywlwUserMapper gywlwUserMapper;
@@ -40,8 +44,13 @@ public class ManufacturerService {
 	}
 	
 	public List<GywlwHistoryItem> getHistoryData(String deviceId){
+		logger.info("开始同步数据： " + new Date());
 		projectService.refresh();
-		return gywlwHistoryItemMapper.getHistoryData(deviceId);
+		logger.info("同步数据完成，开始查表： " + new Date());
+		List<GywlwHistoryItem> list = gywlwHistoryItemMapper.getHistoryData(deviceId);
+		logger.info("查表结束，返回数据： " + new Date());
+		return list;
+
 	}
 	
 	public List<GywlwHistoryItem> getDeviceAlarmlist(String startTime,String endTime,String deviceId){

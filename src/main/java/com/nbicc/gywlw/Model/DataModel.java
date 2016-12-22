@@ -73,4 +73,17 @@ public class DataModel {
     public void setValue(Double value) {
         this.value = value;
     }
+
+    @Override
+    public String toString() {
+        return "DataModel{" +
+                "time='" + time + '\'' +
+                ", alarm1='" + alarm1 + '\'' +
+                ", alarm1Value='" + alarm1Value + '\'' +
+                ", alarm2='" + alarm2 + '\'' +
+                ", alarm2Value='" + alarm2Value + '\'' +
+                ", name='" + name + '\'' +
+                ", value=" + value +
+                '}';
+    }
 }

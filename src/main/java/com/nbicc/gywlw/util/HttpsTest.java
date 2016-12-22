@@ -1,18 +1,19 @@
 package com.nbicc.gywlw.util;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.socket.LayeredConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,48 +34,66 @@ public class HttpsTest {
 //            e.printStackTrace();
 //        }
 //    }
-    public static void postForm() {
+    public static void postForm() throws Exception {
         //创建默认实例
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost("http://120.55.171.132:18080/gywlw-1.0/login");
-        //设置参数
-        List<NameValuePair> params = new ArrayList<>();
-        params.add(new BasicNameValuePair("phone", "05742222"));
-        params.add(new BasicNameValuePair("password", "123"));
+        String url = "https://121.40.90.27:8083/device/queryDeviceStatusHistory";
+//        String url = "https://www.baidu.com";
 
-        UrlEncodedFormEntity uefEntity;
-        try {
-            uefEntity = new UrlEncodedFormEntity(params, "UTF-8");
-            httpPost.setEntity(uefEntity);
-            System.out.println("excuting request " + httpPost.getURI());
-            CloseableHttpResponse response = httpClient.execute(httpPost);
-            try {
-                HttpEntity entity = response.getEntity();
-                if (entity != null) {
-                    System.out.println("----------------------");
-                    System.out.println("Response content: " + EntityUtils.toString(entity, "UTF-8"));
-                    System.out.println("----------------------");
+//        CloseableHttpClient httpClient = new SSLClient();
+        // Create a trust manager that does not validate certificate chains
+        TrustManager[] trustAllCerts = new TrustManager[] {
+                new X509TrustManager() {
+                    public X509Certificate[] getAcceptedIssuers() {
+                        return null;
+                    }
+                    public void checkClientTrusted(X509Certificate[] certs, String authType) {
+                        // don't check
+                    }
+                    public void checkServerTrusted(X509Certificate[] certs, String authType) {
+                        // don't check
+                    }
                 }
-            } finally {
-                response.close();
-            }
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        } catch (ClientProtocolException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            //关闭连接，释放资源
-            try {
-                httpClient.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        };
+
+        SSLContext ctx = SSLContext.getInstance("TLS");
+        ctx.init(null, trustAllCerts, null);
+
+        LayeredConnectionSocketFactory sslSocketFactory = new SSLConnectionSocketFactory(ctx);
+
+        CloseableHttpClient httpClient = HttpClients.custom()
+                .setSSLSocketFactory(sslSocketFactory)
+                .build();
+//        HttpGet httpGet = new HttpGet(url);
+        HttpPost httpPost = new HttpPost(url);
+       // 设置参数
+        List<String> list = new ArrayList<>();
+        list.add("alarm1");
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("deviceId", "0052000000000003");//"0052000000000003"
+        jsonObject.put("idList", list);
+        jsonObject.put("timestamp", 1480767339L);
+
+        StringEntity params =new StringEntity(jsonObject.toString());
+        httpPost.addHeader("content-type", "application/json");
+        httpPost.addHeader("Accept","application/json");
+        httpPost.setEntity(params);
+        CloseableHttpResponse response = httpClient.execute(httpPost);
+        // handle response here...
+        System.out.println("---------------------------------");
+
+        int status = response.getStatusLine().getStatusCode();
+        if(status == 200){
+            String result = EntityUtils.toString(response.getEntity(),"UTF-8");
+            System.out.println("result: " + result);
         }
     }
-//    public static void main(String[] args){
-//        postForm();
-//    }
+
+    public static void main(String[] args){
+            try {
+                postForm();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+    }
 }
 

@@ -99,7 +99,7 @@ public class ManufacturerController {
 	//设备实时数据
 	@RequestMapping(path = { "/devicedatalist" }, method = { RequestMethod.POST })
 	@ResponseBody
-	public JSONObject deviceDatalist(@RequestParam(value = "deviceId") String deviceId) {
+	public JSONObject deviceDatalist(@RequestParam(value = "device_id") String deviceId) {
 		try{
             List<GywlwHistoryItem> list = manufacturerService.getHistoryData(deviceId);
             return MyUtil.response(0, list);
@@ -112,7 +112,7 @@ public class ManufacturerController {
 	//设备实时数据 by page
 	@RequestMapping(path = { "/devicedatalistbypage" }, method = { RequestMethod.POST })
 	@ResponseBody
-	public JSONObject deviceDatalistByPage(@RequestParam(value = "deviceId") String deviceId,
+	public JSONObject deviceDatalistByPage(@RequestParam(value = "device_id") String deviceId,
 										   @RequestParam(value = "page_num", defaultValue = "1")Integer pageNum,
 										   @RequestParam(value = "page_size", defaultValue = "6")Integer pageSize) {
 		try{
