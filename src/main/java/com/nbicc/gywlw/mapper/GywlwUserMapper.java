@@ -29,7 +29,7 @@ public interface GywlwUserMapper {
 
     List<GywlwUser> searchUserByFactoy(@Param("factoryId") String factoryId,@Param("level") int level,@Param("name") String name);
     
-    List<GywlwUser> getFactoryLimitUser(@Param("name") String name,@Param("id") String id);
+    List<GywlwUser> getFactoryLimitUser(@Param("userId") String userId,@Param("id") String id);
     
     void addFactoryLimitUserDistribution(GywlwUserAdminGroup gywlwUserAdminGroup);
     

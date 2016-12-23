@@ -64,8 +64,13 @@ public class ManufacturerService {
 		return gywlwHistoryItemMapper.getAlarmDetail(itemId);
 	}
 	
-	public List<GywlwUser> getFactoryLimitUser(String name,String id){
-		return gywlwUserMapper.getFactoryLimitUser(name, id);
+	public List<GywlwUser> getFactoryLimitUser(String userId,String id){
+		List<GywlwUser> list = gywlwUserMapper.getFactoryLimitUser(userId, id);
+		GywlwUser admin = gywlwUserMapper.selectByPrimaryKey(userId);
+		for(GywlwUser user : list){
+			user.setContent(admin.getUserName());
+		}
+		return list;
 	}
 	
 	public Boolean editFactoryLimitUserDistribution(String factoryId,String userId,int tag){
@@ -86,7 +91,11 @@ public class ManufacturerService {
 
 	public List<GywlwDevice> getFactoryDevicelist(String factoryId, String deviceSn, int level) {
 		// TODO Auto-generated method stub
-		return gywlwDeviceMapper.getFactoryDevicelist(factoryId, deviceSn,level);
+		List<GywlwDevice> list = gywlwDeviceMapper.getFactoryDevicelist(factoryId, deviceSn,level);
+		for(GywlwDevice device : list){
+			device.setAdminName(gywlwUserMapper.selectByPrimaryKey(device.getAdminId()).getUserName());
+		}
+		return list;
 	}
 
 }

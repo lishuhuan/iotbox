@@ -34,6 +34,16 @@ public class GywlwUser {
     //记录用户以什么身份登录的,普通用户0，设备厂商1；
     private Byte userType;
 
+    private String content;
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
     public Byte getUserType() {
         return userType;
     }

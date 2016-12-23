@@ -261,14 +261,14 @@
 		<if test="name != null and name !=''">
 		 	and a.user_name like CONCAT('%','${name}','%')
 		</if>
+		group by user_id
 	</select>
 	
 	<select id="getFactoryLimitUser" resultMap="BaseResultMap"
 		parameterType="java.lang.String">
-		select * from gywlw_user where parent_id=#{id}
-		<if test="name != null and name !=''">
-		 	and user_name like CONCAT('%','${name}','%')
-		</if>
+		select a.* from gywlw_user a
+		LEFT JOIN gywlw_user_admin_group b on b.user_id=a.user_id
+		where b.admin_id= #{userId,jdbcType=VARCHAR}
 	</select>
 	
 	<insert id="addFactoryLimitUserDistribution">

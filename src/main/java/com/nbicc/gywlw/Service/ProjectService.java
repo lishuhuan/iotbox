@@ -533,18 +533,18 @@ public class ProjectService {
 //                break;
 //            }
             if(!time.equals(map.get("timestamp")) && k != 0){
-                dataModel.setTime(String.valueOf(map.get("timestamp")));
+                dataModel.setTime(String.valueOf(time));
                 list.add(dataModel);
                 dataModel = new DataModel();
             }
             ++k;
             if(map.get("alarm1")!=null){
                 dataModel.setAlarm1("alarm1");
-                dataModel.setAlarm1Value((String) map.get("alarm1"));
+                dataModel.setAlarm1Value(String.valueOf(map.get("alarm1")));
             }
             if(map.get("alarm2")!=null){
                 dataModel.setAlarm2("alarm2");
-                dataModel.setAlarm2Value((String) map.get("alarm2"));
+                dataModel.setAlarm2Value(String.valueOf(map.get("alarm2")));
             }
             /*if(map.get("D0001")!=null){
                 dataModel.setName("D0001");
@@ -564,7 +564,7 @@ public class ProjectService {
         }
         dataModel.setTime(String.valueOf(time));
         list.add(dataModel);
-    //    System.out.println(MyUtil.getJSONString(0,list));
+//        System.out.println(MyUtil.response(0,list));
         List<GywlwHistoryItem> historyItems = new ArrayList<>();
         List<GywlwHistoryItem> historyItems1 = new ArrayList<>();
 
@@ -594,6 +594,7 @@ public class ProjectService {
                 historyItems1.add(gywlwHistoryItem);
             }
         }
+
    //     System.out.println(MyUtil.getJSONString(0,historyItems));
         logger.info("批量插入数据开始");
         if(historyItems.size() > 0) {

@@ -174,10 +174,10 @@ public class ManufacturerController {
 	
 	@RequestMapping(path = { "/factorylimituser" }, method = { RequestMethod.POST })
 	@ResponseBody
-	public JSONObject factoryLimitUser(@RequestParam(value = "name") String name) {
+	public JSONObject factoryLimitUser(@RequestParam(value = "user_id") String userId) {
 		String id=hostHolder.getGywlwUser().getUserId();
 		try{
-           List<GywlwUser> list=manufacturerService.getFactoryLimitUser(name,id);
+           List<GywlwUser> list=manufacturerService.getFactoryLimitUser(userId,id);
             return MyUtil.response(0, list);
         }catch (Exception e){
             logger.error("获取厂商受限用户失败" + e.getMessage());
@@ -188,13 +188,13 @@ public class ManufacturerController {
 	//by page
 	@RequestMapping(path = { "/factorylimituserbypage" }, method = { RequestMethod.POST })
 	@ResponseBody
-	public JSONObject factoryLimitUserByPage(@RequestParam(value = "name") String name,
+	public JSONObject factoryLimitUserByPage(@RequestParam(value = "user_id") String userId,
 											 @RequestParam(value = "page_num", defaultValue = "1")Integer pageNum,
 											 @RequestParam(value = "page_size", defaultValue = "6")Integer pageSize) {
 		String id=hostHolder.getGywlwUser().getUserId();
 		try{
 			PageHelper.startPage(pageNum,pageSize);
-			List<GywlwUser> list=manufacturerService.getFactoryLimitUser(name,id);
+			List<GywlwUser> list=manufacturerService.getFactoryLimitUser(userId,id);
 			PageInfo<GywlwUser> pageInfo = new PageInfo<>(list);
 			return MyUtil.response(0, pageInfo);
 		}catch (Exception e){
@@ -225,11 +225,11 @@ public class ManufacturerController {
 	
 	@RequestMapping(path = { "/factorydevicelist" }, method = { RequestMethod.POST })
 	@ResponseBody
-	public JSONObject factoryDevicelist(@RequestParam(value = "factory_id") String factoryId,
-										@RequestParam(value = "device_sn") String deviceSn) {
+	public JSONObject factoryDevicelist(@RequestParam(value = "device_sn") String deviceSn) {
 		int level=hostHolder.getGywlwUser().getDuserLevel();
 		try{
-            List<GywlwDevice> list = manufacturerService.getFactoryDevicelist(factoryId,deviceSn,level);
+            List<GywlwDevice> list = manufacturerService.getFactoryDevicelist(hostHolder.getGywlwUser().getUserId(),
+					deviceSn,level);
             return MyUtil.response(0, list);
         }catch (Exception e){
             logger.error("搜索设备失败" + e.getMessage());
@@ -240,14 +240,13 @@ public class ManufacturerController {
 	//by page
 	@RequestMapping(path = { "/factorydevicelistbypage" }, method = { RequestMethod.POST })
 	@ResponseBody
-	public JSONObject factoryDevicelistByPage(@RequestParam(value = "factory_id") String factoryId,
-											  @RequestParam(value = "device_sn") String deviceSn,
+	public JSONObject factoryDevicelistByPage(@RequestParam(value = "device_sn") String deviceSn,
 											  @RequestParam(value = "page_num", defaultValue = "1")Integer pageNum,
 											  @RequestParam(value = "page_size", defaultValue = "6")Integer pageSize ) {
 		int level=hostHolder.getGywlwUser().getDuserLevel();
 		try{
 			PageHelper.startPage(pageNum,pageSize);
-			List<GywlwDevice> list = manufacturerService.getFactoryDevicelist(factoryId,deviceSn,level);
+			List<GywlwDevice> list = manufacturerService.getFactoryDevicelist(hostHolder.getGywlwUser().getUserId(),deviceSn,level);
 			PageInfo<GywlwDevice> pageInfo = new PageInfo<>(list);
 			return MyUtil.response(0, pageInfo);
 		}catch (Exception e){

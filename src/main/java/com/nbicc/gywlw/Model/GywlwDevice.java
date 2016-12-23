@@ -9,6 +9,8 @@ public class GywlwDevice {
 
     private String adminId;
 
+    private String adminName;
+
     private String factoryId;
 
     private String factoryName;
@@ -33,6 +35,13 @@ public class GywlwDevice {
 
     private Byte expiredRight;
 
+    public String getAdminName() {
+        return adminName;
+    }
+
+    public void setAdminName(String adminName) {
+        this.adminName = adminName;
+    }
 
     public String getFactoryName() {
         return factoryName;
