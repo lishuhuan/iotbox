@@ -450,11 +450,6 @@ public class ProjectService {
 
     public void refreshData(){
         try {
-//            List<String> list = new ArrayList<>();
-        /*    list.add("D0001");
-            list.add("alarm1");
-            list.add("alarm2");
-            list.add("D0002");*/
             logger.info("同步数据准备工作： " + new Date());
             List<GywlwDevice> devices = gywlwDeviceMapper.selectAll();
             GywlwHistoryItem gywlwHistoryItem = new GywlwHistoryItem();
