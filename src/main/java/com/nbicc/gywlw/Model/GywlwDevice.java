@@ -35,6 +35,16 @@ public class GywlwDevice {
 
     private Byte expiredRight;
 
+    private String gpioId;
+
+    public String getGpioId() {
+        return gpioId;
+    }
+
+    public void setGpioId(String gpioId) {
+        this.gpioId = gpioId;
+    }
+
     public String getAdminName() {
         return adminName;
     }

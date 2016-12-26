@@ -15,11 +15,12 @@
     <result column="gateway" property="gateway" jdbcType="VARCHAR" />
     <result column="expired" property="expired" jdbcType="TIMESTAMP" />
     <result column="expired_right" property="expiredRight" jdbcType="TINYINT" />
+    <result column="gpio_id" property="gpioId" jdbcType="VARCHAR" />
 
   </resultMap>
   <sql id="Base_Column_List" >
     device_id, device_sn, admin_id, factory_id, create_time, content, deviceOnline, device_type_id,
-    device_name, last_connected, gateway, expired, del_mark
+    device_name, last_connected, gateway, expired, del_mark, gpio_id
   </sql>
   <select id="selectByUserIdAndDeviceSn" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 

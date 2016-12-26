@@ -6,6 +6,7 @@ import com.github.pagehelper.PageInfo;
 import com.nbicc.gywlw.Model.*;
 import com.nbicc.gywlw.Service.MessageService;
 import com.nbicc.gywlw.Service.ProjectService;
+import com.nbicc.gywlw.Service.RefreshService;
 import com.nbicc.gywlw.Service.UserService;
 import com.nbicc.gywlw.util.MyUtil;
 import org.slf4j.Logger;
@@ -35,6 +36,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private RefreshService refreshService;
 
     //项目列表
     @RequestMapping(path = {"/projectlist"}, method = {RequestMethod.POST})
@@ -793,7 +797,7 @@ public class UserController {
     @ResponseBody
     public String refreshData(){
         try {
-            projectService.refresh();
+            refreshService.refresh();
             return "ok";
         }catch (Exception e){
             logger.error("refresh失败" + e.getMessage());
