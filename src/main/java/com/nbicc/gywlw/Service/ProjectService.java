@@ -1,19 +1,14 @@
 package com.nbicc.gywlw.Service;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.nbicc.gywlw.Model.*;
 import com.nbicc.gywlw.mapper.*;
-import com.nbicc.gywlw.util.HttpClientUtil;
 import com.nbicc.gywlw.util.MyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
 
 /**
  * Created by BigMao on 2016/11/21.
@@ -53,6 +48,8 @@ public class ProjectService {
     private GywlwProjectDeviceGroupMapper gywlwProjectDeviceGroupMapper;
     @Autowired
     private GywlwWarningRulesMapper gywlwWarningRulesMapper;
+    @Autowired
+    private RefreshService refreshService;
 
 
 
@@ -202,13 +199,13 @@ public class ProjectService {
     }
 
     public List<GywlwHistoryItem> searchHistoryData(String projectId, String variableName) {
-        refresh();
+        refreshService.refresh();
         return gywlwHistoryItemMapper.selectByVariableName(variableName, projectId);
 
     }
 
     public List<GywlwHistoryItem> warningList(String projectId, String variableName, String startTime, String endTime) {
-        refresh();
+        refreshService.refresh();
         return gywlwHistoryItemMapper.selectwarning(projectId, variableName, startTime, endTime);
     }
 
@@ -444,268 +441,268 @@ public class ProjectService {
     }
 
     //实时数据刷新
-    public void refresh(){
-        refreshData();
-    }
-
-    public void refreshData(){
-        try {
-            logger.info("同步数据准备工作： " + new Date());
-            List<GywlwDevice> devices = gywlwDeviceMapper.selectAll();
-            GywlwHistoryItem gywlwHistoryItem = new GywlwHistoryItem();
-            //对于每个盒子，找出它管理的plc，并按照plcid查找历史数据，告警数据
-            if (devices.size() != 0) {
-                for (GywlwDevice device : devices) {
-                    List<GywlwPlcInfo> plcinfos = gywlwPlcInfoMapper.selectByDeviceId(device.getDeviceId());
-                    if (plcinfos.size() != 0) {
-                        for (GywlwPlcInfo plcInfo : plcinfos) {
-                            Long timeStamp;
-
-                            GywlwHistoryItem his = gywlwHistoryItemMapper.getLastTimeByPlcId(plcInfo.getId());
-
-                            if(his == null) {
-                                System.out.println("null");
-                                timeStamp = 1477929600L;
-                            }else{
-                                timeStamp = his.getItemTime().getTime();
-                            }
-                            System.out.println("timeStamp:   "+timeStamp);
-                            List<String> regList = new ArrayList<>();
-                            List<String> requestList = new ArrayList<>();
-                            List<GywlwRegInfo> reglists = gywlwRegInfoMapper.selectByPlcId(plcInfo.getId());
-                            if(reglists.size() == 0){
-                                continue;
-                            }else{
-                                for(GywlwRegInfo reg: reglists){
-                                    regList.add(reg.getRegName());
-                                }
-                            }
-                            requestList.addAll(regList);
-                            requestList.add("alarm1");
-                            requestList.add("alarm2");
-                            //设置参数
-                            JSONObject jsonObject = new JSONObject();
-                            jsonObject.put("deviceId", plcInfo.getSubdeviceId());//"0052000000000003"
-                            jsonObject.put("idList", requestList);
-                            jsonObject.put("timestamp", timeStamp);
-                            System.out.println("param");
-                            System.out.println(jsonObject);
-
-                            logger.info("准备工作结束，发送psot请求： " + new Date());
-
-                            String str = HttpClientUtil.post(jsonObject);
-
-                            //handle response
-                            JSONObject json = new JSONObject();
-                            Map<String, Object> map1 = JSON.parseObject(str);
-                            LinkedList<Map> linkedList = new LinkedList<>();
-                            List<Map> list1 = JSON.parseArray(map1.get("result_data").toString(), Map.class);
-                            System.out.println("list1.size():"+MyUtil.response(0,list1));
-                            logger.info("请求成功，开始处理数据： " + new Date());
-                            if(list1.size()!=0) {
-                                //多线程处理
-//                                handler(list1, device, plcInfo, regList);
-                                linkedList.addAll(list1);
-                                handleByThread(linkedList,device,plcInfo,regList,10);
-                            }
-                            logger.info("数据存入mysql结束： " + new Date());
-                        }
-                    }
-                }
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
-    public void handler(List<Map> list1,GywlwDevice device,GywlwPlcInfo plcInfo,List<String> regList) throws ParseException {
-        DataModel dataModel = new DataModel();
-        Long time = 0L;
-        List<DataModel> list = new ArrayList<>();
-        int k = 0;
-        for(Map map : list1){
-//            if(k>600){
-//                break;
+//    public void refresh(){
+//        refreshData();
+//    }
+//
+//    public void refreshData(){
+//        try {
+//            logger.info("同步数据准备工作： " + new Date());
+//            List<GywlwDevice> devices = gywlwDeviceMapper.selectAll();
+//            GywlwHistoryItem gywlwHistoryItem = new GywlwHistoryItem();
+//            //对于每个盒子，找出它管理的plc，并按照plcid查找历史数据，告警数据
+//            if (devices.size() != 0) {
+//                for (GywlwDevice device : devices) {
+//                    List<GywlwPlcInfo> plcinfos = gywlwPlcInfoMapper.selectByDeviceId(device.getDeviceId());
+//                    if (plcinfos.size() != 0) {
+//                        for (GywlwPlcInfo plcInfo : plcinfos) {
+//                            Long timeStamp;
+//
+//                            GywlwHistoryItem his = gywlwHistoryItemMapper.getLastTimeByPlcId(plcInfo.getId());
+//
+//                            if(his == null) {
+//                                System.out.println("null");
+//                                timeStamp = 1477929600L;
+//                            }else{
+//                                timeStamp = his.getItemTime().getTime();
+//                            }
+//                            System.out.println("timeStamp:   "+timeStamp);
+//                            List<String> regList = new ArrayList<>();
+//                            List<String> requestList = new ArrayList<>();
+//                            List<GywlwRegInfo> reglists = gywlwRegInfoMapper.selectByPlcId(plcInfo.getId());
+//                            if(reglists.size() == 0){
+//                                continue;
+//                            }else{
+//                                for(GywlwRegInfo reg: reglists){
+//                                    regList.add(reg.getRegName());
+//                                }
+//                            }
+//                            requestList.addAll(regList);
+//                            requestList.add("alarm1");
+//                            requestList.add("alarm2");
+//                            //设置参数
+//                            JSONObject jsonObject = new JSONObject();
+//                            jsonObject.put("deviceId", plcInfo.getSubdeviceId());//"0052000000000003"
+//                            jsonObject.put("idList", requestList);
+//                            jsonObject.put("timestamp", timeStamp);
+//                            System.out.println("param");
+//                            System.out.println(jsonObject);
+//
+//                            logger.info("准备工作结束，发送psot请求： " + new Date());
+//
+//                            String str = HttpClientUtil.post(jsonObject);
+//
+//                            //handle response
+//                            JSONObject json = new JSONObject();
+//                            Map<String, Object> map1 = JSON.parseObject(str);
+//                            LinkedList<Map> linkedList = new LinkedList<>();
+//                            List<Map> list1 = JSON.parseArray(map1.get("result_data").toString(), Map.class);
+//                            System.out.println("list1.size():"+MyUtil.response(0,list1));
+//                            logger.info("请求成功，开始处理数据： " + new Date());
+//                            if(list1.size()!=0) {
+//                                //多线程处理
+////                                handler(list1, device, plcInfo, regList);
+////                                linkedList.addAll(list1);
+////                                handleByThread(linkedList,device,plcInfo,regList,10);
+//                            }
+//                            logger.info("数据存入mysql结束： " + new Date());
+//                        }
+//                    }
+//                }
 //            }
-            if(!time.equals(map.get("timestamp")) && k != 0){
-                dataModel.setTime(String.valueOf(time));
-                list.add(dataModel);
-                dataModel = new DataModel();
-            }
-            ++k;
-            if(map.get("alarm1")!=null){
-                dataModel.setAlarm1("alarm1");
-                dataModel.setAlarm1Value(String.valueOf(map.get("alarm1")));
-            }
-            if(map.get("alarm2")!=null){
-                dataModel.setAlarm2("alarm2");
-                dataModel.setAlarm2Value(String.valueOf(map.get("alarm2")));
-            }
-            /*if(map.get("D0001")!=null){
-                dataModel.setName("D0001");
-                dataModel.setValue(Double.parseDouble((String) map.get("D0001")));
-            }
-            if(map.get("D0002")!=null){
-                dataModel.setName("D0002");
-                dataModel.setValue(Double.parseDouble((String) map.get("D0002")));
-            }*/
-            for(String info : regList){
-                if(map.get(info)!=null){
-                    dataModel.setName(info);
-                    dataModel.setValue(Double.parseDouble((String) map.get(info)));
-                }
-            }
-            time = (Long) map.get("timestamp");
-        }
-        dataModel.setTime(String.valueOf(time));
-        list.add(dataModel);
-//        System.out.println(MyUtil.response(0,list));
-        List<GywlwHistoryItem> historyItems = new ArrayList<>();
-        List<GywlwHistoryItem> historyItems1 = new ArrayList<>();
+//        }catch (Exception e){
+//            e.printStackTrace();
+//        }
+//    }
 
-        for(DataModel model :list){
-            GywlwHistoryItem gywlwHistoryItem = new GywlwHistoryItem();
-            addItem(model,gywlwHistoryItem,device,plcInfo,regList);
-            if(model.getAlarm1()!=null){
-                gywlwHistoryItem.setSeverity(1);
-                String string = model.getAlarm1Value();
-                int index = string.lastIndexOf(".");
-                gywlwHistoryItem.setRuleId(Integer.valueOf(string.substring(0,index)));
-                gywlwHistoryItem.setItemContent(model.getAlarm1());
-                historyItems.add(gywlwHistoryItem);
-                gywlwHistoryItem = new GywlwHistoryItem();
-                //防止被alarm2修改
-                addItem(model,gywlwHistoryItem,device,plcInfo,regList);
-            }
-            if(model.getAlarm2()!=null){
-                gywlwHistoryItem.setSeverity(2);
-                String string = model.getAlarm2Value();
-                int index = string.lastIndexOf(".");
-                gywlwHistoryItem.setRuleId(Integer.valueOf(string.substring(0,index)));
-                gywlwHistoryItem.setItemContent(model.getAlarm2());
-                historyItems.add(gywlwHistoryItem);
-            }
-            if(model.getAlarm1() == null && model.getAlarm2()==null){
-                historyItems1.add(gywlwHistoryItem);
-            }
-        }
-
-   //     System.out.println(MyUtil.getJSONString(0,historyItems));
-        logger.info("批量插入数据开始");
-        if(historyItems.size() > 0) {
-            gywlwHistoryItemMapper.insertBatch(historyItems);
-        }
-        if(historyItems1.size() > 0) {
-            gywlwHistoryItemMapper.insertBatch1(historyItems1);
-        }
-        logger.info("批量插入数据结束");
-
-    }
-
-    public void addItem(DataModel model, GywlwHistoryItem gywlwHistoryItem,GywlwDevice device,GywlwPlcInfo plcInfo,List<String> regList) throws ParseException {
-        Date date = MyUtil.timeTransformToDateNo1000(String.valueOf(model.getTime()));
-        gywlwHistoryItem.setItemTime(date);
-        gywlwHistoryItem.setDeviceId(device.getDeviceId());
-        gywlwHistoryItem.setProjectId(gywlwProjectDeviceGroupMapper.selectByDeviceId(device.getDeviceId()).getProjectId());
-        gywlwHistoryItem.setPlcId(plcInfo.getId());
-        gywlwHistoryItem.setPlcName(plcInfo.getPlcName());
-        /*if("D0002".equals(model.getName())) {
-            gywlwHistoryItem.setRegId(gywlwRegInfoMapper.selectByRegName("D0002").getRegId());
-            gywlwHistoryItem.setItemName("D0002");
-            gywlwHistoryItem.setItemValue(model.getValue());
-        }else if("D0001".equals(model.getName())){
-            gywlwHistoryItem.setRegId(gywlwRegInfoMapper.selectByRegName("D0001").getRegId());
-            gywlwHistoryItem.setItemName("D0001");
-            gywlwHistoryItem.setItemValue(model.getValue());
-        }*/
-//        logger.info("model: " + model.toString());
-        for(String info : regList){
-            if(info.equals(model.getName())){
-//                logger.info("info: " + info);
-                gywlwHistoryItem.setRegId(gywlwRegInfoMapper.selectByRegName(info).getRegId());
-                gywlwHistoryItem.setItemName(info);
-                gywlwHistoryItem.setItemValue(model.getValue());
-            }
-        }
-
-    }
-
-    //handler(list1, device, plcInfo, regList);
-    public synchronized void handleByThread(LinkedList<Map> list1,GywlwDevice device,GywlwPlcInfo plcInfo,
-                                            List<String> regList,int threadNum) throws InterruptedException, ParseException {
-        int length = list1.size();
-        int t1 = length % threadNum == 0 ? length / threadNum : (length / threadNum + 1);
-        CountDownLatch latch = new CountDownLatch(threadNum);// 多少协作
-        long a = System.currentTimeMillis();
-        if(length < threadNum * 3){
-            handler(list1, device, plcInfo, regList);
-        } else {
-            for (int i = 0; i < threadNum; i++) {
-                int end = (i + 1) * t1 - 1;
-                end = end > length ? length - 1 : end;
-                //这里把alarm1和alarm2硬编码写死了。。以后改进
-                end = (list1.get(end).get("alarm1") != null) ? end + 2 : end;
-                end = (list1.get(end).get("alarm2") != null) ? end + 1 : end;
-                int start = i * t1;
-                start = (list1.get(start).get("alarm2") != null) ? start + 2 : start;
-                if (start != 0) {
-                    start = (list1.get(start - 1).get("alarm2") != null) ? start + 1 : start;
-                }
-                if (start <= length) {
-                    // 继承thread启动线程
-                    // HandleThread thread = new HandleThread("线程[" + (i + 1) +"] ",data, i * tl, end > length ? length : end, latch);
-                    // thread.start();
-                    // 实现Runnable启动线程
-                    logger.info("线程[" + (i + 1) + "] " + "  start: " + start + "   end:  " + end);
-                    RunnableThread thread = new RunnableThread("线程[" + (i + 1) + "] ",
-                            list1, start, end, latch, device, plcInfo, regList);
-                    Thread runable = new Thread(thread);
-                    runable.start();
-                }
-            }
-            latch.await();// 等待所有工人完成工作
-        }
-        System.out.println("结束*****************************");
-        long b = System.currentTimeMillis();
-        System.out.println("时间:" + (b - a) + "毫秒***********************");
-    }
-
-    class RunnableThread implements Runnable {
-        private String threadName;
-        private List data;
-        private int start;
-        private int end;
-        private CountDownLatch latch;
-        private GywlwDevice device;
-        private GywlwPlcInfo plcInfo;
-        private List<String> regList;
-
-        public RunnableThread(String threadName, List data, int start, int end, CountDownLatch latch, GywlwDevice device,
-                              GywlwPlcInfo plcInfo, List<String> regList) {
-            this.threadName = threadName;
-            this.data = data;
-            this.start = start;
-            this.end = end;
-            this.latch = latch;
-            this.device = device;
-            this.plcInfo = plcInfo;
-            this.regList = regList;
-        }
-
-        public void run() {
-            // TODO 这里处理数据
-            logger.info("start: " + start + " ||  end: " + end);
-            List subList = data.subList(start, end);
-            System.out.println(threadName + "--" + data.size() + "--" + start + "--" + end + "--");
-            // 单个线程中的数据
-            try {
-                handler(subList, device, plcInfo, regList);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            latch.countDown();// 工人完成工作，计数器减一
-        }
-    }
+//    public void handler(List<Map> list1,GywlwDevice device,GywlwPlcInfo plcInfo,List<String> regList) throws ParseException {
+//        DataModel dataModel = new DataModel();
+//        Long time = 0L;
+//        List<DataModel> list = new ArrayList<>();
+//        int k = 0;
+//        for(Map map : list1){
+////            if(k>600){
+////                break;
+////            }
+//            if(!time.equals(map.get("timestamp")) && k != 0){
+//                dataModel.setTime(String.valueOf(time));
+//                list.add(dataModel);
+//                dataModel = new DataModel();
+//            }
+//            ++k;
+//            if(map.get("alarm1")!=null){
+//                dataModel.setAlarm1("alarm1");
+//                dataModel.setAlarm1Value(String.valueOf(map.get("alarm1")));
+//            }
+//            if(map.get("alarm2")!=null){
+//                dataModel.setAlarm2("alarm2");
+//                dataModel.setAlarm2Value(String.valueOf(map.get("alarm2")));
+//            }
+//            /*if(map.get("D0001")!=null){
+//                dataModel.setName("D0001");
+//                dataModel.setValue(Double.parseDouble((String) map.get("D0001")));
+//            }
+//            if(map.get("D0002")!=null){
+//                dataModel.setName("D0002");
+//                dataModel.setValue(Double.parseDouble((String) map.get("D0002")));
+//            }*/
+//            for(String info : regList){
+//                if(map.get(info)!=null){
+//                    dataModel.setName(info);
+//                    dataModel.setValue(Double.parseDouble((String) map.get(info)));
+//                }
+//            }
+//            time = (Long) map.get("timestamp");
+//        }
+//        dataModel.setTime(String.valueOf(time));
+//        list.add(dataModel);
+////        System.out.println(MyUtil.response(0,list));
+//        List<GywlwHistoryItem> historyItems = new ArrayList<>();
+//        List<GywlwHistoryItem> historyItems1 = new ArrayList<>();
+//
+//        for(DataModel model :list){
+//            GywlwHistoryItem gywlwHistoryItem = new GywlwHistoryItem();
+//            addItem(model,gywlwHistoryItem,device,plcInfo,regList);
+//            if(model.getAlarm1()!=null){
+//                gywlwHistoryItem.setSeverity(1);
+//                String string = model.getAlarm1Value();
+//                int index = string.lastIndexOf(".");
+//                gywlwHistoryItem.setRuleId(Integer.valueOf(string.substring(0,index)));
+//                gywlwHistoryItem.setItemContent(model.getAlarm1());
+//                historyItems.add(gywlwHistoryItem);
+//                gywlwHistoryItem = new GywlwHistoryItem();
+//                //防止被alarm2修改
+//                addItem(model,gywlwHistoryItem,device,plcInfo,regList);
+//            }
+//            if(model.getAlarm2()!=null){
+//                gywlwHistoryItem.setSeverity(2);
+//                String string = model.getAlarm2Value();
+//                int index = string.lastIndexOf(".");
+//                gywlwHistoryItem.setRuleId(Integer.valueOf(string.substring(0,index)));
+//                gywlwHistoryItem.setItemContent(model.getAlarm2());
+//                historyItems.add(gywlwHistoryItem);
+//            }
+//            if(model.getAlarm1() == null && model.getAlarm2()==null){
+//                historyItems1.add(gywlwHistoryItem);
+//            }
+//        }
+//
+//   //     System.out.println(MyUtil.getJSONString(0,historyItems));
+//        logger.info("批量插入数据开始");
+//        if(historyItems.size() > 0) {
+//            gywlwHistoryItemMapper.insertBatch(historyItems);
+//        }
+//        if(historyItems1.size() > 0) {
+//            gywlwHistoryItemMapper.insertBatch1(historyItems1);
+//        }
+//        logger.info("批量插入数据结束");
+//
+//    }
+//
+//    public void addItem(DataModel model, GywlwHistoryItem gywlwHistoryItem,GywlwDevice device,GywlwPlcInfo plcInfo,List<String> regList) throws ParseException {
+//        Date date = MyUtil.timeTransformToDateNo1000(String.valueOf(model.getTime()));
+//        gywlwHistoryItem.setItemTime(date);
+//        gywlwHistoryItem.setDeviceId(device.getDeviceId());
+//        gywlwHistoryItem.setProjectId(gywlwProjectDeviceGroupMapper.selectByDeviceId(device.getDeviceId()).getProjectId());
+//        gywlwHistoryItem.setPlcId(plcInfo.getId());
+//        gywlwHistoryItem.setPlcName(plcInfo.getPlcName());
+//        /*if("D0002".equals(model.getName())) {
+//            gywlwHistoryItem.setRegId(gywlwRegInfoMapper.selectByRegName("D0002").getRegId());
+//            gywlwHistoryItem.setItemName("D0002");
+//            gywlwHistoryItem.setItemValue(model.getValue());
+//        }else if("D0001".equals(model.getName())){
+//            gywlwHistoryItem.setRegId(gywlwRegInfoMapper.selectByRegName("D0001").getRegId());
+//            gywlwHistoryItem.setItemName("D0001");
+//            gywlwHistoryItem.setItemValue(model.getValue());
+//        }*/
+////        logger.info("model: " + model.toString());
+//        for(String info : regList){
+//            if(info.equals(model.getName())){
+////                logger.info("info: " + info);
+//                gywlwHistoryItem.setRegId(gywlwRegInfoMapper.selectByRegName(info).getRegId());
+//                gywlwHistoryItem.setItemName(info);
+//                gywlwHistoryItem.setItemValue(model.getValue());
+//            }
+//        }
+//
+//    }
+//
+//    //handler(list1, device, plcInfo, regList);
+//    public synchronized void handleByThread(LinkedList<Map> list1,GywlwDevice device,GywlwPlcInfo plcInfo,
+//                                            List<String> regList,int threadNum) throws InterruptedException, ParseException {
+//        int length = list1.size();
+//        int t1 = length % threadNum == 0 ? length / threadNum : (length / threadNum + 1);
+//        CountDownLatch latch = new CountDownLatch(threadNum);// 多少协作
+//        long a = System.currentTimeMillis();
+//        if(length < threadNum * 3){
+//            handler(list1, device, plcInfo, regList);
+//        } else {
+//            for (int i = 0; i < threadNum; i++) {
+//                int end = (i + 1) * t1 - 1;
+//                end = end > length ? length - 1 : end;
+//                //这里把alarm1和alarm2硬编码写死了。。以后改进
+//                end = (list1.get(end).get("alarm1") != null) ? end + 2 : end;
+//                end = (list1.get(end).get("alarm2") != null) ? end + 1 : end;
+//                int start = i * t1;
+//                start = (list1.get(start).get("alarm2") != null) ? start + 2 : start;
+//                if (start != 0) {
+//                    start = (list1.get(start - 1).get("alarm2") != null) ? start + 1 : start;
+//                }
+//                if (start <= length) {
+//                    // 继承thread启动线程
+//                    // HandleThread thread = new HandleThread("线程[" + (i + 1) +"] ",data, i * tl, end > length ? length : end, latch);
+//                    // thread.start();
+//                    // 实现Runnable启动线程
+//                    logger.info("线程[" + (i + 1) + "] " + "  start: " + start + "   end:  " + end);
+//                    RunnableThread thread = new RunnableThread("线程[" + (i + 1) + "] ",
+//                            list1, start, end, latch, device, plcInfo, regList);
+//                    Thread runable = new Thread(thread);
+//                    runable.start();
+//                }
+//            }
+//            latch.await();// 等待所有工人完成工作
+//        }
+//        System.out.println("结束*****************************");
+//        long b = System.currentTimeMillis();
+//        System.out.println("时间:" + (b - a) + "毫秒***********************");
+//    }
+//
+//    class RunnableThread implements Runnable {
+//        private String threadName;
+//        private List data;
+//        private int start;
+//        private int end;
+//        private CountDownLatch latch;
+//        private GywlwDevice device;
+//        private GywlwPlcInfo plcInfo;
+//        private List<String> regList;
+//
+//        public RunnableThread(String threadName, List data, int start, int end, CountDownLatch latch, GywlwDevice device,
+//                              GywlwPlcInfo plcInfo, List<String> regList) {
+//            this.threadName = threadName;
+//            this.data = data;
+//            this.start = start;
+//            this.end = end;
+//            this.latch = latch;
+//            this.device = device;
+//            this.plcInfo = plcInfo;
+//            this.regList = regList;
+//        }
+//
+//        public void run() {
+//            // TODO 这里处理数据
+//            logger.info("start: " + start + " ||  end: " + end);
+//            List subList = data.subList(start, end);
+//            System.out.println(threadName + "--" + data.size() + "--" + start + "--" + end + "--");
+//            // 单个线程中的数据
+//            try {
+//                handler(subList, device, plcInfo, regList);
+//            } catch (ParseException e) {
+//                e.printStackTrace();
+//            }
+//            latch.countDown();// 工人完成工作，计数器减一
+//        }
+//    }
 
 
 

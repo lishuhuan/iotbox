@@ -33,6 +33,9 @@ public class ManufacturerService {
 
 	@Autowired
 	private ProjectService projectService;
+
+	@Autowired
+	private RefreshService refreshService;
 	
 	
 	public List<GywlwUser> searchUser(String factoryId,int level,String name){
@@ -45,7 +48,7 @@ public class ManufacturerService {
 	
 	public List<GywlwHistoryItem> getHistoryData(String deviceId){
 		logger.info("开始同步数据： " + new Date());
-		projectService.refresh();
+		refreshService.refresh();
 		logger.info("同步数据完成，开始查表： " + new Date());
 		List<GywlwHistoryItem> list = gywlwHistoryItemMapper.getHistoryData(deviceId);
 		logger.info("查表结束，返回数据： " + new Date());
@@ -54,13 +57,13 @@ public class ManufacturerService {
 	}
 	
 	public List<GywlwHistoryItem> getDeviceAlarmlist(String startTime,String endTime,String deviceId){
-		projectService.refresh();
+		refreshService.refresh();
 		return gywlwHistoryItemMapper.getDeviceAlarmlist(MyUtil.timeTransformToString(startTime),
 				MyUtil.timeTransformToString(endTime), deviceId);
 	}
 	
 	public GywlwHistoryItem getAlarmDetail(String itemId){
-		projectService.refresh();
+		refreshService.refresh();
 		return gywlwHistoryItemMapper.getAlarmDetail(itemId);
 	}
 	

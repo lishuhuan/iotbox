@@ -2,7 +2,7 @@ package com.nbicc.gywlw.Model;
 
 import java.util.Date;
 
-public class GywlwHistoryItem {
+public class GywlwHistoryItem implements Cloneable{
     private Integer itemId;
 
     private String regId;
@@ -208,5 +208,10 @@ public class GywlwHistoryItem {
 
     public void setDelMark(Byte delMark) {
         this.delMark = delMark;
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 }

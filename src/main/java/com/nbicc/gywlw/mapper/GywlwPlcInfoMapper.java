@@ -14,6 +14,8 @@ public interface GywlwPlcInfoMapper {
 
     GywlwPlcInfo selectByPrimaryKey(String id);
 
+    GywlwPlcInfo selectBySubDeviceId(String id);
+
     List<GywlwPlcInfo> selectByDeviceId(String deviceId);
 
     int updateByPrimaryKeySelective(GywlwPlcInfo record);

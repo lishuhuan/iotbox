@@ -84,16 +84,16 @@
       )
   </insert>
   <insert id="insertBatch" parameterType="java.util.List" >
-    insert into gywlw_history_item (device_id,item_content,
+    insert into gywlw_history_item (device_id,device_name,item_address,
     item_name,item_time,item_value,plc_id,plc_name,project_id,
-    reg_id,rule_id,severity
+    reg_id,rule_id
     )
     values
     <foreach collection ="list" item="a" index= "index" separator =",">
-    (#{a.deviceId,jdbcType=VARCHAR},#{a.itemContent,jdbcType=VARCHAR},
+    (#{a.deviceId,jdbcType=VARCHAR},#{a.deviceName,jdbcType=VARCHAR},#{a.itemAddress,jdbcType=VARCHAR},
     #{a.itemName,jdbcType=VARCHAR},#{a.itemTime,jdbcType=TIMESTAMP},#{a.itemValue,jdbcType=DOUBLE},
     #{a.plcId,jdbcType=VARCHAR},#{a.plcName,jdbcType=VARCHAR},#{a.projectId,jdbcType=VARCHAR},
-    #{a.regId,jdbcType=VARCHAR}, #{a.ruleId,jdbcType=INTEGER},#{a.severity,jdbcType=INTEGER}
+    #{a.regId,jdbcType=VARCHAR}, #{a.ruleId,jdbcType=INTEGER}
     )
     </foreach>
   </insert>

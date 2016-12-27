@@ -60,6 +60,14 @@ public class MyUtil {
 //        return returnString;
 //    }
 
+    public static Date transformToDate(String time) throws ParseException {
+        SimpleDateFormat format =  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String date = time.substring(0,4) + "-" + time.substring(4,6) + "-" + time.substring(6,8) +
+                " " + time.substring(8,10) + ":" + time.substring(10,12) + ":" + time.substring(12,14);
+        Date date1 = format.parse(date);
+        return date1;
+    }
+
     public static String timeTransformToString(String time){
         SimpleDateFormat format =  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Long time1=Long.parseLong(time);

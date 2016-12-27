@@ -4,6 +4,7 @@ import com.nbicc.gywlw.Model.GywlwHistoryItem;
 import com.nbicc.gywlw.Model.GywlwProject;
 import com.nbicc.gywlw.Service.ProjectService;
 import com.nbicc.gywlw.Service.UserService;
+import com.nbicc.gywlw.util.MyUtil;
 import com.taobao.api.ApiException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,6 +16,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -66,6 +68,17 @@ public class IndustrialIotBoxApplicationTests {
 		assertNotNull(list);
 		List<GywlwHistoryItem> list2 = projectService.searchHistoryData("var1","1");
 		System.out.println("second query: " + list2.size() + "  time: " + new Date().getTime());
+	}
+
+	@Test
+	public void TestDate(){
+		String str = "20161226130624";
+		try {
+			Date date = MyUtil.transformToDate(str);
+			System.out.println(date);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
 	}
 
 

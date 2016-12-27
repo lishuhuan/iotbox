@@ -9,17 +9,28 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
+import java.net.URI;
+
 /**
  * Created by BigMao on 2016/12/3.
  */
 public class HttpClientUtil {
-    public static final String ADD_URL = "http://121.40.90.27:8083/device/queryDeviceStatusHistory";
+    public static final String ADD_URL1 = "http://121.40.90.27:8083/device/queryDeviceStatusHistory";
+    public static final String ADD_URL2 = "http://121.40.90.27:8083/mongodb/queryStatusHistory";
 
-    public static String post(JSONObject jsonObject) {
+    public static String post(JSONObject jsonObject, int k) {
         HttpClient httpClient = new DefaultHttpClient();
 
         try {
-            HttpPost request = new HttpPost(ADD_URL);
+            HttpPost request = new HttpPost();
+            if(k==1) {
+                URI url = new URI(ADD_URL1);
+                request.setURI(url);
+            }
+            if(k==2){
+                URI url = new URI(ADD_URL2);
+                request.setURI(url);
+            }
             StringEntity params =new StringEntity(jsonObject.toString());
             request.addHeader("content-type", "application/json");
             request.addHeader("Accept","application/json");
@@ -43,6 +54,8 @@ public class HttpClientUtil {
         }
         return "ok";
     }
+
+
 
 
 

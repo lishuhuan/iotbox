@@ -1,6 +1,7 @@
 package com.nbicc.gywlw.Tasks;
 
 import com.nbicc.gywlw.Service.ProjectService;
+import com.nbicc.gywlw.Service.RefreshService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 
@@ -14,6 +15,8 @@ import java.util.Date;
 public class ScheduledTasks {
     @Autowired
     private ProjectService projectService;
+    @Autowired
+    private RefreshService refreshService;
 
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
     @Scheduled(fixedRate = 5000)
@@ -22,6 +25,6 @@ public class ScheduledTasks {
     }
     @Scheduled(fixedRate = 1000*3600) //间隔1小时同步一次数据
     public void refreshData(){
-        projectService.refresh();
+        refreshService.refresh();
     }
 }
