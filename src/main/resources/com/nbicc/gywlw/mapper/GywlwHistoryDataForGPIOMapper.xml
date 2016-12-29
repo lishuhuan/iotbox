@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nbicc.gywlw.mapper.GywlwHistoryDataForGPIOMapper" >
+  <resultMap id="BaseResultMap" type="com.nbicc.gywlw.Model.GywlwHistoryDataForGPIO" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="gpio_id" property="gpioId" jdbcType="VARCHAR" />
+    <result column="value" property="value" jdbcType="INTEGER" />
+    <result column="time" property="time" jdbcType="TIMESTAMP" />
+    <result column="device_id" property="deviceId" jdbcType="VARCHAR" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="alarm" property="alarm" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, gpio_id, value, time, device_id, content, alarm
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from gywlw_history_data_for_gpio
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <!--<select id="getLastTimeByDeviceId" resultMap="BaseResultMap" parameterType="java.lang.String">-->
+    <!--select-->
+    <!--id, MAX(time) time-->
+    <!--from gywlw_history_data_for_gpio-->
+    <!--where device_id = #{deviceId,jdbcType=VARCHAR}-->
+  <!--</select>-->
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from gywlw_history_data_for_gpio
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insertBatch" parameterType="java.util.List" >
+    insert into gywlw_history_data_for_gpio (gpio_id, value, time, device_id, content, alarm
+    )
+    values
+    <foreach collection ="list" item="a" index= "index" separator =",">
+      (#{a.gpioId,jdbcType=VARCHAR},#{a.value,jdbcType=INTEGER},
+      #{a.time,jdbcType=TIMESTAMP},#{a.deviceId,jdbcType=VARCHAR},#{a.content,jdbcType=VARCHAR},
+      #{a.alarm,jdbcType=VARCHAR}
+      )
+    </foreach>
+  </insert>
+  <insert id="insert" parameterType="com.nbicc.gywlw.Model.GywlwHistoryDataForGPIO" >
+    insert into gywlw_history_data_for_gpio (id, gpio_id, value, 
+      time, device_id, content, 
+      alarm)
+    values (#{id,jdbcType=INTEGER}, #{gpioId,jdbcType=VARCHAR}, #{value,jdbcType=INTEGER}, 
+      #{time,jdbcType=TIMESTAMP}, #{deviceId,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR}, 
+      #{alarm,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.nbicc.gywlw.Model.GywlwHistoryDataForGPIO" >
+    insert into gywlw_history_data_for_gpio
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="gpioId != null" >
+        gpio_id,
+      </if>
+      <if test="value != null" >
+        value,
+      </if>
+      <if test="time != null" >
+        time,
+      </if>
+      <if test="deviceId != null" >
+        device_id,
+      </if>
+      <if test="content != null" >
+        content,
+      </if>
+      <if test="alarm != null" >
+        alarm,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="gpioId != null" >
+        #{gpioId,jdbcType=VARCHAR},
+      </if>
+      <if test="value != null" >
+        #{value,jdbcType=INTEGER},
+      </if>
+      <if test="time != null" >
+        #{time,jdbcType=TIMESTAMP},
+      </if>
+      <if test="deviceId != null" >
+        #{deviceId,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null" >
+        #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="alarm != null" >
+        #{alarm,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.nbicc.gywlw.Model.GywlwHistoryDataForGPIO" >
+    update gywlw_history_data_for_gpio
+    <set >
+      <if test="gpioId != null" >
+        gpio_id = #{gpioId,jdbcType=VARCHAR},
+      </if>
+      <if test="value != null" >
+        value = #{value,jdbcType=INTEGER},
+      </if>
+      <if test="time != null" >
+        time = #{time,jdbcType=TIMESTAMP},
+      </if>
+      <if test="deviceId != null" >
+        device_id = #{deviceId,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null" >
+        content = #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="alarm != null" >
+        alarm = #{alarm,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.nbicc.gywlw.Model.GywlwHistoryDataForGPIO" >
+    update gywlw_history_data_for_gpio
+    set gpio_id = #{gpioId,jdbcType=VARCHAR},
+      value = #{value,jdbcType=INTEGER},
+      time = #{time,jdbcType=TIMESTAMP},
+      device_id = #{deviceId,jdbcType=VARCHAR},
+      content = #{content,jdbcType=VARCHAR},
+      alarm = #{alarm,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
