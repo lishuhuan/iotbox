@@ -93,7 +93,6 @@ public class ManufacturerService {
 	}
 
 	public List<GywlwDevice> getFactoryDevicelist(String factoryId, String deviceSn, int level) {
-		// TODO Auto-generated method stub
 		List<GywlwDevice> list = gywlwDeviceMapper.getFactoryDevicelist(factoryId, deviceSn,level);
 		for(GywlwDevice device : list){
 			device.setAdminName(gywlwUserMapper.selectByPrimaryKey(device.getAdminId()).getUserName());

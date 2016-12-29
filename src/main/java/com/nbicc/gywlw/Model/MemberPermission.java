@@ -6,7 +6,7 @@ package com.nbicc.gywlw.Model;
 public class MemberPermission {
     private Integer id;
 
-    private Byte writePermission;
+    private Byte write_permission;
 
     public Integer getId() {
         return id;
@@ -16,11 +16,11 @@ public class MemberPermission {
         this.id = id;
     }
 
-    public Byte getWritePermission() {
-        return writePermission;
+    public Byte getWrite_permission() {
+        return write_permission;
     }
 
-    public void setWritePermission(Byte writePermission) {
-        this.writePermission = writePermission;
+    public void setWrite_permission(Byte write_permission) {
+        this.write_permission = write_permission;
     }
 }

@@ -23,7 +23,7 @@ import java.util.concurrent.CountDownLatch;
  */
 @Service
 public class RefreshService {
-    public static final String[] ALARM = {"alarm1","alarm2"};
+    private static final String[] ALARM = {"alarm1","alarm2"};
 
     private static final Logger logger = LoggerFactory.getLogger(RefreshService.class);
     @Autowired
@@ -38,6 +38,7 @@ public class RefreshService {
     private GywlwHistoryDataForGPIOMapper gywlwHistoryDataForGPIOMapper;
     @Autowired
     private GywlwProjectDeviceGroupMapper gywlwProjectDeviceGroupMapper;
+
 
     public void refresh(){
         refreshDataForGpio();
@@ -375,6 +376,7 @@ public class RefreshService {
                     continue;
                 }
                 gywlwHistoryItem.setItemName(reg);
+                gywlwHistoryItem.setRegId(gywlwRegInfoMapper.selectByRegName(reg).getRegId());
                 gywlwHistoryItem.setItemAddress(reg);
                 Map map1 = (JSONObject) JSON.parse(map.get(reg).toString());
                 gywlwHistoryItem.setItemValue(new Double((Integer)map1.get("value")));

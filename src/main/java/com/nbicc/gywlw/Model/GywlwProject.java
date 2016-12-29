@@ -48,7 +48,7 @@ public class GywlwProject {
 
     private String display;
 
-    private List<String> display1;
+    private List<Integer> display1;
 
     private Byte delMark;
 
@@ -56,11 +56,11 @@ public class GywlwProject {
         return display;
     }
 
-    public List<String> getDisplay1() {
+    public List<Integer> getDisplay1() {
         return display1;
     }
 
-    public void setDisplay1(List<String> display1) {
+    public void setDisplay1(List<Integer> display1) {
         this.display1 = display1;
     }
 

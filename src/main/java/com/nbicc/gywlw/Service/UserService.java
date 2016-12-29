@@ -82,13 +82,13 @@ public class UserService {
         gywlwUserMapper.insert(gywlwUser);
 
         // 注册完以普通用户登录
-        String ticket = addLoginTicket(gywlwUser.getUserId(),Byte.parseByte("0"));
+        String ticket = addLoginTicket(gywlwUser.getUserId(),0);
         map.put("ticket", ticket);
         return map;
     }
 
     //登录
-    public Map<String, Object> login(String phone, String password,Byte userType) {
+    public Map<String, Object> login(String phone, String password,Integer userType) {
         Map<String, Object> map = new HashMap<String, Object>();
         if (StringUtils.isBlank(phone)) {
             map.put("data", "手机号不能为空");
@@ -122,7 +122,7 @@ public class UserService {
     }
 
     //添加ticket
-    private String addLoginTicket(String userId,Byte userType){
+    private String addLoginTicket(String userId,Integer userType){
         LoginTicket ticket = new LoginTicket();
         ticket.setUserId(userId);
         ticket.setUserType(userType);
@@ -186,6 +186,7 @@ public class UserService {
         gywlwUser.setUserId(gywlwUserMapper.selectByPhone(phone).getUserId());
         gywlwUser.setUserPsd(MyUtil.MD5(newPassword));
         gywlwUserMapper.updateByPrimaryKeySelective(gywlwUser);
+        loginTicketDAO.deleteByUserId(gywlwUser.getUserId());//修改密码以后删除该用户所有cookie
         return 0;
     }
 

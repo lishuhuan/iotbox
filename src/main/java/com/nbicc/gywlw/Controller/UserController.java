@@ -112,10 +112,17 @@ public class UserController {
     public JSONObject projectInfo(@RequestParam(value = "project_id")String projectId) {
         try {
             GywlwProject gywlwProject = projectService.projectInfo(projectId);
-
             String[] str = gywlwProject.getDisplay().split(",");
             List<String> list = Arrays.asList(str);
-            gywlwProject.setDisplay1(list);
+            List<Integer> list1 = new ArrayList<>();
+            for(String string : list){
+                if(string.equals("0")){
+                    list1.add(0);
+                }else{
+                    list1.add(1);
+                }
+            }
+            gywlwProject.setDisplay1(list1);
             return MyUtil.response(0,gywlwProject);
         }catch (Exception e){
             logger.error("获取项目列表失败" + e.getMessage());
@@ -354,7 +361,7 @@ public class UserController {
     @RequestMapping(path = {"/historydata"}, method = {RequestMethod.POST})
     @ResponseBody
     public JSONObject historyData(@RequestParam("project_id")String projectId,
-                                @RequestParam(value = "variable_name")String variableName){
+                                @RequestParam(value = "variable_name",defaultValue = "ALL")String variableName){
         try{
             List<GywlwHistoryItem> list = projectService.searchHistoryData(projectId,variableName);
             return MyUtil.response(0,list);
@@ -720,6 +727,7 @@ public class UserController {
             return MyUtil.response(1, "获取数据项列表失败!");
         }
     }
+
 
     @RequestMapping(path = {"/user/bindvariableandreg"}, method = {RequestMethod.POST})
     @ResponseBody

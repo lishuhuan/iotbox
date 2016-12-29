@@ -25,4 +25,7 @@ public interface LoginTicketDAO {
 
     @Delete({"delete from ", TABLE_NAME, "where ticket=#{ticket}"})
     void delete(@Param("ticket") String ticket);
+
+    @Delete({"delete from ", TABLE_NAME, "where user_id=#{userId}"})
+    void deleteByUserId(@Param("userId") String userId);
 }

@@ -76,7 +76,7 @@ public class LoginController {
                         @RequestParam(value = "user_type", defaultValue = "0")String userType,  //默认以普通用户登录0
                         HttpServletResponse response) {
         try {
-            Map<String, Object> map = userService.login(phone, password,Byte.parseByte(userType));
+            Map<String, Object> map = userService.login(phone, password,Integer.parseInt(userType));
             if( map.containsKey("ticket")) {
                 Cookie cookie = new Cookie("ticket", map.get("ticket").toString());
                 cookie.setPath("/");

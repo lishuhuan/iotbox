@@ -43,7 +43,11 @@
     SELECT * from(select
     a.item_id,a.plc_name,d.device_name,a.item_name,a.item_alias,a.item_type,a.item_value,a.item_time,b.variable_name
     from gywlw_history_item a,gywlw_variable b,gywlw_variable_reg_group c, gywlw_device d
-    where b.variable_name = #{variableName,jdbcType=VARCHAR} AND b.project_id = #{projectId,jdbcType=VARCHAR} AND c.variable_id = b.variable_id and c.reg_id = a.reg_id and a.device_id=d.device_id
+    where
+    <if test="variableName != 'ALL'">
+    b.variable_name = #{variableName,jdbcType=VARCHAR} AND
+    </if>
+    c.project_id = #{projectId,jdbcType=VARCHAR} AND c.variable_id = b.variable_id and c.reg_id = a.reg_id and a.device_id=d.device_id
     ORDER BY a.item_time DESC ) t
     group by t.item_name;
   </select>

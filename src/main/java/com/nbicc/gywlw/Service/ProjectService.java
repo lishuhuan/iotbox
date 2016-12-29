@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -167,7 +168,7 @@ public class ProjectService {
         GywlwProjectUserGroup gywlwProjectUserGroup = new GywlwProjectUserGroup();
         for(MemberPermission memberPermission : list){
             gywlwProjectUserGroup.setId(memberPermission.getId());
-            gywlwProjectUserGroup.setWritePermission(memberPermission.getWritePermission());
+            gywlwProjectUserGroup.setWritePermission(memberPermission.getWrite_permission());
             gywlwProjectUserGroupMapper.updateByPrimaryKeySelective(gywlwProjectUserGroup);
         }
     }
@@ -249,7 +250,7 @@ public class ProjectService {
     }
 
     public int changeInfo(String userName, String companyName, String sex, String email, String fixedphone) {
-        if(hostHolder.getGywlwUser().getUserType().equals("1") && hostHolder.getGywlwUser().getDuserLevel() == 0 &&
+        if(hostHolder.getGywlwUser().getUserType()==1 && hostHolder.getGywlwUser().getDuserLevel() == 0 &&
                 !companyName.equals("")){
             return 1;
         }
@@ -372,6 +373,7 @@ public class ProjectService {
         return gywlwRegInfoMapper.selectByPlcId(plcId);
     }
 
+
     public void bindRegAndVariable(String variableId,String regId, String deviceId, String projectId){
         GywlwVariableRegGroup gywlwVariableRegGroup = new GywlwVariableRegGroup();
         gywlwVariableRegGroup.setVariableId(variableId);
@@ -423,7 +425,7 @@ public class ProjectService {
                 gywlwDataTrend.setPhotoName(model.getPhotoName());
                 gywlwDataTrendMapper.insert(gywlwDataTrend);
             }
-        }catch (Exception e){
+        } catch (ParseException e) {
             e.printStackTrace();
         }
     }
@@ -690,7 +692,7 @@ public class ProjectService {
 //        }
 //
 //        public void run() {
-//            // TODO 这里处理数据
+//
 //            logger.info("start: " + start + " ||  end: " + end);
 //            List subList = data.subList(start, end);
 //            System.out.println(threadName + "--" + data.size() + "--" + start + "--" + end + "--");

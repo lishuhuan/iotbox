@@ -3,9 +3,7 @@ package com.nbicc.gywlw.util;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
-import redis.clients.jedis.Pipeline;
 
-import javax.management.relation.Relation;
 import java.util.List;
 import java.util.Set;
 
@@ -14,9 +12,7 @@ public class RedisAPI {
 	 private static JedisPool pool = null;  
      
 	    /** 
-	     *  
-	     * @param ip 
-	     * @param port 
+	     *
 	     * @return JedisPool 
 	     */  
 	    public static JedisPool getPool() {  

@@ -4,6 +4,7 @@ import com.nbicc.gywlw.Service.ProjectService;
 import com.nbicc.gywlw.Service.RefreshService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -11,7 +12,7 @@ import java.util.Date;
 /**
  * Created by BigMao on 2016/12/16.
  */
-//@Component
+@Component
 public class ScheduledTasks {
     @Autowired
     private ProjectService projectService;
