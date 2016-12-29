@@ -40,7 +40,7 @@ public class RefreshService {
     private GywlwProjectDeviceGroupMapper gywlwProjectDeviceGroupMapper;
 
     public void refresh(){
-//        refreshDataForGpio();
+        refreshDataForGpio();
         refreshDataForPlc();
     }
 
@@ -133,7 +133,7 @@ public class RefreshService {
                 Long timestamp;
                 JedisPool pool = RedisAPI.getPool();
                 Jedis jedis = pool.getResource();
-                if(jedis.get(device.getDeviceId())!=null){
+                if(jedis.get(device.getGpioId())!=null){
                     timestamp = Long.parseLong(jedis.get(device.getGpioId()));
                 }else{
                     timestamp = System.currentTimeMillis() - 86400L; //当前时间减1天
@@ -179,6 +179,7 @@ public class RefreshService {
 
     }
 
+    //用了硬编码，处理速度还可以，就没有用多线程
     private void handler(List<GpioDataModel> list, GywlwDevice device, List<String> gpioList){
         try {
             List<GywlwHistoryDataForGPIO> listForGpio = new ArrayList<>();
@@ -452,7 +453,7 @@ public class RefreshService {
         }
 
         public void run() {
-            // TODO 这里处理数据
+            // 这里处理数据
             logger.info("start: " + start + " ||  end: " + end);
             List subList = data.subList(start, end);  //[start,end)
             System.out.println(threadName + "--" + data.size() + "--" + start + "--" + end + "--");

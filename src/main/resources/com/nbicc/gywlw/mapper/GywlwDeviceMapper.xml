@@ -54,13 +54,13 @@
   </select>
   <select id="selectByDeviceId" resultMap="BaseResultMap" parameterType="java.lang.String">
     SELECT
-    admin_id
+    *
     from gywlw_device
     WHERE device_id = #{deviceId,jdbcType=VARCHAR};
   </select>
   <select id="selectByAdminId" resultMap="BaseResultMap" parameterType="java.lang.String">
     SELECT
-    device_id
+    *
     from gywlw_device
     WHERE admin_id = #{adminId,jdbcType=VARCHAR};
   </select>

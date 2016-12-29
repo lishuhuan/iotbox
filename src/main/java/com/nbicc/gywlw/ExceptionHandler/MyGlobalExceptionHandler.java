@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletRequest;
  * 全局异常（错误）处理
  */
 @ControllerAdvice
-public class GlobalExceptionHandler {
+public class MyGlobalExceptionHandler {
     @ExceptionHandler(value = MyException.class)
     @ResponseBody
     public ErrorInfo<String> jsonErrorHandler(HttpServletRequest req, MyException e) throws Exception {
