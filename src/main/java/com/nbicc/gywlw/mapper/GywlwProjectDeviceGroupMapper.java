@@ -2,6 +2,7 @@ package com.nbicc.gywlw.mapper;
 
 import com.nbicc.gywlw.Model.GywlwProjectDeviceGroup;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface GywlwProjectDeviceGroupMapper {
@@ -16,6 +17,9 @@ public interface GywlwProjectDeviceGroupMapper {
     GywlwProjectDeviceGroup selectByPrimaryKey(String id);
 
     GywlwProjectDeviceGroup selectByDeviceId(String deviceId);
+
+    GywlwProjectDeviceGroup selectByDeviceIdAndProjectId(@Param("deviceId") String deviceId,
+                                                         @Param("projectId") String projectId);
 
     int updateByPrimaryKeySelective(GywlwProjectDeviceGroup record);
 

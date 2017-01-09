@@ -16,11 +16,17 @@
   <sql id="Base_Column_List" >
     id, variable_id, reg_id, device_id, project_id, del_mark
   </sql>
-  <select id="selectByProjectIdAndVariableId" resultMap="BaseResultMap" parameterType="java.lang.String" >
+  <select id="selectByProjectId" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select
     a.id,a.variable_id,b.variable_name,a.reg_id,c.reg_name,a.device_id,d.device_name,a.project_id,d.last_connected
     from gywlw_variable_reg_group a,gywlw_variable b,gywlw_reg_info c,gywlw_device d, gywlw_project e
     where a.project_id = #{projectId,jdbcType=VARCHAR} AND a.device_id = d.device_id and a.project_id = e.project_id and a.reg_id = c.reg_id and a.variable_id = b.variable_id AND a.del_mark = 0;
+  </select>
+  <select id="selectByProjectIdAndVariable" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    a.id,a.variable_id,b.variable_name,a.reg_id,c.reg_name,a.device_id,d.device_name,a.project_id,d.last_connected
+    from gywlw_variable_reg_group a,gywlw_variable b,gywlw_reg_info c,gywlw_device d, gywlw_project e
+    where a.project_id = #{projectId,jdbcType=VARCHAR} AND b.variable_name = #{variableName,jdbcType=VARCHAR} AND a.device_id = d.device_id and a.project_id = e.project_id and a.reg_id = c.reg_id and a.variable_id = b.variable_id AND a.del_mark = 0;
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from gywlw_variable_reg_group

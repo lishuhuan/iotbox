@@ -87,9 +87,10 @@ public class RefreshService {
                 jsonObject.put("timestamp",timestamp);
                 jsonObject.put("idList",requestList);
 
-                System.out.println("param: " + jsonObject);
+                System.out.println("请求参数: " + jsonObject);
                 logger.info("准备工作结束，发送psot请求： " + new Date());
                 String str = HttpClientUtil.post(jsonObject,2);
+                System.out.println("待同步数据 : "+ str);
                 //handle response
                 JSONObject json = new JSONObject();
                 Map<String, Object> map1 = JSON.parseObject(str);
@@ -155,12 +156,12 @@ public class RefreshService {
                 jsonObject.put("deviceId",gpioId);
                 jsonObject.put("idList",requestList);
                 jsonObject.put("timestamp",timestamp);
-                System.out.println("param: " + jsonObject);
+                System.out.println("请求参数: " + jsonObject);
 
                 logger.info("准备工作结束，发送psot请求： " + new Date());
 
                 String str = HttpClientUtil.post(jsonObject,1);
-                System.out.println("response str:"+ str);
+                System.out.println("待同步数据 : "+ str);
                 //handle response
                 JSONObject json = new JSONObject();
                 Map<String, Object> map1 = JSON.parseObject(str);

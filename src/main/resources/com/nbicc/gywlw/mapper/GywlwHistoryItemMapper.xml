@@ -16,7 +16,8 @@
   </resultMap>
   <resultMap id="BaseResultMap1" type="com.nbicc.gywlw.Model.GywlwHistoryItem" >
     <id column="item_id" property="itemId" jdbcType="INTEGER" />
-    <result column="reg_id" property="plcId" jdbcType="VARCHAR" />
+    <result column="reg_id" property="regId" jdbcType="VARCHAR" />
+    <result column="plc_d" property="plcId" jdbcType="VARCHAR" />
     <result column="variable_name" property="variableName" jdbcType="VARCHAR" />
     <result column="plc_name" property="plcName" jdbcType="VARCHAR" />
     <result column="device_name" property="deviceName" jdbcType="VARCHAR" />
@@ -39,9 +40,11 @@
     item_id, reg_id, plc_id, plc_name, device_id, project_id, variable_name, device_name, item_name, item_alias,
     item_address, item_type, item_value, item_time, severity, item_content, del_mark, rule_id
   </sql>
-  <select id="selectByVariableName" resultMap="BaseResultMap" parameterType="com.nbicc.gywlw.Model.GywlwHistoryItem" >
+  <select id="selectByVariableName" resultMap="BaseResultMap1" parameterType="com.nbicc.gywlw.Model.GywlwHistoryItem" >
     SELECT * from(select
-    a.item_id,a.plc_name,d.device_name,a.item_name,a.item_alias,a.item_type,a.item_value,a.item_time,b.variable_name
+    a.item_id,a.reg_id,a.plc_id,a.plc_name,a.device_id,a.project_id,b.variable_name,
+    a.device_name,a.item_name,a.item_alias,a.item_address,a.item_type,a.item_value,
+    a.item_time,a.severity,a.item_content,a.rule_id
     from gywlw_history_item a,gywlw_variable b,gywlw_variable_reg_group c, gywlw_device d
     where
     <if test="variableName != 'ALL'">

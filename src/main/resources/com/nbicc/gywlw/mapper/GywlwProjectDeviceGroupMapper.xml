@@ -23,6 +23,12 @@
     from gywlw_project_device_group
     where device_id = #{deviceId,jdbcType=VARCHAR}
   </select>
+  <select id="selectByDeviceIdAndProjectId" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from gywlw_project_device_group
+    where device_id = #{deviceId,jdbcType=VARCHAR} AND project_id = #{projectId,jdbcType=VARCHAR}
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
     delete from gywlw_project_device_group
     where id = #{id,jdbcType=VARCHAR}

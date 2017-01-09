@@ -24,7 +24,7 @@ public class ScheduledTasks {
     public void reportCurrentTime() {
         System.out.println("现在时间：" + dateFormat.format(new Date()));
     }
-    @Scheduled(fixedRate = 1000*3600) //间隔1小时同步一次数据
+    @Scheduled(fixedRate = 1000*600) //间隔10min同步一次数据
     public void refreshData(){
         refreshService.refresh();
     }

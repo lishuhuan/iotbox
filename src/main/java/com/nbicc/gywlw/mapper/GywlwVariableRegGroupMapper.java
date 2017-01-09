@@ -15,7 +15,12 @@ public interface GywlwVariableRegGroupMapper {
 
     int insertSelective(GywlwVariableRegGroup record);
 
-    List<GywlwVariableRegGroup> selectByProjectIdAndVariableId(@Param("projectId")String projectId);
+    List<GywlwVariableRegGroup> selectByProjectId(@Param("projectId")String projectId);
+
+    List<GywlwVariableRegGroup> selectByProjectIdAndVariable(@Param("projectId")String projectId,
+                                                             @Param("variableName")String variableName);
+
+
 
     int updateByPrimaryKeySelective(GywlwVariableRegGroup record);
 

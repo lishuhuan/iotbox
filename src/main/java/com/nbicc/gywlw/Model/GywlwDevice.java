@@ -19,7 +19,7 @@ public class GywlwDevice {
 
     private String content;
 
-    private Byte deviceOnline;
+    private Byte deviceOnline;      //0为在线，1为离线
 
     private String deviceTypeId;
 

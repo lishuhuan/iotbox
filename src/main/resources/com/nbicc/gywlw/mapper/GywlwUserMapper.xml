@@ -249,7 +249,9 @@
 
 	<select id="searchUserByFactoy" resultMap="BaseResultMap"
 		parameterType="java.lang.String">
-		select a.* from gywlw_user a
+		select a.user_id, a.user_phone, a.user_name, a.create_time, a.user_level,
+		a.duser_level, a.parent_id, a.user_sex, a.user_email, a.user_fixedphone,
+		a.company_id, a.company_name from gywlw_user a
 		<if test="level == 0">
 			LEFT JOIN gywlw_device b on b.admin_id=a.user_id
 			where b.factory_id=#{factoryId}

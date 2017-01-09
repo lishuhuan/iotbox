@@ -729,7 +729,7 @@ public class UserController {
     }
 
 
-    @RequestMapping(path = {"/user/bindvariableandreg"}, method = {RequestMethod.POST})
+    @RequestMapping(path = {"/bindvariableandreg"}, method = {RequestMethod.POST})
     @ResponseBody
     public JSONObject bindVariableAndReg(@RequestParam("variable_id")String variableId,
                                      @RequestParam("reg_id")String regId,
@@ -743,6 +743,31 @@ public class UserController {
             return MyUtil.response(1, "绑定失败!");
         }
     }
+
+    //批量绑定变量组和数据项
+    @RequestMapping(path = {"/bindvariableandregbatch"}, method = {RequestMethod.POST})
+    @ResponseBody
+    public JSONObject bindVariableAndRegBatch(@RequestBody List<Map> list){
+        try{
+            if(list.size() > 0) {
+                for (Map map : list) {
+                    String variableId = (String) map.get("variable_id");
+                    String regId = (String) map.get("reg_id");
+                    String deviceId = (String) map.get("device_id");
+                    String projectId = (String) map.get("project_id");
+                    projectService.bindRegAndVariable(variableId, regId, deviceId, projectId);
+
+                }
+                return MyUtil.response(0, "绑定成功");
+            }else{
+                return MyUtil.response(1, "无数据!");
+            }
+        }catch (Exception e){
+            logger.error("绑定失败（variableAndReg）" + e.getMessage());
+            return MyUtil.response(1, "绑定失败!");
+        }
+    }
+
 
     @RequestMapping(path = {"/unbindvariableandreg"}, method = {RequestMethod.POST})
     @ResponseBody
@@ -801,6 +826,7 @@ public class UserController {
     }
 
 
+    //数据刷新
     @RequestMapping(path = {"/refresh"}, method = {RequestMethod.POST})
     @ResponseBody
     public String refreshData(){
@@ -812,6 +838,32 @@ public class UserController {
             return "refresh失败";
         }
     }
+
+    //该用户下，树形结构列表（device/plc/reg)
+    @RequestMapping(path = {"/treelistofuser"}, method = {RequestMethod.POST})
+    @ResponseBody
+    public JSONObject treeListOfUser(){
+        try {
+            return MyUtil.response(0,projectService.getTreeListOfUser());
+        }catch (Exception e){
+            logger.error("获取树形结构列表失败(user)" + e.getMessage());
+            return MyUtil.response(1,"获取树形结构列表失败(user)");
+        }
+    }
+
+    //项目下，已经绑定的数据项列表
+    @RequestMapping(path = {"/treelistofproject"}, method = {RequestMethod.POST})
+    @ResponseBody
+    public JSONObject treeListOfProject(@RequestParam("project_id")String projectId){
+        try {
+            return MyUtil.response(0,projectService.getTreeListOfProject(projectId));
+        }catch (Exception e){
+            logger.error("获取树形结构列表失败(project)" + e.getMessage());
+            return MyUtil.response(1,"获取树形结构列表失败(project)");
+        }
+    }
+
+
 
 
 

@@ -1,11 +1,9 @@
 package com.nbicc.gywlw.util;
 
-import com.alibaba.fastjson.JSONObject;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.conn.socket.LayeredConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
@@ -14,8 +12,6 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by BigMao on 2016/12/12.
@@ -36,7 +32,7 @@ public class HttpsTest {
 //    }
     public static void postForm() throws Exception {
         //创建默认实例
-        String url = "https://121.40.90.27:8083/device/queryDeviceStatusHistory";
+        String url = "https://iot-expeed.tech:8445/test";
 //        String url = "https://www.baidu.com";
 
 //        CloseableHttpClient httpClient = new SSLClient();
@@ -63,21 +59,21 @@ public class HttpsTest {
         CloseableHttpClient httpClient = HttpClients.custom()
                 .setSSLSocketFactory(sslSocketFactory)
                 .build();
-//        HttpGet httpGet = new HttpGet(url);
-        HttpPost httpPost = new HttpPost(url);
-       // 设置参数
-        List<String> list = new ArrayList<>();
-        list.add("alarm1");
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("deviceId", "0052000000000003");//"0052000000000003"
-        jsonObject.put("idList", list);
-        jsonObject.put("timestamp", 1480767339L);
-
-        StringEntity params =new StringEntity(jsonObject.toString());
-        httpPost.addHeader("content-type", "application/json");
-        httpPost.addHeader("Accept","application/json");
-        httpPost.setEntity(params);
-        CloseableHttpResponse response = httpClient.execute(httpPost);
+        HttpGet httpGet = new HttpGet(url);
+//        HttpPost httpPost = new HttpPost(url);
+//       // 设置参数
+//        List<String> list = new ArrayList<>();
+//        list.add("alarm1");
+//        JSONObject jsonObject = new JSONObject();
+//        jsonObject.put("deviceId", "0052000000000003");//"0052000000000003"
+//        jsonObject.put("idList", list);
+//        jsonObject.put("timestamp", 1480767339L);
+//
+//        StringEntity params =new StringEntity(jsonObject.toString());
+//        httpPost.addHeader("content-type", "application/json");
+//        httpPost.addHeader("Accept","application/json");
+//        httpPost.setEntity(params);
+        CloseableHttpResponse response = httpClient.execute(httpGet);
         // handle response here...
         System.out.println("---------------------------------");
 
