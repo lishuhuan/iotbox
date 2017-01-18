@@ -21,6 +21,46 @@ public class GywlwRegInfo {
 
     private Byte permission;
 
+    private Integer fieldType;
+
+    private Integer fieldRw;
+
+    private String fieldFunctionCode;
+
+    private String fieldAttach;
+
+    public Integer getFieldType() {
+        return fieldType;
+    }
+
+    public void setFieldType(Integer fieldType) {
+        this.fieldType = fieldType;
+    }
+
+    public Integer getFieldRw() {
+        return fieldRw;
+    }
+
+    public void setFieldRw(Integer fieldRw) {
+        this.fieldRw = fieldRw;
+    }
+
+    public String getFieldFunctionCode() {
+        return fieldFunctionCode;
+    }
+
+    public void setFieldFunctionCode(String fieldFunctionCode) {
+        this.fieldFunctionCode = fieldFunctionCode;
+    }
+
+    public String getFieldAttach() {
+        return fieldAttach;
+    }
+
+    public void setFieldAttach(String fieldAttach) {
+        this.fieldAttach = fieldAttach;
+    }
+
     public String getRegId() {
         return regId;
     }

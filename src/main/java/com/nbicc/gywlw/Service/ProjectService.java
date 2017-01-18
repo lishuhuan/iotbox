@@ -374,7 +374,9 @@ public class ProjectService {
     }
 
 
-    public void bindRegAndVariable(String variableId,String regId, String deviceId, String projectId){
+    public void bindRegAndVariable(String variableId,String regId){
+        String deviceId = gywlwRegInfoMapper.selectByPrimaryKey(regId).getDeviceId();
+        String projectId = gywlwVariableMapper.selectByPrimaryKey(variableId).getProjectId();
         GywlwVariableRegGroup gywlwVariableRegGroup = new GywlwVariableRegGroup();
         gywlwVariableRegGroup.setVariableId(variableId);
         gywlwVariableRegGroup.setDeviceId(deviceId);
@@ -516,6 +518,20 @@ public class ProjectService {
         return treeListModels;
     }
 
-
+    //查看plc中数据项的历史数据
+    public List<GywlwHistoryItem> getHistoryDataForReg(String regId,String startTime,String endTime) throws ParseException {
+        refreshService.refresh();
+        GywlwRegInfo gywlwRegInfo = gywlwRegInfoMapper.selectByPrimaryKey(regId);
+        if(hostHolder.getGywlwUser().getUserId().
+                equals(gywlwDeviceMapper.selectByDeviceId(gywlwRegInfo.getDeviceId()).getAdminId())){
+            List<GywlwHistoryItem> list = gywlwHistoryItemMapper.getDataForReg(regId,
+                    MyUtil.timeTransformToDateNo1000(startTime),MyUtil.timeTransformToDateNo1000(endTime));
+            return list;
+        }
+        return null;
+    }
 }
+
+
+
 

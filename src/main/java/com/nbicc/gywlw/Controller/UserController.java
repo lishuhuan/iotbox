@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -658,7 +659,7 @@ public class UserController {
     //删除变量组
     @RequestMapping(path = {"/deletevariable"}, method = {RequestMethod.POST})
     @ResponseBody
-    public JSONObject addVariable(@RequestParam("variable_id")String variableId){
+    public JSONObject deleteVariable(@RequestParam("variable_id")String variableId){
         try{
             projectService.deleteVariable(variableId);
             return MyUtil.response(0,"OK");
@@ -667,6 +668,25 @@ public class UserController {
             return MyUtil.response(1, "删除变量组失败!");
         }
     }
+
+    //批量删除变量组
+    @RequestMapping(path = {"/deletevariablebatch"}, method = {RequestMethod.POST})
+    @ResponseBody
+    public JSONObject deleteVariableBatch(@RequestBody List<Map> list){
+        try{
+            if(list.size() > 0) {
+                for (Map map : list) {
+                    String variableId = (String) map.get("variable_id");
+                    projectService.deleteVariable(variableId);
+                }
+            }
+            return MyUtil.response(0,"OK");
+        }catch (Exception e){
+            logger.error("删除变量组失败" + e.getMessage());
+            return MyUtil.response(1, "删除变量组失败!");
+        }
+    }
+
 
     //plc列表
     @RequestMapping(path = {"/plclist"}, method = {RequestMethod.POST})
@@ -732,11 +752,9 @@ public class UserController {
     @RequestMapping(path = {"/bindvariableandreg"}, method = {RequestMethod.POST})
     @ResponseBody
     public JSONObject bindVariableAndReg(@RequestParam("variable_id")String variableId,
-                                     @RequestParam("reg_id")String regId,
-                                     @RequestParam("device_id")String deviceId,
-                                     @RequestParam("project_id")String projectId){
+                                     @RequestParam("reg_id")String regId){
         try{
-            projectService.bindRegAndVariable(variableId,regId,deviceId,projectId);
+            projectService.bindRegAndVariable(variableId,regId);
             return MyUtil.response(0,"绑定成功");
         }catch (Exception e){
             logger.error("绑定失败（variableAndReg）" + e.getMessage());
@@ -753,9 +771,9 @@ public class UserController {
                 for (Map map : list) {
                     String variableId = (String) map.get("variable_id");
                     String regId = (String) map.get("reg_id");
-                    String deviceId = (String) map.get("device_id");
-                    String projectId = (String) map.get("project_id");
-                    projectService.bindRegAndVariable(variableId, regId, deviceId, projectId);
+//                    String deviceId = (String) map.get("device_id");
+//                    String projectId = (String) map.get("project_id");
+                    projectService.bindRegAndVariable(variableId, regId);
 
                 }
                 return MyUtil.response(0, "绑定成功");
@@ -768,7 +786,7 @@ public class UserController {
         }
     }
 
-
+    //解绑数据项和变量组
     @RequestMapping(path = {"/unbindvariableandreg"}, method = {RequestMethod.POST})
     @ResponseBody
     public JSONObject unbindVariableAndReg(@RequestParam("id")String id){
@@ -780,6 +798,45 @@ public class UserController {
             return MyUtil.response(1, "解绑失败!");
         }
     }
+
+    //批量解绑数据项和变量组
+    @RequestMapping(path = {"/unbindvariableandregbatch"}, method = {RequestMethod.POST})
+    @ResponseBody
+    public JSONObject unbindVariableAndRegBatch(@RequestBody List<Map> list){
+        try{
+            if(list.size() > 0){
+                for(Map map : list){
+                    String id = (String) map.get("id");
+                    projectService.unbindRegAndVariable(id);
+                }
+            }
+            return MyUtil.response(0,"解绑成功");
+        }catch (Exception e){
+            logger.error("解绑失败（variableandreg）" + e.getMessage());
+            return MyUtil.response(1, "解绑失败!");
+        }
+    }
+
+    //每个reg对应的历史数据查看
+    @RequestMapping(path = {"/historydataforreg"}, method = {RequestMethod.POST})
+    @ResponseBody
+    public JSONObject historyDataForReg(@RequestParam("reg_id")String regId,
+                                        @RequestParam(value = "start_time",defaultValue = "0")String startTime,
+                                        @RequestParam(value = "end_time",defaultValue = "4640396560000")String endTime,
+                                        @RequestParam(value = "page_num", defaultValue = "1")Integer pageNum,
+                                        @RequestParam(value = "page_size", defaultValue = "20")Integer pageSize){
+        try {
+            PageHelper.startPage(pageNum,pageSize);
+            List<GywlwHistoryItem> list = projectService.getHistoryDataForReg(regId,startTime,endTime);
+            PageInfo<GywlwHistoryItem> pageInfo = new PageInfo<>(list);
+            return MyUtil.response(0, pageInfo);
+        } catch (ParseException e) {
+            logger.error("查询数据项历史数据出错" + e.getMessage());
+            return MyUtil.response(1, "查询数据项历史数据出错!");
+        }
+    }
+
+
 
     //趋势参数设置
     @RequestMapping(path = {"/trendpicture"}, method = {RequestMethod.POST})
@@ -808,6 +865,8 @@ public class UserController {
         }
     }
 
+
+
     //趋势数据输出 by page
     @RequestMapping(path = {"/getdatabypage"}, method = {RequestMethod.POST})
     @ResponseBody
@@ -826,18 +885,6 @@ public class UserController {
     }
 
 
-    //数据刷新
-    @RequestMapping(path = {"/refresh"}, method = {RequestMethod.POST})
-    @ResponseBody
-    public String refreshData(){
-        try {
-            refreshService.refresh();
-            return "ok";
-        }catch (Exception e){
-            logger.error("refresh失败" + e.getMessage());
-            return "refresh失败";
-        }
-    }
 
     //该用户下，树形结构列表（device/plc/reg)
     @RequestMapping(path = {"/treelistofuser"}, method = {RequestMethod.POST})

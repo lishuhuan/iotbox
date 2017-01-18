@@ -12,10 +12,14 @@
     <result column="plc_id" property="plcId" jdbcType="VARCHAR" />
     <result column="content" property="content" jdbcType="VARCHAR" />
     <result column="permission" property="permission" jdbcType="TINYINT" />
+    <result column="field_type" property="fieldType" jdbcType="INTEGER" />
+    <result column="field_rw" property="fieldRw" jdbcType="INTEGER" />
+    <result column="field_functioncode" property="fieldFunctionCode" jdbcType="VARCHAR" />
+    <result column="field_attach" property="fieldAttach" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     reg_id, subdevice_id, device_id, reg_name, reg_alias, reg_address, gateway_id, plc_id, 
-    content, permission
+    content, permission, field_type, field_rw, field_functioncode, field_attach
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select
@@ -38,6 +42,10 @@
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
     delete from gywlw_reg_info
     where reg_id = #{regId,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByPlcId" parameterType="java.lang.String" >
+    delete from gywlw_reg_info
+    where plc_id = #{plcId,jdbcType=VARCHAR}
   </delete>
   <insert id="insert" parameterType="com.nbicc.gywlw.Model.GywlwRegInfo" >
     insert into gywlw_reg_info (reg_id, subdevice_id, device_id, 
@@ -82,6 +90,18 @@
       <if test="permission != null" >
         permission,
       </if>
+      <if test="fieldType != null" >
+        field_type,
+      </if>
+      <if test="fieldRw != null" >
+        field_rw,
+      </if>
+      <if test="fieldFunctionCode != null" >
+        field_functioncode,
+      </if>
+      <if test="fieldAttach != null" >
+        field_attach,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="regId != null" >
@@ -114,6 +134,18 @@
       <if test="permission != null" >
         #{permission,jdbcType=TINYINT},
       </if>
+      <if test="fieldType != null" >
+        #{fieldType,jdbcType=INT},
+      </if>
+      <if test="fieldRw != null" >
+        #{fieldRw,jdbcType=INT},
+      </if>
+      <if test="fieldFunctionCode != null" >
+        #{fieldFunctionCode,jdbcType=VARCHAR},
+      </if>
+      <if test="fieldAttach != null" >
+        #{fieldAttach,jdbcType=VARCHAR},
+      </if>
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.nbicc.gywlw.Model.GywlwRegInfo" >
@@ -145,6 +177,18 @@
       </if>
       <if test="permission != null" >
         permission = #{permission,jdbcType=TINYINT},
+      </if>
+      <if test="fieldType != null" >
+        field_type = #{fieldType,jdbcType=INT},
+      </if>
+      <if test="fieldRw != null" >
+        field_rw = #{fieldRw,jdbcType=INT},
+      </if>
+      <if test="fieldFunctionCode != null" >
+        field_functioncode = #{fieldFunctionCode,jdbcType=VARCHAR},
+      </if>
+      <if test="fieldAttach != null" >
+        field_attach = #{fieldAttach,jdbcType=VARCHAR},
       </if>
     </set>
     where reg_id = #{regId,jdbcType=VARCHAR}

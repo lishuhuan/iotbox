@@ -35,6 +35,10 @@
     delete from gywlw_plc_info
     where id = #{id,jdbcType=VARCHAR}
   </delete>
+  <delete id="deleteByPlcId" parameterType="java.lang.String" >
+    delete from gywlw_plc_info
+    where plc_id = #{plcId,jdbcType=VARCHAR}
+  </delete>
   <insert id="insert" parameterType="com.nbicc.gywlw.Model.GywlwPlcInfo" >
     insert into gywlw_plc_info (id, subdevice_id, device_id, 
       plc_type, plc_brand, content, 

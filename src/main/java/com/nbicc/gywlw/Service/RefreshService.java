@@ -4,15 +4,12 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.nbicc.gywlw.Model.*;
 import com.nbicc.gywlw.mapper.*;
-import com.nbicc.gywlw.util.HttpClientUtil;
+import com.nbicc.gywlw.util.HttpsTest;
 import com.nbicc.gywlw.util.MyUtil;
-import com.nbicc.gywlw.util.RedisAPI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
 
 import java.text.ParseException;
 import java.util.*;
@@ -41,27 +38,31 @@ public class RefreshService {
 
 
     public void refresh(){
+//        refreshConfigParams();
+//        refreshPlcParams();
         refreshDataForGpio();
         refreshDataForPlc();
+
     }
 
     //PLC，默认一个物联网盒子上连接的plc都是同一型号
     public void refreshDataForPlc(){
         logger.info("同步plc数据准备工作： " + new Date());
-        JedisPool pool = RedisAPI.getPool();
-        Jedis jedis = pool.getResource();
+//        JedisPool pool = RedisAPI.getPool();
+//        Jedis jedis = pool.getResource();
         List<GywlwDevice> devices = gywlwDeviceMapper.selectAll();
         if(devices.size() != 0) {
             for (GywlwDevice device : devices) {
                 List<String> deviceIdList = new ArrayList<>();
                 String sdkKey = "";
                 Long timestamp;
-                if(jedis.get(device.getDeviceSn())!=null){
-                    timestamp = Long.parseLong(jedis.get(device.getDeviceSn()));
-                }else{
-                    timestamp = System.currentTimeMillis() - 1*86400000L; //当前时间减1天
-                }
+//                if(jedis.get(device.getDeviceSn())!=null){
+//                    timestamp = Long.parseLong(jedis.get(device.getDeviceSn()));
+//                }else{
+//                    timestamp = System.currentTimeMillis() - 1*86400000L; //当前时间减1天
+//                }
 //                Long timestamp = 1482798633000L;//test
+                timestamp = System.currentTimeMillis() - 1*86400000L; //当前时间减1天
                 List<String> regList = new ArrayList<>();
                 List<String> requestList = new ArrayList<>();
                 List<GywlwPlcInfo> plcinfos = gywlwPlcInfoMapper.selectByDeviceId(device.getDeviceId());
@@ -89,9 +90,17 @@ public class RefreshService {
 
                 System.out.println("请求参数: " + jsonObject);
                 logger.info("准备工作结束，发送psot请求： " + new Date());
-                String str = HttpClientUtil.post(jsonObject,2);
+                String str = null;
+                try {
+                    str = HttpsTest.postForm(jsonObject,2);  //2代表plc通道，也就是走子设备通道
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 System.out.println("待同步数据 : "+ str);
                 //handle response
+                if(str.equals("0")){
+                    continue;
+                }
                 JSONObject json = new JSONObject();
                 Map<String, Object> map1 = JSON.parseObject(str);
                 List<Map> list1 = JSON.parseArray(map1.get("result_data").toString(), Map.class);
@@ -99,13 +108,13 @@ public class RefreshService {
                 logger.info("请求成功，开始处理数据： " + new Date());
                 if(list1.size() > 0){
                     try {
-                        jedis.set(device.getDeviceSn(), list1.get(0).get("timestamp").toString());
+//                        jedis.set(device.getDeviceSn(), list1.get(0).get("timestamp").toString());
                         //单线程
 //                        handlerForPlc(list1,regList);
                         //多线程
                         LinkedList<Map> linkedList = new LinkedList<>();
                         linkedList.addAll(list1);
-                        handleByThread(linkedList,regList,15);  //同时处理的线程数量多少最搞笑？
+                        handleByThread(linkedList,regList,15);  //同时处理的线程数量多少最高效？
                     } catch (ParseException e) {
                         e.printStackTrace();
                     } catch (CloneNotSupportedException e) {
@@ -114,10 +123,6 @@ public class RefreshService {
                         e.printStackTrace();
                     }
                 }
-
-
-
-
             }
         }
     }
@@ -133,13 +138,14 @@ public class RefreshService {
                     continue;
                 }
                 Long timestamp;
-                JedisPool pool = RedisAPI.getPool();
-                Jedis jedis = pool.getResource();
-                if(jedis.get(device.getGpioId())!=null){
-                    timestamp = Long.parseLong(jedis.get(device.getGpioId()));
-                }else{
-                    timestamp = System.currentTimeMillis() - 86400L; //当前时间减1天
-                }
+//                JedisPool pool = RedisAPI.getPool();
+//                Jedis jedis = pool.getResource();
+//                if(jedis.get(device.getGpioId())!=null){
+//                    timestamp = Long.parseLong(jedis.get(device.getGpioId()));
+//                }else{
+//                    timestamp = System.currentTimeMillis() - 86400L; //当前时间减1天
+//                }
+                timestamp = System.currentTimeMillis() - 86400L; //当前时间减1天
                 List<String> requestList = new ArrayList<>();
                 List<String> gpioList = new ArrayList<>();
                 gpioList.add("gpio_1");
@@ -160,9 +166,17 @@ public class RefreshService {
 
                 logger.info("准备工作结束，发送psot请求： " + new Date());
 
-                String str = HttpClientUtil.post(jsonObject,1);
+                String str = null;
+                try {
+                    str = HttpsTest.postForm(jsonObject,1); //1代表走设备通道
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 System.out.println("待同步数据 : "+ str);
                 //handle response
+                if(str.equals("0")){
+                    continue;
+                }
                 JSONObject json = new JSONObject();
                 Map<String, Object> map1 = JSON.parseObject(str);
                 List<GpioDataModel> list1 = JSON.parseArray(map1.get("result_data").toString(), GpioDataModel.class);
@@ -170,15 +184,139 @@ public class RefreshService {
                 logger.info("请求成功，开始处理数据： " + new Date());
                 if(list1.size() != 0){
                     //储存该设备最新一次更新的时间戳
-                    jedis.set(device.getGpioId(),list1.get(0).getTimestamp());
+//                    jedis.set(device.getGpioId(),list1.get(0).getTimestamp());
                     handler(list1,device,gpioList);
                 }
             }
         }
     }
 
-    public void refreshRules(){
+    //todo 数据还没有
+    public void refreshRulesForPlc(){
 
+    }
+
+    public void refreshRulesForGpio(){
+
+    }
+
+    public void refreshConfigParams(){
+        logger.info("同步设备配置的准备工作： " + new Date());
+        List<GywlwDevice> devices = gywlwDeviceMapper.selectAll();
+        if(devices.size() != 0) {
+            for (GywlwDevice device : devices) {
+                String gpioId = device.getGpioId();
+                if (gpioId == null) {
+                    continue;
+                }
+                Long timestamp;
+//                JedisPool pool = RedisAPI.getPool();
+//                Jedis jedis = pool.getResource();
+//                if(jedis.get(device.getGpioId())!=null){
+//                    timestamp = Long.parseLong(jedis.get(device.getGpioId()));
+//                }else{
+//                    timestamp = System.currentTimeMillis() - 86400L; //当前时间减1天
+//                }
+//                timestamp = System.currentTimeMillis() - 86400L; //当前时间减1天
+                timestamp = device.getLastConnected().getTime();
+                List<String> requestList = new ArrayList<>();
+                requestList.add("hardware_edition");
+                requestList.add("software_edition");
+                requestList.add("3g_mode");
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("deviceId",gpioId);
+                jsonObject.put("idList",requestList);
+                jsonObject.put("timestamp",timestamp);
+                System.out.println("请求参数: " + jsonObject);
+
+                logger.info("准备工作结束，发送psot请求： " + new Date());
+
+                String str = null;
+                try {
+                    str = HttpsTest.postForm(jsonObject,1);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                System.out.println("待同步数据 : "+ str);
+                //handle response
+                JSONObject json = new JSONObject();
+                Map<String, Object> map1 = JSON.parseObject(str);
+                List<Map> list1 = JSON.parseArray(map1.get("result_data").toString(), Map.class);
+//                System.out.println("返回数据:  "+list1.toString());
+                logger.info("请求成功，开始处理数据： " + new Date());
+                if(list1.size() > 0){
+                    try {
+                        handlerForConfigParams(list1,device);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            }
+        }
+    }
+
+    public void refreshGpioParams(){
+        logger.info("同步Gpio配置信息的准备工作： " + new Date());
+
+    }
+
+    //还没测试好，因为平台那边只保留一个autocollect
+    public void refreshPlcParams(){
+        logger.info("同步plc配置(通道信息)的准备工作： " + new Date());
+        List<GywlwDevice> devices = gywlwDeviceMapper.selectAll();
+        if(devices.size() != 0) {
+            for (GywlwDevice device : devices) {
+                String gpioId = device.getGpioId();
+                if (gpioId == null) {
+                    continue;
+                }
+                Long timestamp;
+//                JedisPool pool = RedisAPI.getPool();
+//                Jedis jedis = pool.getResource();
+//                if(jedis.get(device.getGpioId())!=null){
+//                    timestamp = Long.parseLong(jedis.get(device.getGpioId()));
+//                }else{
+//                    timestamp = System.currentTimeMillis() - 86400L; //当前时间减1天
+//                }
+//                timestamp = System.currentTimeMillis() - 86400L; //当前时间减1天
+                timestamp = device.getLastConnected().getTime();
+                List<String> requestList = new ArrayList<>();
+                requestList.add("field_autocollect");
+                requestList.add("field_subdev_id");
+                requestList.add("field_type");
+                requestList.add("field_name");
+                requestList.add("field_name2");
+                requestList.add("field_functioncode");
+                requestList.add("field_attach");
+                requestList.add("field_rw");
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("deviceId",gpioId);
+                jsonObject.put("idList",requestList);
+                jsonObject.put("timestamp",timestamp);
+                System.out.println("请求参数: " + jsonObject);
+
+                logger.info("准备工作结束，发送psot请求： " + new Date());
+
+                String str = null;
+                try {
+                    str = HttpsTest.postForm(jsonObject,1);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                System.out.println("待同步数据 : "+ str);
+                //handle response
+                JSONObject json = new JSONObject();
+                Map<String, Object> map1 = JSON.parseObject(str);
+                List<Map> list1 = JSON.parseArray(map1.get("result_data").toString(), Map.class);
+//                System.out.println("返回数据:  "+list1.toString());
+                logger.info("请求成功，开始处理数据： " + new Date());
+                if(list1.size() > 0){
+                    handlerForPlcParams(list1,device);
+                }
+
+            }
+        }
     }
 
     //用了硬编码，处理速度还可以，就没有用多线程
@@ -405,7 +543,7 @@ public class RefreshService {
         logger.info("批量插入数据end !");
     }
 
-        public synchronized void handleByThread(LinkedList<Map> list1, List<String> regList, int threadNum)
+    public synchronized void handleByThread(LinkedList<Map> list1, List<String> regList, int threadNum)
                 throws InterruptedException, ParseException, CloneNotSupportedException {
         int length = list1.size();
         int t1 = length % threadNum == 0 ? length / threadNum : (length / threadNum + 1);
@@ -470,6 +608,66 @@ public class RefreshService {
             }
             latch.countDown();// 工人完成工作，计数器减一
         }
+    }
+
+    public void handlerForConfigParams(List<Map> list1, GywlwDevice device) throws ParseException {
+        GywlwDevice gywlwDevice = new GywlwDevice();
+        gywlwDevice.setDeviceId(device.getDeviceId());
+        for(Map map : list1){
+            gywlwDevice.setHardwareEdition((String) map.get("hardware_edition"));
+            gywlwDevice.setSoftwareEdition((String) map.get("software_edition"));
+            gywlwDevice.setThreeGMode(Integer.parseInt((String) map.get("3g_mode")));
+            gywlwDevice.setLastConnected(MyUtil.timeTransformToDateNo1000(map.get("timestamp").toString()));
+            break;//只取最新一条
+        }
+        logger.info("更新数据库...");
+        gywlwDeviceMapper.updateByPrimaryKeySelective(gywlwDevice);
+    }
+
+    //还没测试好，因为平台那边只保留一个autocollect
+    public void handlerForPlcParams(List<Map> list1, GywlwDevice device){
+        GywlwPlcInfo gywlwPlcInfo = new GywlwPlcInfo();
+        GywlwRegInfo gywlwRegInfo;
+        List<GywlwPlcInfo> plcInfos = gywlwPlcInfoMapper.selectByDeviceId(device.getDeviceId());
+        //因为目前默认一个盒子只绑定一个plc
+        for(GywlwPlcInfo plcInfo : plcInfos){
+            gywlwPlcInfo.setId(plcInfo.getId());
+            break;
+        }
+        for(Map map : list1){
+            gywlwRegInfo = new GywlwRegInfo();
+            if(map.get("field_autocollect") == null){
+                continue;
+            }
+            gywlwPlcInfo.setSubdeviceId((String) map.get("field_subdev_id"));
+            gywlwRegInfo.setDeviceId(device.getDeviceId());
+            gywlwRegInfo.setPlcId(gywlwPlcInfo.getId());
+            gywlwRegInfo.setRegAddress((String) map.get("field_autocollect"));
+            gywlwRegInfo.setRegName((String) map.get("field_name"));
+            gywlwRegInfo.setRegAlias((String) map.get("field_name2"));
+            if(map.get("field_type") != null){
+                gywlwRegInfo.setFieldType(Integer.parseInt((String) map.get("field_type")));
+            }
+            if(map.get("field_rw") != null){
+                gywlwRegInfo.setFieldRw(Integer.parseInt((String) map.get("field_rw")));
+            }
+            gywlwRegInfo.setFieldFunctionCode((String) map.get("field_functioncode"));
+            gywlwRegInfo.setFieldAttach((String) map.get("field_attach"));
+
+            logger.info("更新数据库...");
+//        System.out.println("gywlwplcinfo:  " + MyUtil.response(0,gywlwPlcInfo));
+            if(gywlwPlcInfo.getSubdeviceId()!=null) {
+                gywlwPlcInfoMapper.updateByPrimaryKeySelective(gywlwPlcInfo);
+            }
+            //先删除已经存在的数据项，再插入新数据项
+            if(gywlwRegInfo.getRegAddress()!=null) {
+                gywlwRegInfoMapper.deleteByPlcId(gywlwPlcInfo.getId());
+                gywlwRegInfo.setRegId(UUID.randomUUID().toString().replaceAll("-",""));
+                gywlwRegInfoMapper.insertSelective(gywlwRegInfo);
+            }
+
+        }
+
     }
 
 

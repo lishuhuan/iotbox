@@ -52,7 +52,7 @@
     </if>
     c.project_id = #{projectId,jdbcType=VARCHAR} AND c.variable_id = b.variable_id and c.reg_id = a.reg_id and a.device_id=d.device_id
     ORDER BY a.item_time DESC ) t
-    group by t.item_name;
+    group by t.item_name
   </select>
   <select id="getLastTimeByPlcId" resultMap="BaseResultMap3" parameterType="java.lang.String">
     select
@@ -70,7 +70,7 @@
     <if test="variableName == 'ALL'">
     where a.item_time BETWEEN #{startTime,jdbcType=TIMESTAMP} AND #{endTime,jdbcType=TIMESTAMP} and a.rule_id = b.rule_id AND a.project_id = #{projectId,jdbcType=VARCHAR}
     </if>
-    ORDER BY a.item_time DESC ;
+    ORDER BY a.item_time DESC
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from gywlw_history_item
@@ -304,7 +304,7 @@
    		SELECT item_id, reg_id, plc_id, plc_name, device_id, project_id, variable_name, device_name, item_name, item_alias,
     item_address, item_type, item_value, item_time, severity, item_content, del_mark, rule_id
    		from (select * from gywlw_history_item where device_id = #{deviceId,jdbcType=VARCHAR} order by item_time desc) t
-   		GROUP BY item_name;
+   		GROUP BY item_name
   </select>
   
   <select id="getDeviceAlarmlist" resultMap="BaseResultMap" >
@@ -312,14 +312,21 @@
         from gywlw_history_item where device_id=#{deviceId}
    		and item_time between #{startTime} and #{endTime}
         and severity in (1,2)
-        ORDER BY item_time DESC ;
+        ORDER BY item_time DESC
   </select>
   <select id="getDataForTrend" resultMap="BaseResultMap" >
     SELECT item_time,item_value
     from gywlw_history_item
     where reg_id=#{regId}
     and item_time between #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP}
-    ORDER BY item_time DESC ;
+    ORDER BY item_time DESC
+  </select>
+  <select id="getDataForReg" resultMap="BaseResultMap" >
+    SELECT *
+    from gywlw_history_item
+    where reg_id=#{regId}
+    and item_time between #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP}
+    ORDER BY item_time DESC
   </select>
   
   <select id="getAlarmDetail" resultMap="BaseResultMap1" >

@@ -16,11 +16,14 @@
     <result column="expired" property="expired" jdbcType="TIMESTAMP" />
     <result column="expired_right" property="expiredRight" jdbcType="TINYINT" />
     <result column="gpio_id" property="gpioId" jdbcType="VARCHAR" />
+    <result column="hardware_edition" property="hardwareEdition" jdbcType="VARCHAR" />
+    <result column="software_edition" property="softwareEdition" jdbcType="VARCHAR" />
+    <result column="3g_mode" property="threeGMode" jdbcType="INTEGER" />
 
   </resultMap>
   <sql id="Base_Column_List" >
     device_id, device_sn, admin_id, factory_id, create_time, content, deviceOnline, device_type_id,
-    device_name, last_connected, gateway, expired, del_mark, gpio_id
+    device_name, last_connected, gateway, expired, del_mark, gpio_id, hardware_edition,software_edition,3g_mode
   </sql>
   <select id="selectByUserIdAndDeviceSn" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
@@ -30,10 +33,10 @@
                          ON gywlw_project_device_group.project_id=gywlw_project_user_group.project_id
                         where gywlw_project_user_group.user_id = #{userId,jdbcType=VARCHAR}) t
     <if test="deviceSn =='ALL'">
-      where a.device_id = t.device_id ;
+      where a.device_id = t.device_id and del_mark = 0
     </if>
     <if test="deviceSn !='ALL'">
-      where a.device_id = t.device_id AND a.device_sn = {deviceSn,jdbcType=VARCHAR};
+      where a.device_id = t.device_id AND a.device_sn = {deviceSn,jdbcType=VARCHAR} and del_mark = 0
     </if>
   </select>
   <select id="selectByUserIdAndDeviceSnWithAdmin" resultMap="BaseResultMap" parameterType="java.lang.String" >
@@ -41,41 +44,41 @@
     admin_id,factory_id,device_id,device_sn,device_name,last_connected,device_online,expired,expired_right
     from gywlw_device
     <if test="deviceSn =='ALL'">
-      where admin_id = #{userId,jdbcType=VARCHAR};
+      where admin_id = #{userId,jdbcType=VARCHAR}  and del_mark = 0
     </if>
     <if test="deviceSn !='ALL'">
-      where admin_id = #{userId,jdbcType=VARCHAR} AND device_sn = {deviceSn,jdbcType=VARCHAR};
+      where admin_id = #{userId,jdbcType=VARCHAR} AND device_sn = {deviceSn,jdbcType=VARCHAR}  and del_mark = 0
     </if>
   </select>
   <select id="selectAll" resultMap="BaseResultMap">
     select
     *
     from gywlw_device
+    where del_mark = 0
   </select>
   <select id="selectByDeviceId" resultMap="BaseResultMap" parameterType="java.lang.String">
     SELECT
     *
     from gywlw_device
-    WHERE device_id = #{deviceId,jdbcType=VARCHAR};
+    WHERE device_id = #{deviceId,jdbcType=VARCHAR} and del_mark = 0
   </select>
   <select id="selectByAdminId" resultMap="BaseResultMap" parameterType="java.lang.String">
     SELECT
     *
     from gywlw_device
-    WHERE admin_id = #{adminId,jdbcType=VARCHAR};
+    WHERE admin_id = #{adminId,jdbcType=VARCHAR} and del_mark = 0
   </select>
   <select id="selectByFactoryId" resultMap="BaseResultMap" parameterType="java.lang.String">
     SELECT
     admin_id
     from gywlw_device
-    WHERE factory_id = #{factoryId,jdbcType=VARCHAR};
+    WHERE factory_id = #{factoryId,jdbcType=VARCHAR} and del_mark = 0
   </select>
   <select id="selectByDeviceSn" resultMap="BaseResultMap" parameterType="java.lang.String">
     SELECT
-    device_id, device_sn, admin_id, factory_id, create_time, content, device_online, device_type_id,
-    device_name, last_connected, gateway, expired, del_mark
+    *
     from gywlw_device
-    WHERE device_Sn = #{deviceSn,jdbcType=VARCHAR};
+    WHERE device_Sn = #{deviceSn,jdbcType=VARCHAR} and del_mark = 0
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
     delete from gywlw_device
@@ -135,6 +138,15 @@
       <if test="delMark != null" >
         del_mark,
       </if>
+      <if test="delMark != null" >
+        handware_edition,
+      </if>
+      <if test="delMark != null" >
+        software_edition,
+      </if>
+      <if test="delMark != null" >
+        3g_mode,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="deviceId != null" >
@@ -175,6 +187,15 @@
       </if>
       <if test="delMark != null" >
         #{delMark,jdbcType=TINYINT},
+      </if>
+      <if test="hardwareEdition != null" >
+        #{hardwareEdition,jdbcType=VARCHAR},
+      </if>
+      <if test="softwareEdition != null" >
+        #{softwareEdition,jdbcType=VARCHAR},
+      </if>
+      <if test="threeGMode != null" >
+        #{threeGMode,jdbcType=INTEGER},
       </if>
     </trim>
   </insert>
@@ -219,6 +240,15 @@
       </if>
       <if test="expiredRight != null" >
         expired_right = #{expiredRight,jdbcType=TINYINT},
+      </if>
+      <if test="hardwareEdition != null" >
+        hardware_edition = #{hardwareEdition,jdbcType=VARCHAR},
+      </if>
+      <if test="softwareEdition != null" >
+        software_edition = #{softwareEdition,jdbcType=VARCHAR},
+      </if>
+      <if test="threeGMode != null" >
+        3g_mode = #{threeGMode,jdbcType=INTEGER},
       </if>
     </set>
     where device_id = #{deviceId,jdbcType=VARCHAR}
@@ -310,7 +340,7 @@
   	 	where b.user_id=#{factoryId}
   	 </if>
   	 <if test="deviceSn != null and deviceSn !=''">
-  	 	and a.device_sn like CONCAT('%','${deviceSn}','%')
+  	 	and a.device_sn = ${deviceSn}
   	 </if>
   </select>
 </mapper>

@@ -29,17 +29,23 @@ public interface GywlwHistoryItemMapper {
 
     int updateByPrimaryKey(GywlwHistoryItem record);
     
-    public List<GywlwHistoryItem> getHistoryData(@Param("deviceId") String deviceId);
+    List<GywlwHistoryItem> getHistoryData(@Param("deviceId") String deviceId);
     
-    public GywlwHistoryItem getAlarmDetail(@Param("itemId") String itemId);
+    GywlwHistoryItem getAlarmDetail(@Param("itemId") String itemId);
     
-    public List<GywlwHistoryItem> getDeviceAlarmlist(@Param("startTime") String startTime,
+    List<GywlwHistoryItem> getDeviceAlarmlist(@Param("startTime") String startTime,
                                                      @Param("endTime") String endTime,
                                                      @Param("deviceId") String deviceId);
 
-    public List<GywlwHistoryItem> getDataForTrend(@Param("regId")String regId,
+    List<GywlwHistoryItem> getDataForTrend(@Param("regId")String regId,
                                                   @Param("startTime") Date startTime,
                                                   @Param("endTime") Date endTime);
 
+    List<GywlwHistoryItem> getDataForReg(@Param("regId")String regId,
+                                           @Param("startTime") Date startTime,
+                                           @Param("endTime") Date endTime);
+
     GywlwHistoryItem getLastTimeByPlcId(String plcId);
+
+
 }

@@ -1,9 +1,12 @@
 package com.nbicc.gywlw.Controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.nbicc.gywlw.Service.RefreshService;
 import com.nbicc.gywlw.util.InitDataForHistory;
 import com.nbicc.gywlw.util.MyUtil;
 import com.nbicc.gywlw.util.RedisAPI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +18,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
  */
 @Controller
 public class TestController {
+    private static final Logger logger = LoggerFactory.getLogger(TestController.class);
+    @Autowired
+    private RefreshService refreshService;
     @Autowired
     InitDataForHistory initDataForHistory;
     @RequestMapping(path = {"/insertdata"}, method = {RequestMethod.POST})
@@ -31,5 +37,18 @@ public class TestController {
         redisAPI.set("aaa","aab");
         String str = redisAPI.get("aaa");
         return MyUtil.response(0,str);
+    }
+
+    //数据刷新
+    @RequestMapping(path = {"/refresh"}, method = {RequestMethod.POST,RequestMethod.GET})
+    @ResponseBody
+    public String refreshData(){
+        try {
+            refreshService.refresh();
+            return "ok";
+        }catch (Exception e){
+            logger.error("refresh失败" + e.getMessage());
+            return "refresh失败";
+        }
     }
 }

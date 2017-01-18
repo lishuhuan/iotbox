@@ -37,6 +37,36 @@ public class GywlwDevice {
 
     private String gpioId;
 
+    private String hardwareEdition;
+
+    private String softwareEdition;
+
+    private Integer threeGMode; //0：否，默认为以太网模式 ,1：是
+
+    public String getHardwareEdition() {
+        return hardwareEdition;
+    }
+
+    public void setHardwareEdition(String hardwareEdition) {
+        this.hardwareEdition = hardwareEdition;
+    }
+
+    public String getSoftwareEdition() {
+        return softwareEdition;
+    }
+
+    public void setSoftwareEdition(String softwareEdition) {
+        this.softwareEdition = softwareEdition;
+    }
+
+    public Integer getThreeGMode() {
+        return threeGMode;
+    }
+
+    public void setThreeGMode(Integer threeGMode) {
+        this.threeGMode = threeGMode;
+    }
+
     public String getGpioId() {
         return gpioId;
     }

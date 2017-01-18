@@ -9,6 +9,8 @@ import java.util.List;
 public interface GywlwRegInfoMapper {
     int deleteByPrimaryKey(String regId);
 
+    int deleteByPlcId(String plcId);
+
     int insert(GywlwRegInfo record);
 
     int insertSelective(GywlwRegInfo record);

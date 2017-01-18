@@ -82,7 +82,7 @@ public class LoginController {
                 cookie.setPath("/");
                 cookie.setMaxAge(3600*24*5);
                 response.addCookie(cookie);
-                return MyUtil.response(0, "成功");
+                return MyUtil.response(0, map.get("ticket").toString());
             } else {
                 return MyUtil.response(1, map);
             }
@@ -118,6 +118,12 @@ public class LoginController {
         userService.logout(ticket);
 //        return "redirect:/error";  //返回登录界面
         throw new MyException("请重新登录");
+    }
+
+    @RequestMapping(path = {"/test"},method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public JSONObject test(){
+        return MyUtil.response(0,"test ok!");
     }
 
 }
