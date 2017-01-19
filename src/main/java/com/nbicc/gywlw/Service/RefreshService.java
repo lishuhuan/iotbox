@@ -80,7 +80,9 @@ public class RefreshService {
                 }else{
                     continue;
                 }
-                requestList.addAll(regList);
+                if(regList != null) {
+                    requestList.addAll(regList);
+                }
                 requestList.add("time");
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("deviceIdList",deviceIdList);
@@ -500,7 +502,7 @@ public class RefreshService {
 //            Map map1 = (JSONObject) JSON.parse(map.get("Y0002").toString());
 //            System.out.println(map1.get("value"));
             GywlwHistoryItem gywlwHistoryItem = new GywlwHistoryItem();
-            gywlwHistoryItem.setItemTime(MyUtil.transformToDate((String) map.get("time")));
+            gywlwHistoryItem.setItemTime(MyUtil.timeTransformToDateNo1000(map.get("timestamp").toString())); //s
             GywlwPlcInfo plcInfo = gywlwPlcInfoMapper.selectBySubDeviceId(map.get("device_id").toString());
             gywlwHistoryItem.setPlcId(plcInfo.getId());
             gywlwHistoryItem.setPlcName(plcInfo.getPlcName());

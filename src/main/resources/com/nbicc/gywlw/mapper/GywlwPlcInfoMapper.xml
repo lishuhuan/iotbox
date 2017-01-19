@@ -9,9 +9,10 @@
     <result column="plc_brand" property="plcBrand" jdbcType="VARCHAR" />
     <result column="content" property="content" jdbcType="VARCHAR" />
     <result column="plc_name" property="plcName" jdbcType="VARCHAR" />
+    <result column="plc_status" property="plcStatus" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, subdevice_id, device_id, plc_type, plc_brand, content, plc_name
+    id, subdevice_id, device_id, plc_type, plc_brand, content, plc_name, plc_status
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
@@ -26,6 +27,12 @@
     where subdevice_id = #{id,jdbcType=VARCHAR}
   </select>
   <select id="selectByDeviceId" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from gywlw_plc_info
+    where device_id = #{deviceId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByDeviceId1" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select
     <include refid="Base_Column_List" />
     from gywlw_plc_info

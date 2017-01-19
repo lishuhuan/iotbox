@@ -328,6 +328,13 @@
     and item_time between #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP}
     ORDER BY item_time DESC
   </select>
+  <select id="getDataForRegId" resultMap="BaseResultMap" >
+    SELECT *
+    from gywlw_history_item
+    where reg_id=#{regId}
+    ORDER BY item_time DESC
+    limit 0,1
+  </select>
   
   <select id="getAlarmDetail" resultMap="BaseResultMap1" >
    		SELECT * from gywlw_history_item where item_id=#{itemId}

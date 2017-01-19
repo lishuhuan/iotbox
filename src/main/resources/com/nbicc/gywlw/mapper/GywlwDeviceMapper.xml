@@ -19,11 +19,13 @@
     <result column="hardware_edition" property="hardwareEdition" jdbcType="VARCHAR" />
     <result column="software_edition" property="softwareEdition" jdbcType="VARCHAR" />
     <result column="3g_mode" property="threeGMode" jdbcType="INTEGER" />
+    <result column="device_status" property="deviceStatus" jdbcType="VARCHAR" />
 
   </resultMap>
   <sql id="Base_Column_List" >
     device_id, device_sn, admin_id, factory_id, create_time, content, deviceOnline, device_type_id,
-    device_name, last_connected, gateway, expired, del_mark, gpio_id, hardware_edition,software_edition,3g_mode
+    device_name, last_connected, gateway, expired, del_mark, gpio_id, hardware_edition,software_edition,
+    3g_mode,device_status
   </sql>
   <select id="selectByUserIdAndDeviceSn" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
@@ -250,6 +252,10 @@
       <if test="threeGMode != null" >
         3g_mode = #{threeGMode,jdbcType=INTEGER},
       </if>
+      <if test="deviceStatus != null" >
+        device_status = #{deviceStatus,jdbcType=VARCHAR},
+      </if>
+
     </set>
     where device_id = #{deviceId,jdbcType=VARCHAR}
   </update>

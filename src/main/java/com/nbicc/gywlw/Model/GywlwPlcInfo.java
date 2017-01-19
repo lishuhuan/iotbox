@@ -15,6 +15,16 @@ public class GywlwPlcInfo {
 
     private String plcName;
 
+    private String plcStatus;
+
+    public String getPlcStatus() {
+        return plcStatus;
+    }
+
+    public void setPlcStatus(String plcStatus) {
+        this.plcStatus = plcStatus;
+    }
+
     public String getId() {
         return id;
     }

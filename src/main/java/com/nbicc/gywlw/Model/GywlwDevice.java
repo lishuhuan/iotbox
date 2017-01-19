@@ -43,6 +43,36 @@ public class GywlwDevice {
 
     private Integer threeGMode; //0：否，默认为以太网模式 ,1：是
 
+    private String deviceStatus;
+
+    private String orderCode;
+
+    private Integer orderNum;
+
+    public String getOrderCode() {
+        return orderCode;
+    }
+
+    public void setOrderCode(String orderCode) {
+        this.orderCode = orderCode;
+    }
+
+    public Integer getOrderNum() {
+        return orderNum;
+    }
+
+    public void setOrderNum(Integer orderNum) {
+        this.orderNum = orderNum;
+    }
+
+    public String getDeviceStatus() {
+        return deviceStatus;
+    }
+
+    public void setDeviceStatus(String deviceStatus) {
+        this.deviceStatus = deviceStatus;
+    }
+
     public String getHardwareEdition() {
         return hardwareEdition;
     }

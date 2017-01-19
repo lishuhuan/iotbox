@@ -1,5 +1,7 @@
 package com.nbicc.gywlw.Model;
 
+import java.util.Date;
+
 public class GywlwRegInfo {
     private String regId;
 
@@ -28,6 +30,36 @@ public class GywlwRegInfo {
     private String fieldFunctionCode;
 
     private String fieldAttach;
+
+    private String frequency;//频率
+
+    private Double value;//当前值
+
+    private Date lastConnect;//最近时间
+
+    public String getFrequency() {
+        return frequency;
+    }
+
+    public void setFrequency(String frequency) {
+        this.frequency = frequency;
+    }
+
+    public Double getValue() {
+        return value;
+    }
+
+    public void setValue(Double value) {
+        this.value = value;
+    }
+
+    public Date getLastConnect() {
+        return lastConnect;
+    }
+
+    public void setLastConnect(Date lastConnect) {
+        this.lastConnect = lastConnect;
+    }
 
     public Integer getFieldType() {
         return fieldType;

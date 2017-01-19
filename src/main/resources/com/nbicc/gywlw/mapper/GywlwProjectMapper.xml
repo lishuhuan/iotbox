@@ -41,7 +41,7 @@
     select
     <include refid="Base_Column_List" />
     from gywlw_project
-    where project_id = #{gywlwProjectId,jdbcType=VARCHAR} and del_mark = 0
+    where project_id = #{gywlwProjectId,jdbcType=VARCHAR}
   </select>
   <select id="selectByGywlwUserId1" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select

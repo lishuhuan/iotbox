@@ -30,6 +30,6 @@
              <property name="enableSubPackages" value="true" />
          </javaClientGenerator>
          <!-- 要生成那些表(更改tableName和domainObjectName就可以) -->
-         <table tableName="gywlw_history_data_for_gpio" domainObjectName="GywlwHistoryDataForGPIO" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false" />
+         <table tableName="gywlw_device_order" domainObjectName="GywlwDeviceOrder" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false" />
      </context>
 </generatorConfiguration>

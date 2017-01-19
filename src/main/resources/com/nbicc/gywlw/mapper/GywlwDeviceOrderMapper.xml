@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nbicc.gywlw.mapper.GywlwDeviceOrderMapper" >
+  <resultMap id="BaseResultMap" type="com.nbicc.gywlw.Model.GywlwDeviceOrder" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="device_id" property="deviceId" jdbcType="VARCHAR" />
+    <result column="order_code" property="orderCode" jdbcType="VARCHAR" />
+    <result column="order_num" property="orderNum" jdbcType="INTEGER" />
+    <result column="plc_id" property="plcId" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, device_id, order_code, order_num, plc_id
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from gywlw_device_order
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectByDeviceId" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from gywlw_device_order
+    where device_id = #{deviceId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from gywlw_device_order
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.nbicc.gywlw.Model.GywlwDeviceOrder" >
+    insert into gywlw_device_order (id, device_id, order_code, 
+      order_num, plc_id)
+    values (#{id,jdbcType=INTEGER}, #{deviceId,jdbcType=VARCHAR}, #{orderCode,jdbcType=VARCHAR}, 
+      #{orderNum,jdbcType=INTEGER}, #{plcId,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.nbicc.gywlw.Model.GywlwDeviceOrder" >
+    insert into gywlw_device_order
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="deviceId != null" >
+        device_id,
+      </if>
+      <if test="orderCode != null" >
+        order_code,
+      </if>
+      <if test="orderNum != null" >
+        order_num,
+      </if>
+      <if test="plcId != null" >
+        plc_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="deviceId != null" >
+        #{deviceId,jdbcType=VARCHAR},
+      </if>
+      <if test="orderCode != null" >
+        #{orderCode,jdbcType=VARCHAR},
+      </if>
+      <if test="orderNum != null" >
+        #{orderNum,jdbcType=INTEGER},
+      </if>
+      <if test="plcId != null" >
+        #{plcId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.nbicc.gywlw.Model.GywlwDeviceOrder" >
+    update gywlw_device_order
+    <set >
+      <if test="deviceId != null" >
+        device_id = #{deviceId,jdbcType=VARCHAR},
+      </if>
+      <if test="orderCode != null" >
+        order_code = #{orderCode,jdbcType=VARCHAR},
+      </if>
+      <if test="orderNum != null" >
+        order_num = #{orderNum,jdbcType=INTEGER},
+      </if>
+      <if test="plcId != null" >
+        plc_id = #{plcId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.nbicc.gywlw.Model.GywlwDeviceOrder" >
+    update gywlw_device_order
+    set device_id = #{deviceId,jdbcType=VARCHAR},
+      order_code = #{orderCode,jdbcType=VARCHAR},
+      order_num = #{orderNum,jdbcType=INTEGER},
+      plc_id = #{plcId,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

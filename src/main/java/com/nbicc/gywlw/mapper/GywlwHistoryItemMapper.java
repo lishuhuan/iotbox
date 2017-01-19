@@ -47,5 +47,7 @@ public interface GywlwHistoryItemMapper {
 
     GywlwHistoryItem getLastTimeByPlcId(String plcId);
 
+    GywlwHistoryItem getDataForRegId(@Param("regId")String regId);
+
 
 }
