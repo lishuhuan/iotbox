@@ -38,7 +38,7 @@
       where a.device_id = t.device_id and del_mark = 0
     </if>
     <if test="deviceSn !='ALL'">
-      where a.device_id = t.device_id AND a.device_sn = {deviceSn,jdbcType=VARCHAR} and del_mark = 0
+      where a.device_id = t.device_id AND a.device_sn = #{deviceSn,jdbcType=VARCHAR} and del_mark = 0
     </if>
   </select>
   <select id="selectByUserIdAndDeviceSnWithAdmin" resultMap="BaseResultMap" parameterType="java.lang.String" >
@@ -49,7 +49,7 @@
       where admin_id = #{userId,jdbcType=VARCHAR}  and del_mark = 0
     </if>
     <if test="deviceSn !='ALL'">
-      where admin_id = #{userId,jdbcType=VARCHAR} AND device_sn = {deviceSn,jdbcType=VARCHAR}  and del_mark = 0
+      where admin_id = #{userId,jdbcType=VARCHAR} AND device_sn = #{deviceSn,jdbcType=VARCHAR}  and del_mark = 0
     </if>
   </select>
   <select id="selectAll" resultMap="BaseResultMap">

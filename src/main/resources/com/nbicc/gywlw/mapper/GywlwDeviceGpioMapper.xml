@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nbicc.gywlw.mapper.GywlwDeviceGpioMapper" >
+  <resultMap id="BaseResultMap" type="com.nbicc.gywlw.Model.GywlwDeviceGpio" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="field_address" property="fieldAddress" jdbcType="VARCHAR" />
+    <result column="field_name" property="fieldName" jdbcType="VARCHAR" />
+    <result column="field_name2" property="fieldName2" jdbcType="VARCHAR" />
+    <result column="field_functioncode" property="fieldFunctioncode" jdbcType="VARCHAR" />
+    <result column="field_attach" property="fieldAttach" jdbcType="VARCHAR" />
+    <result column="field_rw" property="fieldRw" jdbcType="INTEGER" />
+    <result column="device_id" property="deviceId" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, field_address, field_name, field_name2, field_functioncode, field_attach, field_rw, 
+    device_id
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from gywlw_device_gpio
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from gywlw_device_gpio
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByDeviceId" parameterType="java.lang.String" >
+    delete from gywlw_device_gpio
+    where device_id = #{deviceId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.nbicc.gywlw.Model.GywlwDeviceGpio" >
+    insert into gywlw_device_gpio (id, field_address, field_name, 
+      field_name2, field_functioncode, field_attach, 
+      field_rw, device_id)
+    values (#{id,jdbcType=INTEGER}, #{fieldAddress,jdbcType=VARCHAR}, #{fieldName,jdbcType=VARCHAR}, 
+      #{fieldName2,jdbcType=VARCHAR}, #{fieldFunctioncode,jdbcType=VARCHAR}, #{fieldAttach,jdbcType=VARCHAR}, 
+      #{fieldRw,jdbcType=INTEGER}, #{deviceId,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.nbicc.gywlw.Model.GywlwDeviceGpio" >
+    insert into gywlw_device_gpio
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="fieldAddress != null" >
+        field_address,
+      </if>
+      <if test="fieldName != null" >
+        field_name,
+      </if>
+      <if test="fieldName2 != null" >
+        field_name2,
+      </if>
+      <if test="fieldFunctioncode != null" >
+        field_functioncode,
+      </if>
+      <if test="fieldAttach != null" >
+        field_attach,
+      </if>
+      <if test="fieldRw != null" >
+        field_rw,
+      </if>
+      <if test="deviceId != null" >
+        device_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="fieldAddress != null" >
+        #{fieldAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="fieldName != null" >
+        #{fieldName,jdbcType=VARCHAR},
+      </if>
+      <if test="fieldName2 != null" >
+        #{fieldName2,jdbcType=VARCHAR},
+      </if>
+      <if test="fieldFunctioncode != null" >
+        #{fieldFunctioncode,jdbcType=VARCHAR},
+      </if>
+      <if test="fieldAttach != null" >
+        #{fieldAttach,jdbcType=VARCHAR},
+      </if>
+      <if test="fieldRw != null" >
+        #{fieldRw,jdbcType=INTEGER},
+      </if>
+      <if test="deviceId != null" >
+        #{deviceId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.nbicc.gywlw.Model.GywlwDeviceGpio" >
+    update gywlw_device_gpio
+    <set >
+      <if test="fieldAddress != null" >
+        field_address = #{fieldAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="fieldName != null" >
+        field_name = #{fieldName,jdbcType=VARCHAR},
+      </if>
+      <if test="fieldName2 != null" >
+        field_name2 = #{fieldName2,jdbcType=VARCHAR},
+      </if>
+      <if test="fieldFunctioncode != null" >
+        field_functioncode = #{fieldFunctioncode,jdbcType=VARCHAR},
+      </if>
+      <if test="fieldAttach != null" >
+        field_attach = #{fieldAttach,jdbcType=VARCHAR},
+      </if>
+      <if test="fieldRw != null" >
+        field_rw = #{fieldRw,jdbcType=INTEGER},
+      </if>
+      <if test="deviceId != null" >
+        device_id = #{deviceId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.nbicc.gywlw.Model.GywlwDeviceGpio" >
+    update gywlw_device_gpio
+    set field_address = #{fieldAddress,jdbcType=VARCHAR},
+      field_name = #{fieldName,jdbcType=VARCHAR},
+      field_name2 = #{fieldName2,jdbcType=VARCHAR},
+      field_functioncode = #{fieldFunctioncode,jdbcType=VARCHAR},
+      field_attach = #{fieldAttach,jdbcType=VARCHAR},
+      field_rw = #{fieldRw,jdbcType=INTEGER},
+      device_id = #{deviceId,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

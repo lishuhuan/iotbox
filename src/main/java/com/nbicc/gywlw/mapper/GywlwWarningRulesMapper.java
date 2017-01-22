@@ -4,9 +4,12 @@ import com.nbicc.gywlw.Model.GywlwWarningRules;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
+
 @Mapper
 public interface GywlwWarningRulesMapper {
     int deleteByPrimaryKey(Integer ruleId);
+
+    int deleteByPlcId(String plcId);
 
     int insert(GywlwWarningRules record);
 
@@ -14,9 +17,9 @@ public interface GywlwWarningRulesMapper {
 
     GywlwWarningRules selectByPrimaryKey(Integer ruleId);
 
-    List<GywlwWarningRules> selectByDeviceId(String deviceId);
-
     int updateByPrimaryKeySelective(GywlwWarningRules record);
 
     int updateByPrimaryKey(GywlwWarningRules record);
+
+    List<GywlwWarningRules> selectByDeviceId(String deviceId);
 }

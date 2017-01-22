@@ -17,7 +17,6 @@ public class GpioDataModel {
 
     private String timestamp;
 
-    private String time;
 
     public static class Gpio {
         public Integer alarm;
@@ -80,14 +79,6 @@ public class GpioDataModel {
 
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
-    }
-
-    public String getTime() {
-        return time;
-    }
-
-    public void setTime(String time) {
-        this.time = time;
     }
 
     public Gpio getGpio_1() {

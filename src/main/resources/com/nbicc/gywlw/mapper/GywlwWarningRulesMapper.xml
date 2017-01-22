@@ -4,17 +4,20 @@
   <resultMap id="BaseResultMap" type="com.nbicc.gywlw.Model.GywlwWarningRules" >
     <id column="rule_id" property="ruleId" jdbcType="INTEGER" />
     <result column="rule_name" property="ruleName" jdbcType="VARCHAR" />
-    <result column="rule_desc" property="ruleDesc" jdbcType="VARCHAR" />
-    <result column="reg_id" property="regId" jdbcType="VARCHAR" />
-    <result column="reg_name" property="regName" jdbcType="VARCHAR" />
+    <result column="rule_name2" property="ruleName2" jdbcType="VARCHAR" />
+    <result column="plc_id" property="plcId" jdbcType="VARCHAR" />
     <result column="device_id" property="deviceId" jdbcType="VARCHAR" />
-    <result column="operand" property="operand" jdbcType="DOUBLE" />
-    <result column="operator" property="operator" jdbcType="VARCHAR" />
-    <result column="severity" property="severity" jdbcType="INTEGER" />
     <result column="del_mark" property="delMark" jdbcType="TINYINT" />
+    <result column="rules_pass" property="rulesPass" jdbcType="INTEGER" />
+    <result column="rule_2" property="rule2" jdbcType="INTEGER" />
+    <result column="rule_1" property="rule1" jdbcType="INTEGER" />
+    <result column="rule_condition" property="ruleCondition" jdbcType="INTEGER" />
+    <result column="rule_field" property="ruleField" jdbcType="VARCHAR" />
+    <result column="rule_alarmlevel" property="ruleAlarmlevel" jdbcType="INTEGER" />
   </resultMap>
   <sql id="Base_Column_List" >
-    rule_id, rule_name, rule_desc, reg_id, device_id, operand, operator, severity, del_mark
+    rule_id, rule_name, rule_name2, plc_id, device_id, del_mark, rules_pass, rule_2, 
+    rule_1, rule_condition, rule_field, rule_alarmlevel
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -24,22 +27,28 @@
   </select>
   <select id="selectByDeviceId" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select
-    a.rule_id, a.rule_name, a.rule_desc, a.reg_id, b.reg_name, a.device_id, a.operand, a.operator, a.severity, a.del_mark
-    from gywlw_warning_rules a, gywlw_reg_info b
-    where a.device_id = #{deviceId,jdbcType=VARCHAR} and a.reg_id=b.reg_id
+    a.*
+    from gywlw_warning_rules a
+    where a.device_id = #{deviceId,jdbcType=VARCHAR}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from gywlw_warning_rules
     where rule_id = #{ruleId,jdbcType=INTEGER}
   </delete>
+  <delete id="deleteByPlcId" parameterType="java.lang.String" >
+    delete from gywlw_warning_rules
+    where plc_id = #{plcId,jdbcType=VARCHAR}
+  </delete>
   <insert id="insert" parameterType="com.nbicc.gywlw.Model.GywlwWarningRules" >
-    insert into gywlw_warning_rules (rule_id, rule_name, rule_desc, 
-      reg_id, device_id, operand, 
-      operator, severity, del_mark
+    insert into gywlw_warning_rules (rule_id, rule_name, rule_name2, 
+      plc_id, device_id, del_mark, 
+      rules_pass, rule_2, rule_1, 
+      rule_condition, rule_field, rule_alarmlevel
       )
-    values (#{ruleId,jdbcType=INTEGER}, #{ruleName,jdbcType=VARCHAR}, #{ruleDesc,jdbcType=VARCHAR}, 
-      #{regId,jdbcType=VARCHAR}, #{deviceId,jdbcType=VARCHAR}, #{operand,jdbcType=DOUBLE}, 
-      #{operator,jdbcType=VARCHAR}, #{severity,jdbcType=INTEGER}, #{delMark,jdbcType=TINYINT}
+    values (#{ruleId,jdbcType=INTEGER}, #{ruleName,jdbcType=VARCHAR}, #{ruleName2,jdbcType=VARCHAR}, 
+      #{plcId,jdbcType=VARCHAR}, #{deviceId,jdbcType=VARCHAR}, #{delMark,jdbcType=TINYINT}, 
+      #{rulesPass,jdbcType=INTEGER}, #{rule2,jdbcType=INTEGER}, #{rule1,jdbcType=INTEGER}, 
+      #{ruleCondition,jdbcType=INTEGER}, #{ruleField,jdbcType=VARCHAR}, #{ruleAlarmlevel,jdbcType=INTEGER}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.nbicc.gywlw.Model.GywlwWarningRules" >
@@ -51,26 +60,35 @@
       <if test="ruleName != null" >
         rule_name,
       </if>
-      <if test="ruleDesc != null" >
-        rule_desc,
+      <if test="ruleName2 != null" >
+        rule_name2,
       </if>
-      <if test="regId != null" >
-        reg_id,
+      <if test="plcId != null" >
+        plc_id,
       </if>
       <if test="deviceId != null" >
         device_id,
       </if>
-      <if test="operand != null" >
-        operand,
-      </if>
-      <if test="operator != null" >
-        operator,
-      </if>
-      <if test="severity != null" >
-        severity,
-      </if>
       <if test="delMark != null" >
         del_mark,
+      </if>
+      <if test="rulesPass != null" >
+        rules_pass,
+      </if>
+      <if test="rule2 != null" >
+        rule_2,
+      </if>
+      <if test="rule1 != null" >
+        rule_1,
+      </if>
+      <if test="ruleCondition != null" >
+        rule_condition,
+      </if>
+      <if test="ruleField != null" >
+        rule_field,
+      </if>
+      <if test="ruleAlarmlevel != null" >
+        rule_alarmlevel,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
@@ -80,26 +98,35 @@
       <if test="ruleName != null" >
         #{ruleName,jdbcType=VARCHAR},
       </if>
-      <if test="ruleDesc != null" >
-        #{ruleDesc,jdbcType=VARCHAR},
+      <if test="ruleName2 != null" >
+        #{ruleName2,jdbcType=VARCHAR},
       </if>
-      <if test="regId != null" >
-        #{regId,jdbcType=VARCHAR},
+      <if test="plcId != null" >
+        #{plcId,jdbcType=VARCHAR},
       </if>
       <if test="deviceId != null" >
         #{deviceId,jdbcType=VARCHAR},
       </if>
-      <if test="operand != null" >
-        #{operand,jdbcType=DOUBLE},
-      </if>
-      <if test="operator != null" >
-        #{operator,jdbcType=VARCHAR},
-      </if>
-      <if test="severity != null" >
-        #{severity,jdbcType=INTEGER},
-      </if>
       <if test="delMark != null" >
         #{delMark,jdbcType=TINYINT},
+      </if>
+      <if test="rulesPass != null" >
+        #{rulesPass,jdbcType=INTEGER},
+      </if>
+      <if test="rule2 != null" >
+        #{rule2,jdbcType=INTEGER},
+      </if>
+      <if test="rule1 != null" >
+        #{rule1,jdbcType=INTEGER},
+      </if>
+      <if test="ruleCondition != null" >
+        #{ruleCondition,jdbcType=INTEGER},
+      </if>
+      <if test="ruleField != null" >
+        #{ruleField,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleAlarmlevel != null" >
+        #{ruleAlarmlevel,jdbcType=INTEGER},
       </if>
     </trim>
   </insert>
@@ -109,26 +136,35 @@
       <if test="ruleName != null" >
         rule_name = #{ruleName,jdbcType=VARCHAR},
       </if>
-      <if test="ruleDesc != null" >
-        rule_desc = #{ruleDesc,jdbcType=VARCHAR},
+      <if test="ruleName2 != null" >
+        rule_name2 = #{ruleName2,jdbcType=VARCHAR},
       </if>
-      <if test="regId != null" >
-        reg_id = #{regId,jdbcType=VARCHAR},
+      <if test="plcId != null" >
+        plc_id = #{plcId,jdbcType=VARCHAR},
       </if>
       <if test="deviceId != null" >
         device_id = #{deviceId,jdbcType=VARCHAR},
       </if>
-      <if test="operand != null" >
-        operand = #{operand,jdbcType=DOUBLE},
-      </if>
-      <if test="operator != null" >
-        operator = #{operator,jdbcType=VARCHAR},
-      </if>
-      <if test="severity != null" >
-        severity = #{severity,jdbcType=INTEGER},
-      </if>
       <if test="delMark != null" >
         del_mark = #{delMark,jdbcType=TINYINT},
+      </if>
+      <if test="rulesPass != null" >
+        rules_pass = #{rulesPass,jdbcType=INTEGER},
+      </if>
+      <if test="rule2 != null" >
+        rule_2 = #{rule2,jdbcType=INTEGER},
+      </if>
+      <if test="rule1 != null" >
+        rule_1 = #{rule1,jdbcType=INTEGER},
+      </if>
+      <if test="ruleCondition != null" >
+        rule_condition = #{ruleCondition,jdbcType=INTEGER},
+      </if>
+      <if test="ruleField != null" >
+        rule_field = #{ruleField,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleAlarmlevel != null" >
+        rule_alarmlevel = #{ruleAlarmlevel,jdbcType=INTEGER},
       </if>
     </set>
     where rule_id = #{ruleId,jdbcType=INTEGER}
@@ -136,13 +172,16 @@
   <update id="updateByPrimaryKey" parameterType="com.nbicc.gywlw.Model.GywlwWarningRules" >
     update gywlw_warning_rules
     set rule_name = #{ruleName,jdbcType=VARCHAR},
-      rule_desc = #{ruleDesc,jdbcType=VARCHAR},
-      reg_id = #{regId,jdbcType=VARCHAR},
+      rule_name2 = #{ruleName2,jdbcType=VARCHAR},
+      plc_id = #{plcId,jdbcType=VARCHAR},
       device_id = #{deviceId,jdbcType=VARCHAR},
-      operand = #{operand,jdbcType=DOUBLE},
-      operator = #{operator,jdbcType=VARCHAR},
-      severity = #{severity,jdbcType=INTEGER},
-      del_mark = #{delMark,jdbcType=TINYINT}
+      del_mark = #{delMark,jdbcType=TINYINT},
+      rules_pass = #{rulesPass,jdbcType=INTEGER},
+      rule_2 = #{rule2,jdbcType=INTEGER},
+      rule_1 = #{rule1,jdbcType=INTEGER},
+      rule_condition = #{ruleCondition,jdbcType=INTEGER},
+      rule_field = #{ruleField,jdbcType=VARCHAR},
+      rule_alarmlevel = #{ruleAlarmlevel,jdbcType=INTEGER}
     where rule_id = #{ruleId,jdbcType=INTEGER}
   </update>
 </mapper>

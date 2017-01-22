@@ -27,11 +27,11 @@
     from gywlw_reg_info
     where reg_id = #{regId,jdbcType=VARCHAR}
   </select>
-  <select id="selectByRegName" resultMap="BaseResultMap" parameterType="java.lang.String" >
+  <select id="selectByRegAddress" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select
     <include refid="Base_Column_List" />
     from gywlw_reg_info
-    where reg_name = #{regName,jdbcType=VARCHAR}
+    where reg_address = #{regAddress,jdbcType=VARCHAR}
   </select>
   <select id="selectByPlcId" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select
@@ -135,10 +135,10 @@
         #{permission,jdbcType=TINYINT},
       </if>
       <if test="fieldType != null" >
-        #{fieldType,jdbcType=INT},
+        #{fieldType,jdbcType=INTEGER},
       </if>
       <if test="fieldRw != null" >
-        #{fieldRw,jdbcType=INT},
+        #{fieldRw,jdbcType=INTEGER},
       </if>
       <if test="fieldFunctionCode != null" >
         #{fieldFunctionCode,jdbcType=VARCHAR},

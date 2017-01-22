@@ -5,29 +5,25 @@ public class GywlwWarningRules {
 
     private String ruleName;
 
-    private String ruleDesc;
+    private String ruleName2;
 
-    private String regId;
-
-    private String regName;
+    private String plcId;
 
     private String deviceId;
 
-    private Double operand;
-
-    private String operator;
-
-    private Integer severity;
-
     private Byte delMark;
 
-    public String getRegName() {
-        return regName;
-    }
+    private Integer rulesPass;
 
-    public void setRegName(String regName) {
-        this.regName = regName;
-    }
+    private Integer rule2;
+
+    private Integer rule1;
+
+    private Integer ruleCondition;
+
+    private String ruleField;
+
+    private Integer ruleAlarmlevel;
 
     public Integer getRuleId() {
         return ruleId;
@@ -45,20 +41,20 @@ public class GywlwWarningRules {
         this.ruleName = ruleName == null ? null : ruleName.trim();
     }
 
-    public String getRuleDesc() {
-        return ruleDesc;
+    public String getRuleName2() {
+        return ruleName2;
     }
 
-    public void setRuleDesc(String ruleDesc) {
-        this.ruleDesc = ruleDesc == null ? null : ruleDesc.trim();
+    public void setRuleName2(String ruleName2) {
+        this.ruleName2 = ruleName2 == null ? null : ruleName2.trim();
     }
 
-    public String getRegId() {
-        return regId;
+    public String getPlcId() {
+        return plcId;
     }
 
-    public void setRegId(String regId) {
-        this.regId = regId == null ? null : regId.trim();
+    public void setPlcId(String plcId) {
+        this.plcId = plcId == null ? null : plcId.trim();
     }
 
     public String getDeviceId() {
@@ -69,35 +65,59 @@ public class GywlwWarningRules {
         this.deviceId = deviceId == null ? null : deviceId.trim();
     }
 
-    public Double getOperand() {
-        return operand;
-    }
-
-    public void setOperand(Double operand) {
-        this.operand = operand;
-    }
-
-    public String getOperator() {
-        return operator;
-    }
-
-    public void setOperator(String operator) {
-        this.operator = operator == null ? null : operator.trim();
-    }
-
-    public Integer getSeverity() {
-        return severity;
-    }
-
-    public void setSeverity(Integer severity) {
-        this.severity = severity;
-    }
-
     public Byte getDelMark() {
         return delMark;
     }
 
     public void setDelMark(Byte delMark) {
         this.delMark = delMark;
+    }
+
+    public Integer getRulesPass() {
+        return rulesPass;
+    }
+
+    public void setRulesPass(Integer rulesPass) {
+        this.rulesPass = rulesPass;
+    }
+
+    public Integer getRule2() {
+        return rule2;
+    }
+
+    public void setRule2(Integer rule2) {
+        this.rule2 = rule2;
+    }
+
+    public Integer getRule1() {
+        return rule1;
+    }
+
+    public void setRule1(Integer rule1) {
+        this.rule1 = rule1;
+    }
+
+    public Integer getRuleCondition() {
+        return ruleCondition;
+    }
+
+    public void setRuleCondition(Integer ruleCondition) {
+        this.ruleCondition = ruleCondition;
+    }
+
+    public String getRuleField() {
+        return ruleField;
+    }
+
+    public void setRuleField(String ruleField) {
+        this.ruleField = ruleField == null ? null : ruleField.trim();
+    }
+
+    public Integer getRuleAlarmlevel() {
+        return ruleAlarmlevel;
+    }
+
+    public void setRuleAlarmlevel(Integer ruleAlarmlevel) {
+        this.ruleAlarmlevel = ruleAlarmlevel;
     }
 }

@@ -17,7 +17,7 @@ public interface GywlwRegInfoMapper {
 
     GywlwRegInfo selectByPrimaryKey(String regId);
 
-    GywlwRegInfo selectByRegName(String regName);
+    GywlwRegInfo selectByRegAddress(String regAddress);
 
     List<GywlwRegInfo> selectByPlcId(String plcId);
 
