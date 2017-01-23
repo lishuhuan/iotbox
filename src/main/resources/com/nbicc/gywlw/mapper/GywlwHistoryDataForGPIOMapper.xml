@@ -10,6 +10,16 @@
     <result column="content" property="content" jdbcType="VARCHAR" />
     <result column="alarm" property="alarm" jdbcType="VARCHAR" />
   </resultMap>
+  <resultMap id="BaseResultMap1" type="com.nbicc.gywlw.Model.GywlwHistoryDataForGPIO" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="gpio_id" property="gpioId" jdbcType="VARCHAR" />
+    <result column="value" property="value" jdbcType="INTEGER" />
+    <result column="time" property="time" jdbcType="TIMESTAMP" />
+    <result column="device_id" property="deviceId" jdbcType="VARCHAR" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="alarm" property="alarm" jdbcType="VARCHAR" />
+    <result column="variable_name" property="variableName" jdbcType="VARCHAR" />
+  </resultMap>
   <sql id="Base_Column_List" >
     id, gpio_id, value, time, device_id, content, alarm
   </sql>
@@ -19,12 +29,35 @@
     from gywlw_history_data_for_gpio
     where id = #{id,jdbcType=INTEGER}
   </select>
-  <!--<select id="getLastTimeByDeviceId" resultMap="BaseResultMap" parameterType="java.lang.String">-->
-    <!--select-->
-    <!--id, MAX(time) time-->
-    <!--from gywlw_history_data_for_gpio-->
-    <!--where device_id = #{deviceId,jdbcType=VARCHAR}-->
-  <!--</select>-->
+  <select id="getHistoryData" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from gywlw_history_data_for_gpio
+    where device_id = #{deviceId,jdbcType=VARCHAR} and gpio_id = #{gpioId,jdbcType=VARCHAR}
+  </select>
+  <select id="getLatestData" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from (select * from gywlw_history_data_for_gpio where device_id = #{deviceId,jdbcType=VARCHAR} order by time desc) t
+    GROUP BY gpio_id
+  </select>
+  <select id="getLatestDataByVariableName" resultMap="BaseResultMap1" parameterType="java.lang.String" >
+    SELECT * from
+    (select a.*,c.variable_name from gywlw_history_data_for_gpio a,gywlw_variable_reg_group b,gywlw_variable c
+    where c.project_id = #{projectId,jdbcType=VARCHAR} and b.variable_id = c.variable_id
+    <if test="variableName != ALL" >
+    and c.variable_name = #{variableName,jdbcType=VARCHAR}
+    </if>
+    and a.gpio_id = b.reg_id ORDER BY time desc) t
+    GROUP BY gpio_id
+  </select>
+  <select id="getLastTimeByDeviceId" resultMap="BaseResultMap" parameterType="java.lang.String">
+    SELECT *
+    FROM gywlw_history_data_for_gpio
+    where device_id = #{deviceId,jdbcType=VARCHAR}
+    ORDER BY time DESC
+    Limit 1
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from gywlw_history_data_for_gpio
     where id = #{id,jdbcType=INTEGER}

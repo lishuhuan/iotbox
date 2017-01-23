@@ -17,6 +17,16 @@ public class GywlwHistoryDataForGPIO {
 
     private String alarm;
 
+    private String variableName;
+
+    public String getVariableName() {
+        return variableName;
+    }
+
+    public void setVariableName(String variableName) {
+        this.variableName = variableName;
+    }
+
     public Integer getId() {
         return id;
     }

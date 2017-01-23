@@ -51,14 +51,17 @@ public class ProjectService {
     private GywlwWarningRulesMapper gywlwWarningRulesMapper;
     @Autowired
     private RefreshService refreshService;
-
+    @Autowired
+    private GywlwDeviceGpioMapper gywlwDeviceGpioMapper;
+    @Autowired
+    private GywlwHistoryDataForGPIOMapper gywlwHistoryDataForGPIOMapper;
 
 
     public List<GywlwProject> projectList(String gywlwUserId, Byte projectStatus) {
         List<GywlwProject> list = gywlwProjectMapper.selectByGywlwUserId(gywlwUserId, projectStatus);
         System.out.println(gywlwUserId);
         if(list.size()==0){
-            list = gywlwProjectUserGroupMapper.selectProjectByUserId(gywlwUserId);
+            list = gywlwProjectUserGroupMapper.selectProjectByUserId(gywlwUserId, projectStatus);
         }
         //设置权限
         for(GywlwProject project : list){
@@ -75,7 +78,21 @@ public class ProjectService {
     }
 
     public GywlwProject projectInfo(String projectId){
-        return gywlwProjectMapper.selectByGywlwProjectId(projectId);
+        GywlwProject project =  gywlwProjectMapper.selectByGywlwProjectId(projectId);
+        //设置权限
+        project.setWritePermission(Byte.parseByte("0"));
+        if(project.getAdminId().equals(hostHolder.getGywlwUser().getUserId())){
+            project.setWritePermission(Byte.parseByte("1"));
+            return project;
+        }else {
+            GywlwProjectUserGroup gywlwProjectUserGroup = gywlwProjectUserGroupMapper.selectByProjectIdAndUserId(
+                    project.getProjectId(), hostHolder.getGywlwUser().getUserId());
+            if (gywlwProjectUserGroup != null) {
+                project.setWritePermission(gywlwProjectUserGroup.getWritePermission());
+                return project;
+            }
+        }
+        return null;
     }
     public String editProject(String projectId, String projectName, String parentText, String projectDesc,
                               String longitude, String latitude, String province, String city, String purchaseDate,
@@ -201,7 +218,12 @@ public class ProjectService {
 
     public List<GywlwHistoryItem> searchHistoryData(String projectId, String variableName) {
         refreshService.refresh();
-        return gywlwHistoryItemMapper.selectByVariableName(variableName, projectId);
+        List<GywlwHistoryItem> list = gywlwHistoryItemMapper.selectByVariableName(variableName, projectId);
+        List<GywlwHistoryDataForGPIO> list1 = gywlwHistoryDataForGPIOMapper.getLatestDataByVariableName(projectId,variableName);
+        if(list1.size() > 0){
+            //todo
+        }
+        return list;
 
     }
 
@@ -460,6 +482,7 @@ public class ProjectService {
                 treeListModel.setName(device.getDeviceName());
                 treeListModel.setId(device.getDeviceId());
                 List<GywlwPlcInfo> gywlwPlcInfos = gywlwPlcInfoMapper.selectByDeviceId(device.getDeviceId());
+                List<GywlwDeviceGpio> gywlwDeviceGpios = gywlwDeviceGpioMapper.selectByDeviceId(device.getDeviceId());
                 List<TreeListModel> treeListForPlc = new ArrayList<>();
                 if(gywlwPlcInfos.size() > 0){
                     for(GywlwPlcInfo plcInfo : gywlwPlcInfos){
@@ -481,6 +504,22 @@ public class ProjectService {
                         treeListModel1ForPlc.setChildren(treeListForReg);
                         treeListForPlc.add(treeListModel1ForPlc);
                     }
+                }
+                if(gywlwDeviceGpios.size() > 0 ){
+                    TreeListModel modelForGpio = new TreeListModel();
+                    modelForGpio.setType("plc");
+                    modelForGpio.setName("gpio");
+                    modelForGpio.setId("0");
+                    List<TreeListModel> treeListForGpio = new ArrayList<>();
+                    for(GywlwDeviceGpio gywlwDeviceGpio : gywlwDeviceGpios){
+                        TreeListModel modelForGpio1 = new TreeListModel();
+                        modelForGpio1.setId(gywlwDeviceGpio.getId());
+                        modelForGpio1.setName(gywlwDeviceGpio.getFieldName());
+                        modelForGpio1.setType("gpio");
+                        treeListForGpio.add(modelForGpio1);
+                    }
+                    modelForGpio.setChildren(treeListForGpio);
+                    treeListForPlc.add(modelForGpio);
                 }
                 treeListModel.setChildren(treeListForPlc);
                 treeListModels.add(treeListModel);
@@ -522,6 +561,9 @@ public class ProjectService {
     public List<GywlwHistoryItem> getHistoryDataForReg(String regId,String startTime,String endTime) throws ParseException {
         refreshService.refresh();
         GywlwRegInfo gywlwRegInfo = gywlwRegInfoMapper.selectByPrimaryKey(regId);
+        if(gywlwRegInfo == null){
+            return null;
+        }
         if(hostHolder.getGywlwUser().getUserId().
                 equals(gywlwDeviceMapper.selectByDeviceId(gywlwRegInfo.getDeviceId()).getAdminId())){
             List<GywlwHistoryItem> list = gywlwHistoryItemMapper.getDataForReg(regId,
@@ -529,6 +571,16 @@ public class ProjectService {
             return list;
         }
         return null;
+    }
+
+    public List<GywlwHistoryDataForGPIO> getHistoryDataForGpio(String regId, String startTime, String endTime) {
+//        refreshService.refresh();  //在查询数据项的时候已经刷新过一次了
+        GywlwDeviceGpio gywlwDeviceGpio = gywlwDeviceGpioMapper.selectByPrimaryKey(regId);
+        if(gywlwDeviceGpio == null){
+            return null;
+        }
+        String[] str = gywlwDeviceGpio.getFieldAddress().split("_");
+        return gywlwHistoryDataForGPIOMapper.getHistoryData(gywlwDeviceGpio.getDeviceId(),str[1]);
     }
 }
 

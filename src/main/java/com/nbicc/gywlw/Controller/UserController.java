@@ -113,6 +113,9 @@ public class UserController {
     public JSONObject projectInfo(@RequestParam(value = "project_id")String projectId) {
         try {
             GywlwProject gywlwProject = projectService.projectInfo(projectId);
+            if(gywlwProject == null){
+                return MyUtil.response(0,"未找到项目");
+            }
             String[] str = gywlwProject.getDisplay().split(",");
             List<String> list = Arrays.asList(str);
             List<Integer> list1 = new ArrayList<>();
@@ -828,6 +831,14 @@ public class UserController {
         try {
             PageHelper.startPage(pageNum,pageSize);
             List<GywlwHistoryItem> list = projectService.getHistoryDataForReg(regId,startTime,endTime);
+            if(list == null){
+                List<GywlwHistoryDataForGPIO> listForGpio = projectService.getHistoryDataForGpio(regId,startTime,endTime);
+                if(listForGpio == null) {
+                    return MyUtil.response(0, "查不到相关数据！");
+                }
+                PageInfo<GywlwHistoryDataForGPIO> pageInfo1 = new PageInfo<>(listForGpio);
+                return MyUtil.response(0, pageInfo1);
+            }
             PageInfo<GywlwHistoryItem> pageInfo = new PageInfo<>(list);
             return MyUtil.response(0, pageInfo);
         } catch (ParseException e) {
@@ -886,7 +897,7 @@ public class UserController {
 
 
 
-    //该用户下，树形结构列表（device/plc/reg)
+    //该用户下，树形结构列表（device/plc(gpio)/reg)
     @RequestMapping(path = {"/treelistofuser"}, method = {RequestMethod.POST})
     @ResponseBody
     public JSONObject treeListOfUser(){

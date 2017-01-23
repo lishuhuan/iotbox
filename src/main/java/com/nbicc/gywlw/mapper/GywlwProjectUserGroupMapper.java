@@ -17,7 +17,8 @@ public interface GywlwProjectUserGroupMapper {
 
     List<GywlwProjectUserGroup> selectByProjectId(@Param("projectId") String projectId);
 
-    List<GywlwProject> selectProjectByUserId(String userId);
+    List<GywlwProject> selectProjectByUserId(@Param("userId") String userId,
+                                             @Param("projectStatus")Byte projectStatus);
 
     GywlwProjectUserGroup selectByProjectIdAndUserId(@Param("projectId") String projectId,
                                                      @Param("userId") String userId);

@@ -62,15 +62,15 @@
     from gywlw_project_user_group
     where user_id = #{userId,jdbcType=VARCHAR};
   </select>
-  <select id="selectProjectByUserId" resultMap="BaseResultMap1" parameterType="java.lang.String" >
+  <select id="selectProjectByUserId" resultMap="BaseResultMap1" >
     select
     b.project_id, b.project_name, b.admin_id, b.content, b.create_time, b.longitude, b.latitude, b.parent_text,
     b.province, city, b.purchase_date, b.completion_date, b.install_date, b.contact_name, b.contact_phone,
-    b.customer_type, b.firstparty, b.project_type, b.project_desc, a.write_permission
+    b.customer_type, b.firstparty, b.project_type, b.project_desc, a.write_permission, b.del_mark
     from gywlw_project_user_group a
     LEFT JOIN gywlw_project b
     ON a.project_id=b.project_id
-    where a.user_id = #{userId,jdbcType=VARCHAR};
+    where a.user_id = #{userId,jdbcType=VARCHAR} and b.del_mark = #{projectStatus,jdbcType=TINYINT};
   </select>
   <delete id="deleteByProjectIdAndUserId" parameterType="java.lang.String" >
     delete from gywlw_project_user_group
@@ -78,7 +78,6 @@
     <if test="userId != 'ALL'">
       AND user_id = #{userId,jdbcType=VARCHAR}
     </if>
-
   </delete>
   <insert id="insert" parameterType="com.nbicc.gywlw.Model.GywlwProjectUserGroup" >
     insert into gywlw_project_user_group (project_id, user_id,

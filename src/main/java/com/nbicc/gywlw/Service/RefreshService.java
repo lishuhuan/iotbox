@@ -6,10 +6,13 @@ import com.nbicc.gywlw.Model.*;
 import com.nbicc.gywlw.mapper.*;
 import com.nbicc.gywlw.util.HttpsTest;
 import com.nbicc.gywlw.util.MyUtil;
+import com.nbicc.gywlw.util.RedisAPI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
 
 import java.text.ParseException;
 import java.util.*;
@@ -43,33 +46,28 @@ public class RefreshService {
 
     public void refresh(){
         refreshConfigParams();
-        refreshPlcParams(0); //同步plc数据项设置
-        refreshPlcParams(1);    //同步plc rules
-        refreshPlcParams(2);    //同步gpio参数设置
-        refreshPlcParams(3);    //同步gpio rules
+        refreshParamsForPlc();  //同步plc数据项设置
+        refreshRulesForPlc();   //同步plc rules
+        refreshParamsForGpio();    //同步gpio参数设置
+        refreshRulesForGpio();    //同步gpio rules
         refreshDataForGpio();
         refreshDataForPlc();
-
     }
 
-    //PLC，默认一个物联网盒子上连接的plc都是同一型号
+    //PLC，默认一个物联网盒子上连接的plc都是同一型号(目前是一对一)
     public void refreshDataForPlc(){
         logger.info("同步plc数据准备工作： " + new Date());
-//        JedisPool pool = RedisAPI.getPool();
-//        Jedis jedis = pool.getResource();
+        JedisPool pool = RedisAPI.getPool();
+        Jedis jedis = pool.getResource();
         List<GywlwDevice> devices = gywlwDeviceMapper.selectAll();
         if(devices.size() != 0) {
             for (GywlwDevice device : devices) {
                 List<String> deviceIdList = new ArrayList<>();
                 String sdkKey = "";
-                Long timestamp;
-//                if(jedis.get(device.getDeviceSn())!=null){
-//                    timestamp = Long.parseLong(jedis.get(device.getDeviceSn()));
-//                }else{
-//                    timestamp = System.currentTimeMillis() - 1*86400000L; //当前时间减1天
-//                }
+                Long timestamp = 0L;
+                String redisKey = null;
 //                Long timestamp = 1482798633000L;//test
-                timestamp = device.getLastConnected().getTime(); //当前时间减1天
+//                timestamp = device.getLastConnected().getTime(); //当前时间减1天
                 List<String> regList = new ArrayList<>();
                 List<String> requestList = new ArrayList<>();
                 List<GywlwPlcInfo> plcinfos = gywlwPlcInfoMapper.selectByDeviceId(device.getDeviceId());
@@ -77,6 +75,13 @@ public class RefreshService {
                     for (GywlwPlcInfo plcInfo : plcinfos) {
                         if(plcInfo.getSubdeviceId() == null){
                             continue;
+                        }
+                        //redis保存最近一次的更新时间
+                        redisKey = plcInfo.getSubdeviceId();
+                        if(jedis.get(redisKey)!=null){
+                            timestamp = Long.parseLong(jedis.get(plcInfo.getSubdeviceId()));
+                        }else{
+                            timestamp = System.currentTimeMillis() - 1*86400000L; //当前时间减1天
                         }
                         deviceIdList.add(plcInfo.getSubdeviceId());
                         sdkKey = plcInfo.getContent(); //content保存着sdkkey
@@ -99,15 +104,15 @@ public class RefreshService {
                 jsonObject.put("timestamp",timestamp);
                 jsonObject.put("idList",requestList);
 
-                System.out.println("请求参数: " + jsonObject);
-                logger.info("准备工作结束，发送psot请求： " + new Date());
+//                System.out.println("请求参数: " + jsonObject);
+//                logger.info("准备工作结束，发送psot请求： " + new Date());
                 String str = null;
                 try {
                     str = HttpsTest.postForm(jsonObject,2);  //2代表plc通道，也就是走子设备通道
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                System.out.println("待同步数据 : "+ str);
+                logger.info("待同步数据 : "+ str);
                 //handle response
                 if(str.equals("0")){
                     continue;
@@ -116,10 +121,10 @@ public class RefreshService {
                 Map<String, Object> map1 = JSON.parseObject(str);
                 List<Map> list1 = JSON.parseArray(map1.get("result_data").toString(), Map.class);
    //             System.out.println("list1.size():"+list1.toString());
-                logger.info("请求成功，开始处理数据： " + new Date());
+//                logger.info("请求成功，开始处理数据： " + new Date());
                 if(list1.size() > 0){
                     try {
-//                        jedis.set(device.getDeviceSn(), list1.get(0).get("timestamp").toString());
+                        jedis.set(redisKey, list1.get(0).get("timestamp").toString());
                         //单线程
 //                        handlerForPlc(list1,regList);
                         //多线程
@@ -140,7 +145,7 @@ public class RefreshService {
 
     //GPIO
     public void refreshDataForGpio() {
-        logger.info("同步gpio数据准备工作： " + new Date());
+        logger.info("同步gpio数据准备工作:..........");
         List<GywlwDevice> devices = gywlwDeviceMapper.selectAll();
         if(devices.size() != 0){
             for (GywlwDevice device : devices) {
@@ -149,15 +154,19 @@ public class RefreshService {
                     continue;
                 }
                 Long timestamp;
-//                JedisPool pool = RedisAPI.getPool();
-//                Jedis jedis = pool.getResource();
-//                if(jedis.get(device.getGpioId())!=null){
-//                    timestamp = Long.parseLong(jedis.get(device.getGpioId()));
-//                }else{
-//                    timestamp = System.currentTimeMillis() - 86400L; //当前时间减1天
-//                }
-                timestamp = device.getLastConnected().getTime(); //当前时间减1天
-                List<String> requestList = new ArrayList<>();
+                JedisPool pool = RedisAPI.getPool();
+                Jedis jedis = pool.getResource();
+                if(jedis.get(device.getGpioId())!=null){
+                    timestamp = Long.parseLong(jedis.get(device.getGpioId()));
+                }else{
+                    GywlwHistoryDataForGPIO dataForGPIO = gywlwHistoryDataForGPIOMapper.
+                            getLastTimeByDeviceId(device.getDeviceId());
+                    if(dataForGPIO == null){
+                        timestamp = System.currentTimeMillis() - 86400L; //当前时间减1天
+                    }else{
+                        timestamp = dataForGPIO.getTime().getTime();
+                    }
+                }
                 List<String> gpioList = new ArrayList<>();
                 gpioList.add("gpio_1");
                 gpioList.add("gpio_2");
@@ -167,14 +176,13 @@ public class RefreshService {
                 gpioList.add("gpio_6");
                 gpioList.add("gpio_7");
                 gpioList.add("gpio_8");
-                requestList.addAll(gpioList);
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("deviceId",gpioId);
-                jsonObject.put("idList",requestList);
+                jsonObject.put("idList",gpioList);
                 jsonObject.put("timestamp",timestamp);
-                System.out.println("请求参数: " + jsonObject);
+//                System.out.println("请求参数: " + jsonObject);
 
-                logger.info("准备工作结束，发送psot请求： " + new Date());
+//                logger.info("准备工作结束，发送psot请求： " + new Date());
 
                 String str = null;
                 try {
@@ -182,7 +190,7 @@ public class RefreshService {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                System.out.println("待同步数据 : "+ str);
+                logger.info("gpio待同步数据 : "+ str);
                 //handle response
                 if(str.equals("0")){
                     continue;
@@ -191,10 +199,10 @@ public class RefreshService {
                 Map<String, Object> map1 = JSON.parseObject(str);
                 List<GpioDataModel> list1 = JSON.parseArray(map1.get("result_data").toString(), GpioDataModel.class);
 //                System.out.println("response data:"+ list1);
-                logger.info("请求成功，开始处理数据： " + new Date());
+//                logger.info("请求成功，开始处理数据： " + new Date());
                 if(list1.size() != 0){
                     //储存该设备最新一次更新的时间戳
-//                    jedis.set(device.getGpioId(),list1.get(0).getTimestamp());
+                    jedis.set(device.getGpioId(),list1.get(0).getTimestamp());
                     handler(list1,device,gpioList);
                 }
             }
@@ -203,11 +211,15 @@ public class RefreshService {
 
 
     public void refreshRulesForGpio(){
+        refreshParams(3);
+    }
 
+    public void refreshRulesForPlc(){
+        refreshParams(1);
     }
 
     public void refreshConfigParams(){
-        logger.info("同步设备配置的准备工作： " + new Date());
+        logger.info("同步设备配置(ConfigParams)的准备工作.....................");
         List<GywlwDevice> devices = gywlwDeviceMapper.selectAll();
         if(devices.size() != 0) {
             for (GywlwDevice device : devices) {
@@ -215,16 +227,7 @@ public class RefreshService {
                 if (gpioId == null) {
                     continue;
                 }
-                Long timestamp;
-//                JedisPool pool = RedisAPI.getPool();
-//                Jedis jedis = pool.getResource();
-//                if(jedis.get(device.getGpioId())!=null){
-//                    timestamp = Long.parseLong(jedis.get(device.getGpioId()));
-//                }else{
-//                    timestamp = System.currentTimeMillis() - 86400L; //当前时间减1天
-//                }
-//                timestamp = System.currentTimeMillis() - 86400L; //当前时间减1天
-                timestamp = device.getLastConnected().getTime();
+                Long timestamp = device.getLastConnected().getTime();
                 List<String> requestList = new ArrayList<>();
                 requestList.add("hardware_edition");
                 requestList.add("software_edition");
@@ -234,9 +237,7 @@ public class RefreshService {
                 jsonObject.put("idList",requestList);
                 jsonObject.put("timestamp",timestamp);
                 System.out.println("请求参数: " + jsonObject);
-
-                logger.info("准备工作结束，发送psot请求： " + new Date());
-
+//                logger.info("准备工作结束，发送psot请求： " + new Date());
                 String str = null;
                 try {
                     str = HttpsTest.postForm(jsonObject,1);
@@ -246,13 +247,13 @@ public class RefreshService {
                 if(str.equals("0")){
                     continue;
                 }
-                System.out.println("待同步数据 : "+ str);
+                logger.info("同步设备配置(ConfigParams)的待同步数据 : "+ str);
                 //handle response
                 JSONObject json = new JSONObject();
                 Map<String, Object> map1 = JSON.parseObject(str);
                 List<Map> list1 = JSON.parseArray(map1.get("result_data").toString(), Map.class);
 //                System.out.println("返回数据:  "+list1.toString());
-                logger.info("请求成功，开始处理数据： " + new Date());
+//                logger.info("请求成功，开始处理数据： " + new Date());
                 if(list1.size() > 0){
                     try {
                         handlerForConfigParams(list1,device);
@@ -265,11 +266,18 @@ public class RefreshService {
         }
     }
 
+    public void refreshParamsForPlc(){
+        refreshParams(0);
+    }
+
+    public void refreshParamsForGpio(){
+        refreshParams(2);
+    }
+
 
 
     //mark=0表示同步plc数据项设置，mark=1表示同步plcrules数据；
-    public void refreshPlcParams(int mark){
-        logger.info("同步plc配置(通道信息)的准备工作： " + new Date());
+    public void refreshParams(int mark){
         List<GywlwDevice> devices = gywlwDeviceMapper.selectAll();
         if(devices.size() != 0) {
             for (GywlwDevice device : devices) {
@@ -278,35 +286,29 @@ public class RefreshService {
                     continue;
                 }
                 Long timestamp;
-//                JedisPool pool = RedisAPI.getPool();
-//                Jedis jedis = pool.getResource();
-//                if(jedis.get(device.getGpioId())!=null){
-//                    timestamp = Long.parseLong(jedis.get(device.getGpioId()));
-//                }else{
-//                    timestamp = System.currentTimeMillis() - 86400L; //当前时间减1天
-//                }
-//                timestamp = System.currentTimeMillis() - 86400L; //当前时间减1天
                 timestamp = device.getLastConnected().getTime();
                 List<String> requestList = new ArrayList<>();
                 String requestData = null;
                 if(mark == 0) {
                     requestData = "field_data"; //plc params;
+                    logger.info("同步plc配置信息的准备工作.....................");
                 }else if(mark == 1){
                     requestData = "rules_data"; //plc rules;
+                    logger.info("同步plc规则的准备工作.....................");
                 }else if(mark == 2){
                     requestData = "field_data_gpio"; //gpio params
+                    logger.info("同步gpio配置信息的准备工作.....................");
                 }else if(mark == 3){
                     requestData = "rules_data_gpio";  //gpio rules
+                    logger.info("同步gpio规则的准备工作.....................");
                 }
                 requestList.add(requestData);
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("deviceId",gpioId);
                 jsonObject.put("idList",requestList);
                 jsonObject.put("timestamp",timestamp);
-                System.out.println("请求参数: " + jsonObject);
-
-                logger.info("准备工作结束，发送psot请求： " + new Date());
-
+//                System.out.println("请求参数: " + jsonObject);
+//                logger.info("准备工作结束，发送psot请求： " + new Date());
                 String str = null;
                 try {
                     str = HttpsTest.postForm(jsonObject,1);
@@ -316,16 +318,15 @@ public class RefreshService {
                 if(str.equals("0")){
                     continue;
                 }
-                System.out.println("待同步数据 : "+ str);
+                logger.info("Params待同步数据   : "+ str);
                 //handle response
                 JSONObject json = new JSONObject();
                 Map<String, Object> map1 = JSON.parseObject(str);
                 List<Map> list1 = JSON.parseArray(map1.get("result_data").toString(), Map.class);
 //                System.out.println("返回数据:  "+list1.toString());
-                logger.info("请求成功，开始处理数据： " + new Date());
+//                logger.info("请求成功，开始处理数据： " + new Date());
                 if(list1.size() > 0){
-//                    handlerForPlcParams(list1,device);
-                    logger.info("开始解析：-----");
+//                    logger.info("开始解析：-----");
                     if(map1.get(requestData) == null){
                         continue;
                     }
@@ -334,7 +335,7 @@ public class RefreshService {
                         strList = map.get(requestData).toString().split(",");
                         break;
                     }
-                    System.out.println(requestData + "   " + strList[0] + "   " + strList[1]);
+//                    System.out.println(requestData + "   " + strList[0] + "   " + strList[1]);
                     if(strList.length > 0) {
                         if(mark == 0) {
                             handlerForPlcParams(strList, device);
@@ -364,7 +365,7 @@ public class RefreshService {
             jsonObject.put("idList",requestList);
             jsonObject.put("timestamp",timestamp);
             System.out.println("请求参数: " + jsonObject);
-            logger.info("handlerForPlcParams准备工作结束，发送psot请求： " + new Date());
+//            logger.info("handlerForPlcParams准备工作结束，发送psot请求： " + new Date());
 
             String responseStr = null;
             try {
@@ -375,14 +376,14 @@ public class RefreshService {
             if(responseStr.equals("0")){
                 continue;
             }
-            System.out.println("待同步数据 : "+ responseStr);
+//            System.out.println("待同步数据 : "+ responseStr);
             //handle response
             JSONObject json = new JSONObject();
             Map<String, Object> map1 = JSON.parseObject(responseStr);
             List<Map> map2 = JSON.parseArray(map1.get("result_data").toString(),Map.class);
             GpioRulesModel model = JSON.parseObject(map2.get(0).get(str).toString(),GpioRulesModel.class);
 
-            logger.info("请求成功，开始处理数据： " + new Date());
+//            logger.info("请求成功，开始处理数据： " + new Date());
             //更新rules
             GywlwWarningRules gywlwWarningRules = new GywlwWarningRules();
             gywlwWarningRules.setDeviceId(device.getDeviceId());
@@ -399,7 +400,7 @@ public class RefreshService {
                 gywlwWarningRules.setRuleAlarmlevel(Integer.parseInt(model.getRules_alarmlevel()));
             }
 
-            logger.info("更新数据库...");
+//            logger.info("更新数据库...");
             //先删除已经存在的规则，再插入新规则
             if(gywlwWarningRules.getRuleId()!=null) {
                 gywlwWarningRulesMapper.deleteByPrimaryKey(gywlwWarningRules.getRuleId());
@@ -420,7 +421,7 @@ public class RefreshService {
             jsonObject.put("idList",requestList);
             jsonObject.put("timestamp",timestamp);
             System.out.println("请求参数: " + jsonObject);
-            logger.info("handlerForPlcParams准备工作结束，发送psot请求： " + new Date());
+//            logger.info("handlerForPlcParams准备工作结束，发送psot请求： " + new Date());
 
             String responseStr = null;
             try {
@@ -431,7 +432,7 @@ public class RefreshService {
             if(responseStr.equals("0")){
                 continue;
             }
-            System.out.println("待同步数据 : "+ responseStr);
+//            System.out.println("待同步数据 : "+ responseStr);
             //handle response
             JSONObject json = new JSONObject();
             Map<String, Object> map1 = JSON.parseObject(responseStr);
@@ -439,7 +440,7 @@ public class RefreshService {
             GpioParamsModel model = new GpioParamsModel();
             model = JSON.parseObject(map2.get(map2.size()-1).get(str).toString(),GpioParamsModel.class);
 //                System.out.println("response data:"+ list1);
-            logger.info("请求成功，开始处理数据： " + new Date());
+//            logger.info("请求成功，开始处理数据： " + new Date());
             //更新gpio params
             GywlwDeviceGpio gywlwDeviceGpio = new GywlwDeviceGpio();
             gywlwDeviceGpio.setDeviceId(device.getDeviceId());
@@ -451,8 +452,9 @@ public class RefreshService {
             if(model.getField_rw() != null) {
                 gywlwDeviceGpio.setFieldRw(Integer.parseInt(model.getField_rw()));
             }
+            gywlwDeviceGpio.setId(UUID.randomUUID().toString().replace("-",""));
 
-            logger.info("更新数据库...");
+//            logger.info("更新数据库...");
             //先删除已经存在的gpio，再插入新gpio
             if(gywlwDeviceGpio.getFieldAddress()!=null) {
                 if(isFirstOne == 0) {   //第一次插入数据项前先删去已经存在的；
@@ -476,7 +478,7 @@ public class RefreshService {
             jsonObject.put("idList",requestList);
             jsonObject.put("timestamp",timestamp);
             System.out.println("请求参数: " + jsonObject);
-            logger.info("handlerForPlcParams准备工作结束，发送psot请求： " + new Date());
+//            logger.info("handlerForPlcParams准备工作结束，发送psot请求： " + new Date());
 
             String responseStr = null;
             try {
@@ -487,7 +489,7 @@ public class RefreshService {
             if(responseStr.equals("0")){
                 continue;
             }
-            System.out.println("待同步数据 : "+ responseStr);
+//            System.out.println("待同步数据 : "+ responseStr);
             //handle response
             JSONObject json = new JSONObject();
             Map<String, Object> map1 = JSON.parseObject(responseStr);
@@ -495,8 +497,7 @@ public class RefreshService {
             PlcRulesModel model = JSON.parseObject(map2.get(0).get(str).toString(),PlcRulesModel.class);
 
 //                System.out.println("response data:"+ list1);
-            logger.info("请求成功，开始处理数据： " + new Date());
-//            for(PlcConfigModel model : list2) {
+//            logger.info("请求成功，开始处理数据： " + new Date());
             //更新rules
             GywlwWarningRules gywlwWarningRules = new GywlwWarningRules();
             gywlwWarningRules.setDeviceId(device.getDeviceId());
@@ -523,7 +524,7 @@ public class RefreshService {
             gywlwWarningRules.setRuleName(model.getRules_name());
             gywlwWarningRules.setRuleName2(model.getRules_name2());
 
-            logger.info("更新数据库...");
+//            logger.info("更新数据库...");
             //先删除已经存在的规则，再插入新规则
             if(gywlwWarningRules.getRuleId()!=null) {
                 gywlwWarningRulesMapper.deleteByPrimaryKey(gywlwWarningRules.getRuleId());
@@ -541,7 +542,7 @@ public class RefreshService {
 //            System.out.println(model.getTime());
                 badAdd(listForGpio,model,device);
             }
-            logger.info("批量插入数据开始");
+//            logger.info("批量插入数据开始");
             if(listForGpio.size() > 0){
                 gywlwHistoryDataForGPIOMapper.insertBatch(listForGpio);
             }
@@ -554,171 +555,187 @@ public class RefreshService {
     public void badAdd(List<GywlwHistoryDataForGPIO> listForGpio, GpioDataModel model,GywlwDevice device) throws ParseException {
         GywlwHistoryDataForGPIO gywlwHistoryDataForGPIO = new GywlwHistoryDataForGPIO();
         //#1
-//        gywlwHistoryDataForGPIO.setContent(model.getTimestamp());
         if(model.getGpio_1() != null) {
-            gywlwHistoryDataForGPIO.setTime(MyUtil.timeTransformToDateNo1000(model.getTimestamp()));
-            gywlwHistoryDataForGPIO.setDeviceId(device.getDeviceId());
-            gywlwHistoryDataForGPIO.setGpioId("1");
-            gywlwHistoryDataForGPIO.setValue(model.getGpio_1().getValue());
-            if (model.getGpio_1().getAlarm() != 0) {
-                String alarm = "";
-                if (model.getGpio_1().getAlarm1() != null) {
-                    alarm = alarm + model.getGpio_1().getAlarm1();
+            GywlwDeviceGpio gywlwDeviceGpio = gywlwDeviceGpioMapper.selectByDeviceIdAndGpioId(device.getDeviceId(),"gpio_1");
+            if(gywlwDeviceGpio != null) {
+                gywlwHistoryDataForGPIO.setTime(MyUtil.timeTransformToDateNo1000(model.getTimestamp()));
+                gywlwHistoryDataForGPIO.setDeviceId(device.getDeviceId());
+                gywlwHistoryDataForGPIO.setGpioId(gywlwDeviceGpio.getId());
+                gywlwHistoryDataForGPIO.setValue(model.getGpio_1().getValue());
+                if (model.getGpio_1().getAlarm() != 0) {
+                    String alarm = "";
+                    if (model.getGpio_1().getAlarm1() != null) {
+                        alarm = alarm + model.getGpio_1().getAlarm1();
+                    }
+                    if (model.getGpio_1().getAlarm2() != null) {
+                        alarm = alarm + " " + model.getGpio_1().getAlarm2();
+                    }
+                    gywlwHistoryDataForGPIO.setAlarm(alarm);
                 }
-                if (model.getGpio_1().getAlarm2() != null) {
-                    alarm = alarm + " " + model.getGpio_1().getAlarm2();
-                }
-                gywlwHistoryDataForGPIO.setAlarm(alarm);
+                listForGpio.add(gywlwHistoryDataForGPIO);
             }
-            listForGpio.add(gywlwHistoryDataForGPIO);
         }
 
         //#2
         if(model.getGpio_2() != null) {
-            gywlwHistoryDataForGPIO = new GywlwHistoryDataForGPIO();
-//        gywlwHistoryDataForGPIO.setContent(model.getTimestamp());
-            gywlwHistoryDataForGPIO.setTime(MyUtil.timeTransformToDateNo1000(model.getTimestamp()));
-            gywlwHistoryDataForGPIO.setDeviceId(device.getDeviceId());
-            gywlwHistoryDataForGPIO.setGpioId("2");
-            gywlwHistoryDataForGPIO.setValue(model.getGpio_2().getValue());
-            if (model.getGpio_2().getAlarm() != 0) {
-                String alarm = "";
-                if (model.getGpio_2().getAlarm1() != null) {
-                    alarm = alarm + model.getGpio_2().getAlarm1();
+            GywlwDeviceGpio gywlwDeviceGpio = gywlwDeviceGpioMapper.selectByDeviceIdAndGpioId(device.getDeviceId(),"gpio_2");
+            if(gywlwDeviceGpio != null) {
+                gywlwHistoryDataForGPIO = new GywlwHistoryDataForGPIO();
+                gywlwHistoryDataForGPIO.setTime(MyUtil.timeTransformToDateNo1000(model.getTimestamp()));
+                gywlwHistoryDataForGPIO.setDeviceId(device.getDeviceId());
+                gywlwHistoryDataForGPIO.setGpioId(gywlwDeviceGpio.getId());
+                gywlwHistoryDataForGPIO.setValue(model.getGpio_2().getValue());
+                if (model.getGpio_2().getAlarm() != 0) {
+                    String alarm = "";
+                    if (model.getGpio_2().getAlarm1() != null) {
+                        alarm = alarm + model.getGpio_2().getAlarm1();
+                    }
+                    if (model.getGpio_2().getAlarm2() != null) {
+                        alarm = alarm + " " + model.getGpio_2().getAlarm2();
+                    }
+                    gywlwHistoryDataForGPIO.setAlarm(alarm);
                 }
-                if (model.getGpio_2().getAlarm2() != null) {
-                    alarm = alarm + " " + model.getGpio_2().getAlarm2();
-                }
-                gywlwHistoryDataForGPIO.setAlarm(alarm);
+                listForGpio.add(gywlwHistoryDataForGPIO);
             }
-            listForGpio.add(gywlwHistoryDataForGPIO);
         }
 
 
         //#3
         if(model.getGpio_3() != null) {
-            gywlwHistoryDataForGPIO = new GywlwHistoryDataForGPIO();
-//        gywlwHistoryDataForGPIO.setContent(model.getTimestamp());
-            gywlwHistoryDataForGPIO.setTime(MyUtil.timeTransformToDateNo1000(model.getTimestamp()));
-            gywlwHistoryDataForGPIO.setDeviceId(device.getDeviceId());
-            gywlwHistoryDataForGPIO.setGpioId("3");
-            gywlwHistoryDataForGPIO.setValue(model.getGpio_3().getValue());
-            if (model.getGpio_3().getAlarm() != 0) {
-                String alarm = "";
-                if (model.getGpio_3().getAlarm1() != null) {
-                    alarm = alarm + model.getGpio_3().getAlarm1();
+            GywlwDeviceGpio gywlwDeviceGpio = gywlwDeviceGpioMapper.selectByDeviceIdAndGpioId(device.getDeviceId(),"gpio_3");
+            if(gywlwDeviceGpio != null) {
+                gywlwHistoryDataForGPIO = new GywlwHistoryDataForGPIO();
+                gywlwHistoryDataForGPIO.setTime(MyUtil.timeTransformToDateNo1000(model.getTimestamp()));
+                gywlwHistoryDataForGPIO.setDeviceId(device.getDeviceId());
+                gywlwHistoryDataForGPIO.setGpioId(gywlwDeviceGpio.getId());
+                gywlwHistoryDataForGPIO.setValue(model.getGpio_3().getValue());
+                if (model.getGpio_3().getAlarm() != 0) {
+                    String alarm = "";
+                    if (model.getGpio_3().getAlarm1() != null) {
+                        alarm = alarm + model.getGpio_3().getAlarm1();
+                    }
+                    if (model.getGpio_3().getAlarm2() != null) {
+                        alarm = alarm + " " + model.getGpio_3().getAlarm2();
+                    }
+                    gywlwHistoryDataForGPIO.setAlarm(alarm);
                 }
-                if (model.getGpio_3().getAlarm2() != null) {
-                    alarm = alarm + " " + model.getGpio_3().getAlarm2();
-                }
-                gywlwHistoryDataForGPIO.setAlarm(alarm);
+                listForGpio.add(gywlwHistoryDataForGPIO);
             }
-            listForGpio.add(gywlwHistoryDataForGPIO);
         }
 
         //#4
         if(model.getGpio_4() != null) {
-            gywlwHistoryDataForGPIO = new GywlwHistoryDataForGPIO();
-//        gywlwHistoryDataForGPIO.setContent(model.getTimestamp());
-            gywlwHistoryDataForGPIO.setTime(MyUtil.timeTransformToDateNo1000(model.getTimestamp()));
-            gywlwHistoryDataForGPIO.setDeviceId(device.getDeviceId());
-            gywlwHistoryDataForGPIO.setGpioId("4");
-            gywlwHistoryDataForGPIO.setValue(model.getGpio_4().getValue());
-            if (model.getGpio_4().getAlarm() != 0) {
-                String alarm = "";
-                if (model.getGpio_4().getAlarm1() != null) {
-                    alarm = alarm + model.getGpio_4().getAlarm1();
+            GywlwDeviceGpio gywlwDeviceGpio = gywlwDeviceGpioMapper.selectByDeviceIdAndGpioId(device.getDeviceId(),"gpio_4");
+            if(gywlwDeviceGpio != null) {
+                gywlwHistoryDataForGPIO = new GywlwHistoryDataForGPIO();
+                gywlwHistoryDataForGPIO.setTime(MyUtil.timeTransformToDateNo1000(model.getTimestamp()));
+                gywlwHistoryDataForGPIO.setDeviceId(device.getDeviceId());
+                gywlwHistoryDataForGPIO.setGpioId(gywlwDeviceGpio.getId());
+                gywlwHistoryDataForGPIO.setValue(model.getGpio_4().getValue());
+                if (model.getGpio_4().getAlarm() != 0) {
+                    String alarm = "";
+                    if (model.getGpio_4().getAlarm1() != null) {
+                        alarm = alarm + model.getGpio_4().getAlarm1();
+                    }
+                    if (model.getGpio_4().getAlarm2() != null) {
+                        alarm = alarm + " " + model.getGpio_4().getAlarm2();
+                    }
+                    gywlwHistoryDataForGPIO.setAlarm(alarm);
                 }
-                if (model.getGpio_4().getAlarm2() != null) {
-                    alarm = alarm + " " + model.getGpio_4().getAlarm2();
-                }
-                gywlwHistoryDataForGPIO.setAlarm(alarm);
+                listForGpio.add(gywlwHistoryDataForGPIO);
             }
-            listForGpio.add(gywlwHistoryDataForGPIO);
         }
 
         //#5
         if(model.getGpio_5() != null) {
-            gywlwHistoryDataForGPIO = new GywlwHistoryDataForGPIO();
-//        gywlwHistoryDataForGPIO.setContent(model.getTimestamp());
-            gywlwHistoryDataForGPIO.setTime(MyUtil.timeTransformToDateNo1000(model.getTimestamp()));
-            gywlwHistoryDataForGPIO.setDeviceId(device.getDeviceId());
-            gywlwHistoryDataForGPIO.setGpioId("5");
-            gywlwHistoryDataForGPIO.setValue(model.getGpio_5().getValue());
-            if (model.getGpio_5().getAlarm() != 0) {
-                String alarm = "";
-                if (model.getGpio_5().getAlarm1() != null) {
-                    alarm = alarm + model.getGpio_5().getAlarm1();
+            GywlwDeviceGpio gywlwDeviceGpio = gywlwDeviceGpioMapper.selectByDeviceIdAndGpioId(device.getDeviceId(),"gpio_5");
+            if(gywlwDeviceGpio != null) {
+                gywlwHistoryDataForGPIO = new GywlwHistoryDataForGPIO();
+                gywlwHistoryDataForGPIO.setTime(MyUtil.timeTransformToDateNo1000(model.getTimestamp()));
+                gywlwHistoryDataForGPIO.setDeviceId(device.getDeviceId());
+                gywlwHistoryDataForGPIO.setGpioId(gywlwDeviceGpio.getId());
+                gywlwHistoryDataForGPIO.setValue(model.getGpio_5().getValue());
+                if (model.getGpio_5().getAlarm() != 0) {
+                    String alarm = "";
+                    if (model.getGpio_5().getAlarm1() != null) {
+                        alarm = alarm + model.getGpio_5().getAlarm1();
+                    }
+                    if (model.getGpio_5().getAlarm2() != null) {
+                        alarm = alarm + " " + model.getGpio_5().getAlarm2();
+                    }
+                    gywlwHistoryDataForGPIO.setAlarm(alarm);
                 }
-                if (model.getGpio_5().getAlarm2() != null) {
-                    alarm = alarm + " " + model.getGpio_5().getAlarm2();
-                }
-                gywlwHistoryDataForGPIO.setAlarm(alarm);
+                listForGpio.add(gywlwHistoryDataForGPIO);
             }
-            listForGpio.add(gywlwHistoryDataForGPIO);
         }
 
         //#6
         if(model.getGpio_6() != null) {
-            gywlwHistoryDataForGPIO = new GywlwHistoryDataForGPIO();
-//        gywlwHistoryDataForGPIO.setContent(model.getTimestamp());
-            gywlwHistoryDataForGPIO.setTime(MyUtil.timeTransformToDateNo1000(model.getTimestamp()));
-            gywlwHistoryDataForGPIO.setDeviceId(device.getDeviceId());
-            gywlwHistoryDataForGPIO.setGpioId("6");
-            gywlwHistoryDataForGPIO.setValue(model.getGpio_6().getValue());
-            if (model.getGpio_6().getAlarm() != 0) {
-                String alarm = "";
-                if (model.getGpio_6().getAlarm1() != null) {
-                    alarm = alarm + model.getGpio_6().getAlarm1();
+            GywlwDeviceGpio gywlwDeviceGpio = gywlwDeviceGpioMapper.selectByDeviceIdAndGpioId(device.getDeviceId(),"gpio_6");
+            if(gywlwDeviceGpio != null) {
+                gywlwHistoryDataForGPIO = new GywlwHistoryDataForGPIO();
+                gywlwHistoryDataForGPIO.setTime(MyUtil.timeTransformToDateNo1000(model.getTimestamp()));
+                gywlwHistoryDataForGPIO.setDeviceId(device.getDeviceId());
+                gywlwHistoryDataForGPIO.setGpioId(gywlwDeviceGpio.getId());
+                gywlwHistoryDataForGPIO.setValue(model.getGpio_6().getValue());
+                if (model.getGpio_6().getAlarm() != 0) {
+                    String alarm = "";
+                    if (model.getGpio_6().getAlarm1() != null) {
+                        alarm = alarm + model.getGpio_6().getAlarm1();
+                    }
+                    if (model.getGpio_6().getAlarm2() != null) {
+                        alarm = alarm + " " + model.getGpio_6().getAlarm2();
+                    }
+                    gywlwHistoryDataForGPIO.setAlarm(alarm);
                 }
-                if (model.getGpio_6().getAlarm2() != null) {
-                    alarm = alarm + " " + model.getGpio_6().getAlarm2();
-                }
-                gywlwHistoryDataForGPIO.setAlarm(alarm);
+                listForGpio.add(gywlwHistoryDataForGPIO);
             }
-            listForGpio.add(gywlwHistoryDataForGPIO);
         }
 
         //#7
         if(model.getGpio_7() != null) {
-            gywlwHistoryDataForGPIO = new GywlwHistoryDataForGPIO();
-//        gywlwHistoryDataForGPIO.setContent(model.getTimestamp());
-            gywlwHistoryDataForGPIO.setTime(MyUtil.timeTransformToDateNo1000(model.getTimestamp()));
-            gywlwHistoryDataForGPIO.setDeviceId(device.getDeviceId());
-            gywlwHistoryDataForGPIO.setValue(model.getGpio_7().getValue());
-            gywlwHistoryDataForGPIO.setGpioId("7");
-            if (model.getGpio_7().getAlarm() != 0) {
-                String alarm = "";
-                if (model.getGpio_7().getAlarm1() != null) {
-                    alarm = alarm + model.getGpio_7().getAlarm1();
+            GywlwDeviceGpio gywlwDeviceGpio = gywlwDeviceGpioMapper.selectByDeviceIdAndGpioId(device.getDeviceId(),"gpio_7");
+            if(gywlwDeviceGpio != null) {
+                gywlwHistoryDataForGPIO = new GywlwHistoryDataForGPIO();
+                gywlwHistoryDataForGPIO.setTime(MyUtil.timeTransformToDateNo1000(model.getTimestamp()));
+                gywlwHistoryDataForGPIO.setDeviceId(device.getDeviceId());
+                gywlwHistoryDataForGPIO.setValue(model.getGpio_7().getValue());
+                gywlwHistoryDataForGPIO.setGpioId(gywlwDeviceGpio.getId());
+                if (model.getGpio_7().getAlarm() != 0) {
+                    String alarm = "";
+                    if (model.getGpio_7().getAlarm1() != null) {
+                        alarm = alarm + model.getGpio_7().getAlarm1();
+                    }
+                    if (model.getGpio_7().getAlarm2() != null) {
+                        alarm = alarm + " " + model.getGpio_7().getAlarm2();
+                    }
+                    gywlwHistoryDataForGPIO.setAlarm(alarm);
                 }
-                if (model.getGpio_7().getAlarm2() != null) {
-                    alarm = alarm + " " + model.getGpio_7().getAlarm2();
-                }
-                gywlwHistoryDataForGPIO.setAlarm(alarm);
+                listForGpio.add(gywlwHistoryDataForGPIO);
             }
-            listForGpio.add(gywlwHistoryDataForGPIO);
         }
 
         //#8
         if(model.getGpio_8() != null) {
-            gywlwHistoryDataForGPIO = new GywlwHistoryDataForGPIO();
-//        gywlwHistoryDataForGPIO.setContent(model.getTimestamp());
-            gywlwHistoryDataForGPIO.setTime(MyUtil.timeTransformToDateNo1000(model.getTimestamp()));
-            gywlwHistoryDataForGPIO.setDeviceId(device.getDeviceId());
-            gywlwHistoryDataForGPIO.setValue(model.getGpio_8().getValue());
-            gywlwHistoryDataForGPIO.setGpioId("8");
-            if (model.getGpio_8().getAlarm() != 0) {
-                String alarm = "";
-                if (model.getGpio_8().getAlarm1() != null) {
-                    alarm = alarm + model.getGpio_8().getAlarm1();
+            GywlwDeviceGpio gywlwDeviceGpio = gywlwDeviceGpioMapper.selectByDeviceIdAndGpioId(device.getDeviceId(),"gpio_8");
+            if(gywlwDeviceGpio != null) {
+                gywlwHistoryDataForGPIO = new GywlwHistoryDataForGPIO();
+                gywlwHistoryDataForGPIO.setTime(MyUtil.timeTransformToDateNo1000(model.getTimestamp()));
+                gywlwHistoryDataForGPIO.setDeviceId(device.getDeviceId());
+                gywlwHistoryDataForGPIO.setValue(model.getGpio_8().getValue());
+                gywlwHistoryDataForGPIO.setGpioId(gywlwDeviceGpio.getId());
+                if (model.getGpio_8().getAlarm() != 0) {
+                    String alarm = "";
+                    if (model.getGpio_8().getAlarm1() != null) {
+                        alarm = alarm + model.getGpio_8().getAlarm1();
+                    }
+                    if (model.getGpio_8().getAlarm2() != null) {
+                        alarm = alarm + " " + model.getGpio_8().getAlarm2();
+                    }
+                    gywlwHistoryDataForGPIO.setAlarm(alarm);
                 }
-                if (model.getGpio_8().getAlarm2() != null) {
-                    alarm = alarm + " " + model.getGpio_8().getAlarm2();
-                }
-                gywlwHistoryDataForGPIO.setAlarm(alarm);
+                listForGpio.add(gywlwHistoryDataForGPIO);
             }
-            listForGpio.add(gywlwHistoryDataForGPIO);
         }
     }
 
@@ -745,8 +762,10 @@ public class RefreshService {
                     continue;
                 }
                 gywlwHistoryItem.setItemName(reg);
-                gywlwHistoryItem.setRegId(gywlwRegInfoMapper.selectByRegAddress(reg).getRegId());
+                GywlwRegInfo regInfo = gywlwRegInfoMapper.selectByRegAddress(reg);
+                gywlwHistoryItem.setRegId(regInfo.getRegId());
                 gywlwHistoryItem.setItemAddress(reg);
+                gywlwHistoryItem.setItemAlias(regInfo.getRegAlias());
                 Map map1 = (JSONObject) JSON.parse(map.get(reg).toString());
                 gywlwHistoryItem.setItemValue(new Double((Integer)map1.get("value")));
                 if((int) map1.get("alarm") == 0){
@@ -766,11 +785,11 @@ public class RefreshService {
             }
         }
     //    System.out.println("待插入数据：" + MyUtil.response(0,historyItemList));
-        logger.info("批量插入数据start...");
+//        logger.info("批量插入数据start...");
         if(historyItemList.size() > 0) {
             gywlwHistoryItemMapper.insertBatch(historyItemList);
         }
-        logger.info("批量插入数据end !");
+//        logger.info("批量插入数据end !");
     }
 
     public synchronized void handleByThread(LinkedList<Map> list1, List<String> regList, int threadNum)
@@ -791,7 +810,7 @@ public class RefreshService {
                     // HandleThread thread = new HandleThread("线程[" + (i + 1) +"] ",data, i * tl, end > length ? length : end, latch);
                     // thread.start();
                     // 实现Runnable启动线程
-                    logger.info("线程[" + (i + 1) + "] " + "  start: " + start + "   end:  " + end);
+//                    logger.info("线程[" + (i + 1) + "] " + "  start: " + start + "   end:  " + end);
                     RunnableThread thread = new RunnableThread("线程[" + (i + 1) + "] ",
                             list1, start, end, latch, regList);
                     Thread runable = new Thread(thread);
@@ -825,9 +844,9 @@ public class RefreshService {
 
         public void run() {
             // 这里处理数据
-            logger.info("start: " + start + " ||  end: " + end);
+//            logger.info("start: " + start + " ||  end: " + end);
             List subList = data.subList(start, end);  //[start,end)
-            System.out.println(threadName + "--" + data.size() + "--" + start + "--" + end + "--");
+//            System.out.println(threadName + "--" + data.size() + "--" + start + "--" + end + "--");
             // 单个线程中的数据
             try {
                 handlerForPlc(subList, regList);
@@ -850,7 +869,7 @@ public class RefreshService {
             gywlwDevice.setLastConnected(MyUtil.timeTransformToDateNo1000(map.get("timestamp").toString()));
             break;//只取最新一条
         }
-        logger.info("更新数据库...");
+//        logger.info("更新数据库...");
         gywlwDeviceMapper.updateByPrimaryKeySelective(gywlwDevice);
     }
 
@@ -867,8 +886,7 @@ public class RefreshService {
             jsonObject.put("idList",requestList);
             jsonObject.put("timestamp",timestamp);
             System.out.println("请求参数: " + jsonObject);
-            logger.info("handlerForPlcParams准备工作结束，发送psot请求： " + new Date());
-
+//            logger.info("handlerForPlcParams准备工作结束，发送psot请求： " + new Date());
             String responseStr = null;
             try {
                 responseStr = HttpsTest.postForm(jsonObject,1);
@@ -878,16 +896,14 @@ public class RefreshService {
             if(responseStr.equals("0")){
                 continue;
             }
-            System.out.println("待同步数据 : "+ responseStr);
+//            System.out.println("待同步数据 : "+ responseStr);
             //handle response
             JSONObject json = new JSONObject();
             Map<String, Object> map1 = JSON.parseObject(responseStr);
             List<Map> map2 = JSON.parseArray(map1.get("result_data").toString(),Map.class);
             PlcConfigModel model = JSON.parseObject(map2.get(0).get(str).toString(),PlcConfigModel.class);
-
-//                System.out.println("response data:"+ list1);
-            logger.info("请求成功，开始处理数据： " + new Date());
-//            for(PlcConfigModel model : list2) {
+//            System.out.println("response data:"+ list1);
+//            logger.info("请求成功，开始处理数据： " + new Date());
                 //更新plc中的subdeviceid
                 GywlwPlcInfo gywlwPlcInfo = new GywlwPlcInfo();
                 gywlwPlcInfo.setId(gywlwPlcInfoMapper.selectByDeviceId1(device.getDeviceId()).getId());
@@ -911,7 +927,7 @@ public class RefreshService {
                     gywlwRegInfo.setFieldType(Integer.parseInt(model.getField_type()));
                 }
 
-                logger.info("更新数据库...");
+//                logger.info("更新数据库...");
                 if(gywlwPlcInfo.getSubdeviceId()!=null) {
                     gywlwPlcInfoMapper.updateByPrimaryKeySelective(gywlwPlcInfo);
                 }

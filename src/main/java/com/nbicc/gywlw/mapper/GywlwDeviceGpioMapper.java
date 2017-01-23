@@ -2,10 +2,13 @@ package com.nbicc.gywlw.mapper;
 
 import com.nbicc.gywlw.Model.GywlwDeviceGpio;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 @Mapper
 public interface GywlwDeviceGpioMapper {
-    int deleteByPrimaryKey(Integer id);
+    int deleteByPrimaryKey(String id);
 
     int deleteByDeviceId(String deviceId);
 
@@ -13,7 +16,12 @@ public interface GywlwDeviceGpioMapper {
 
     int insertSelective(GywlwDeviceGpio record);
 
-    GywlwDeviceGpio selectByPrimaryKey(Integer id);
+    GywlwDeviceGpio selectByPrimaryKey(String id);
+
+    GywlwDeviceGpio selectByDeviceIdAndGpioId(@Param("deviceId")String deviceId,
+                                              @Param("gpioId")String gpioId);
+
+    List<GywlwDeviceGpio> selectByDeviceId(String deviceId);
 
     int updateByPrimaryKeySelective(GywlwDeviceGpio record);
 

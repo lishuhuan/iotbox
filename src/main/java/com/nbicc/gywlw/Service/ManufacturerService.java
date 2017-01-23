@@ -1,10 +1,8 @@
 package com.nbicc.gywlw.Service;
 
-import com.nbicc.gywlw.Model.GywlwDevice;
-import com.nbicc.gywlw.Model.GywlwHistoryItem;
-import com.nbicc.gywlw.Model.GywlwUser;
-import com.nbicc.gywlw.Model.GywlwUserAdminGroup;
+import com.nbicc.gywlw.Model.*;
 import com.nbicc.gywlw.mapper.GywlwDeviceMapper;
+import com.nbicc.gywlw.mapper.GywlwHistoryDataForGPIOMapper;
 import com.nbicc.gywlw.mapper.GywlwHistoryItemMapper;
 import com.nbicc.gywlw.mapper.GywlwUserMapper;
 import com.nbicc.gywlw.util.MyUtil;
@@ -36,6 +34,9 @@ public class ManufacturerService {
 
 	@Autowired
 	private RefreshService refreshService;
+
+	@Autowired
+	private GywlwHistoryDataForGPIOMapper gywlwHistoryDataForGPIOMapper;
 	
 	
 	public List<GywlwUser> searchUser(String factoryId,int level,String name){
@@ -47,13 +48,24 @@ public class ManufacturerService {
 	}
 	
 	public List<GywlwHistoryItem> getHistoryData(String deviceId){
-		logger.info("开始同步数据： " + new Date());
+//		logger.info("开始同步数据： " + new Date());
 		refreshService.refresh();
-		logger.info("同步数据完成，开始查表： " + new Date());
+//		logger.info("同步数据完成，开始查表： " + new Date());
 		List<GywlwHistoryItem> list = gywlwHistoryItemMapper.getHistoryData(deviceId);
-		logger.info("查表结束，返回数据： " + new Date());
+		List<GywlwHistoryDataForGPIO> list1 = gywlwHistoryDataForGPIOMapper.getLatestData(deviceId);
+		if(list1.size()>0){
+			for(GywlwHistoryDataForGPIO gpio : list1){
+				GywlwHistoryItem historyItem = new GywlwHistoryItem();
+				historyItem.setDeviceId(deviceId);
+				historyItem.setRegId(gpio.getGpioId());
+				historyItem.setItemValue(gpio.getValue() * 1.0);
+				historyItem.setItemId(gpio.getId());
+				historyItem.setItemTime(gpio.getTime());
+				list.add(historyItem);
+			}
+		}
+//		logger.info("查表结束，返回数据： " + new Date());
 		return list;
-
 	}
 	
 	public List<GywlwHistoryItem> getDeviceAlarmlist(String startTime,String endTime,String deviceId){

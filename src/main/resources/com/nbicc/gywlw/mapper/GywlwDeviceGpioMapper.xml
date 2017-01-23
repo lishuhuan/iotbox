@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.nbicc.gywlw.mapper.GywlwDeviceGpioMapper" >
   <resultMap id="BaseResultMap" type="com.nbicc.gywlw.Model.GywlwDeviceGpio" >
-    <id column="id" property="id" jdbcType="INTEGER" />
+    <id column="id" property="id" jdbcType="VARCHAR" />
     <result column="field_address" property="fieldAddress" jdbcType="VARCHAR" />
     <result column="field_name" property="fieldName" jdbcType="VARCHAR" />
     <result column="field_name2" property="fieldName2" jdbcType="VARCHAR" />
@@ -15,15 +15,27 @@
     id, field_address, field_name, field_name2, field_functioncode, field_attach, field_rw, 
     device_id
   </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
     <include refid="Base_Column_List" />
     from gywlw_device_gpio
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=VARCHAR}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+  <select id="selectByDeviceIdAndGpioId" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from gywlw_device_gpio
+    where device_id = #{deviceId,jdbcType=VARCHAR} and field_address = #{gpioId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByDeviceId" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from gywlw_device_gpio
+    where device_id = #{deviceId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
     delete from gywlw_device_gpio
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=VARCHAR}
   </delete>
   <delete id="deleteByDeviceId" parameterType="java.lang.String" >
     delete from gywlw_device_gpio
@@ -33,7 +45,7 @@
     insert into gywlw_device_gpio (id, field_address, field_name, 
       field_name2, field_functioncode, field_attach, 
       field_rw, device_id)
-    values (#{id,jdbcType=INTEGER}, #{fieldAddress,jdbcType=VARCHAR}, #{fieldName,jdbcType=VARCHAR}, 
+    values (#{id,jdbcType=VARCHAR}, #{fieldAddress,jdbcType=VARCHAR}, #{fieldName,jdbcType=VARCHAR},
       #{fieldName2,jdbcType=VARCHAR}, #{fieldFunctioncode,jdbcType=VARCHAR}, #{fieldAttach,jdbcType=VARCHAR}, 
       #{fieldRw,jdbcType=INTEGER}, #{deviceId,jdbcType=VARCHAR})
   </insert>
@@ -67,7 +79,7 @@
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
-        #{id,jdbcType=INTEGER},
+        #{id,jdbcType=VARCHAR},
       </if>
       <if test="fieldAddress != null" >
         #{fieldAddress,jdbcType=VARCHAR},
@@ -117,7 +129,7 @@
         device_id = #{deviceId,jdbcType=VARCHAR},
       </if>
     </set>
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.nbicc.gywlw.Model.GywlwDeviceGpio" >
     update gywlw_device_gpio
@@ -128,6 +140,6 @@
       field_attach = #{fieldAttach,jdbcType=VARCHAR},
       field_rw = #{fieldRw,jdbcType=INTEGER},
       device_id = #{deviceId,jdbcType=VARCHAR}
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=VARCHAR}
   </update>
 </mapper>
