@@ -3,6 +3,7 @@ package com.nbicc.gywlw.API;
 import com.alibaba.fastjson.JSONObject;
 import com.nbicc.gywlw.Model.GywlwHistoryItem;
 import com.nbicc.gywlw.Service.ApiService;
+import com.nbicc.gywlw.Service.ManufacturerService;
 import com.nbicc.gywlw.Service.ProjectService;
 import com.nbicc.gywlw.util.MyUtil;
 import org.slf4j.Logger;
@@ -29,6 +30,8 @@ public class BaseInfoAPI {
     private ApiService apiService;
     @Autowired
     private ProjectService projectService;
+    @Autowired
+    private ManufacturerService manufacturerService;
 
     //返回该用户下所拥有的盒子的唯一标识码、当前工作网络模式、固件版本号、硬件信息（盒子型号）
     @RequestMapping(path = {"/deviceinfo"}, method = {RequestMethod.POST})
@@ -72,12 +75,7 @@ public class BaseInfoAPI {
                                       @RequestParam("order_code")String orderCode,
                                       @RequestParam("order_num")String orderNum){
         try {
-            String str = apiService.uploadOrderInfo(token,deviceId,orderCode,orderNum);
-            if("ok".equals(str)) {
-                return MyUtil.response(0, "上传订单信息成功！");
-            }else{
-                return MyUtil.response(1,str);
-            }
+            return apiService.uploadOrderInfo(token,deviceId,orderCode,orderNum);
         }catch (Exception e){
             logger.error("上传订单信息异常 " + e.getMessage());
             return MyUtil.response(-1, "上传订单信息异常");
@@ -110,6 +108,38 @@ public class BaseInfoAPI {
         } catch (ParseException e) {
             logger.error("查询数据项历史数据出错" + e.getMessage());
             return MyUtil.response(1, "查询数据项历史数据出错!");
+        }
+    }
+
+    @RequestMapping(path = {"/rules"}, method = {RequestMethod.POST})
+    @ResponseBody
+    public JSONObject rules(@RequestParam("token") String token,
+                            @RequestParam("device_id") String deviceId){
+        try{
+            return apiService.getRules(token,deviceId);
+        } catch (Exception e) {
+            logger.error("查询规则数据出错" + e.getMessage());
+            return MyUtil.response(1, "查询规则数据出错!");
+        }
+    }
+
+    @RequestMapping(path = { "/devicealarmlist" }, method = { RequestMethod.POST })
+    @ResponseBody
+    public JSONObject deviceAlarmlist(@RequestParam("token") String token,
+                                      @RequestParam(value = "start_time",defaultValue = "0") String startTime,
+                                      @RequestParam(value = "end_time",defaultValue = "2480036920") String endTime,
+                                      @RequestParam(value = "device_id") String deviceId,
+                                      @RequestParam(value = "severity",defaultValue = "ALL")String severity) {
+        try{
+            JSONObject result = apiService.checkAdminAndDevice(token,deviceId);
+            if(result == null) {
+                List<GywlwHistoryItem> list = manufacturerService.getDeviceAlarmlist(startTime, endTime, deviceId, severity);
+                return MyUtil.response(0, list);
+            }
+            return result;
+        }catch (Exception e){
+            logger.error("获取plc告警失败" + e.getMessage());
+            return MyUtil.response(1, "获取plc告警失败");
         }
     }
 

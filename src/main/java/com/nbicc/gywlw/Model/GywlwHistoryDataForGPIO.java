@@ -19,6 +19,56 @@ public class GywlwHistoryDataForGPIO {
 
     private String variableName;
 
+    private String ruleName;
+
+    private String ruleName2;
+
+    private String ruleCondition;
+
+    private String ruleField;
+
+    private String ruleAlarmlevel;
+
+    public String getRuleName() {
+        return ruleName;
+    }
+
+    public void setRuleName(String ruleName) {
+        this.ruleName = ruleName;
+    }
+
+    public String getRuleName2() {
+        return ruleName2;
+    }
+
+    public void setRuleName2(String ruleName2) {
+        this.ruleName2 = ruleName2;
+    }
+
+    public String getRuleCondition() {
+        return ruleCondition;
+    }
+
+    public void setRuleCondition(String ruleCondition) {
+        this.ruleCondition = ruleCondition;
+    }
+
+    public String getRuleField() {
+        return ruleField;
+    }
+
+    public void setRuleField(String ruleField) {
+        this.ruleField = ruleField;
+    }
+
+    public String getRuleAlarmlevel() {
+        return ruleAlarmlevel;
+    }
+
+    public void setRuleAlarmlevel(String ruleAlarmlevel) {
+        this.ruleAlarmlevel = ruleAlarmlevel;
+    }
+
     public String getVariableName() {
         return variableName;
     }

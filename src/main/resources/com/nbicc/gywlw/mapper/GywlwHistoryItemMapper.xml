@@ -13,6 +13,7 @@
     <result column="item_time" property="itemTime" jdbcType="TIMESTAMP" />
     <result column="severity" property="severity" jdbcType="INTEGER" />
     <result column="item_content" property="itemAlias" jdbcType="VARCHAR" />
+
   </resultMap>
   <resultMap id="BaseResultMap1" type="com.nbicc.gywlw.Model.GywlwHistoryItem" >
     <id column="item_id" property="itemId" jdbcType="INTEGER" />
@@ -29,8 +30,13 @@
     <result column="item_value" property="itemValue" jdbcType="DOUBLE" />
     <result column="item_time" property="itemTime" jdbcType="TIMESTAMP" />
     <result column="rule_id" property="ruleId" jdbcType="INTEGER" />
-    <result column="operator" property="operator" jdbcType="VARCHAR" />
-    <result column="operand" property="operand" jdbcType="DOUBLE" />
+    <result column="rule_name" property="ruleName" jdbcType="VARCHAR" />
+    <result column="rule_name2" property="ruleName2" jdbcType="VARCHAR" />
+    <result column="rule_1" property="rule1" jdbcType="INTEGER" />
+    <result column="rule_2" property="rule2" jdbcType="INTEGER" />
+    <result column="rule_condition" property="ruleCondition" jdbcType="INTEGER" />
+    <result column="rule_field" property="ruleField" jdbcType="VARCHAR" />
+    <result column="rule_alarmlevel" property="ruleAlarmlevel" jdbcType="VARCHAR" />
   </resultMap>
   <resultMap id="BaseResultMap3" type="com.nbicc.gywlw.Model.GywlwHistoryItem" >
     <id column="item_id" property="itemId" jdbcType="INTEGER" />
@@ -62,7 +68,7 @@
   </select>
   <select id="selectwarning" resultMap="BaseResultMap1" parameterType="com.nbicc.gywlw.Model.GywlwHistoryItem" >
     select
-    a.item_id,a.reg_id,a.plc_name,a.device_name,a.item_type,a.item_content,a.item_time,a.variable_name,a.severity,a.item_name,a.item_alias,a.rule_id,b.rule_name,b.operator,b.operand
+    a.item_id,a.reg_id,a.plc_name,a.device_name,a.item_type,a.item_content,a.item_time,a.variable_name,a.severity,a.item_name,a.item_alias,a.rule_id,b.rule_name,b.rule_condition,b.rule_field,b.rule_alarmlevel,b.rule_name2,b.rule_1,b.rule_2
     from gywlw_history_item a,gywlw_warning_rules b
     <if test="variableName != 'ALL'">
     where a.item_time BETWEEN #{startTime,jdbcType=TIMESTAMP} AND #{endTime,jdbcType=TIMESTAMP} and a.rule_id = b.rule_id and a.variable_name = #{variableName,jdbcType=VARCHAR} AND a.project_id = #{projectId,jdbcType=VARCHAR}
@@ -307,12 +313,18 @@
    		GROUP BY item_name
   </select>
   
-  <select id="getDeviceAlarmlist" resultMap="BaseResultMap" >
-   		SELECT item_id,device_name,item_name,item_alias,item_type,item_value,item_time,variable_name,severity,item_content
-        from gywlw_history_item where device_id=#{deviceId}
-   		and item_time between #{startTime} and #{endTime}
-        and severity in (1,2)
-        ORDER BY item_time DESC
+  <select id="getDeviceAlarmlist" resultMap="BaseResultMap1" >
+   		SELECT a.*,b.*
+        from gywlw_history_item a
+        LEFT JOIN gywlw_warning_rules b
+        ON a.rule_id = b.rule_id
+        where a.device_id=#{deviceId}
+   		and a.item_time between #{startTime} and #{endTime}
+        and a.severity in (0,1,2,3,4,5,6)
+        <if test="severity != 'ALL'">
+        and a.severity = #{severity,jdbcType=VARCHAR}
+        </if>
+        ORDER BY a.item_time DESC
   </select>
   <select id="getDataForTrend" resultMap="BaseResultMap" >
     SELECT item_time,item_value

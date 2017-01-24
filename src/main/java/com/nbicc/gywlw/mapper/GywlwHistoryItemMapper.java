@@ -34,8 +34,9 @@ public interface GywlwHistoryItemMapper {
     GywlwHistoryItem getAlarmDetail(@Param("itemId") String itemId);
     
     List<GywlwHistoryItem> getDeviceAlarmlist(@Param("startTime") String startTime,
-                                                     @Param("endTime") String endTime,
-                                                     @Param("deviceId") String deviceId);
+                                              @Param("endTime") String endTime,
+                                              @Param("deviceId") String deviceId,
+                                              @Param("severity")String severity);
 
     List<GywlwHistoryItem> getDataForTrend(@Param("regId")String regId,
                                                   @Param("startTime") Date startTime,

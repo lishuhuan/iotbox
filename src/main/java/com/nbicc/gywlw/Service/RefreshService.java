@@ -56,7 +56,6 @@ public class RefreshService {
 
     //PLC，默认一个物联网盒子上连接的plc都是同一型号(目前是一对一)
     public void refreshDataForPlc(){
-        logger.info("同步plc数据准备工作： " + new Date());
         JedisPool pool = RedisAPI.getPool();
         Jedis jedis = pool.getResource();
         List<GywlwDevice> devices = gywlwDeviceMapper.selectAll();
@@ -76,12 +75,18 @@ public class RefreshService {
                         if(plcInfo.getSubdeviceId() == null){
                             continue;
                         }
+                        logger.info("同步plc数据准备工作： " + new Date());
                         //redis保存最近一次的更新时间
                         redisKey = plcInfo.getSubdeviceId();
                         if(jedis.get(redisKey)!=null){
                             timestamp = Long.parseLong(jedis.get(plcInfo.getSubdeviceId()));
                         }else{
-                            timestamp = System.currentTimeMillis() - 1*86400000L; //当前时间减1天
+                            GywlwHistoryItem historyItem = gywlwHistoryItemMapper.getLastTimeByPlcId(plcInfo.getId());
+                            if(historyItem == null){
+                                timestamp = System.currentTimeMillis() - 86400L; //当前时间减1天
+                            }else{
+                                timestamp = historyItem.getItemTime().getTime();
+                            }
                         }
                         deviceIdList.add(plcInfo.getSubdeviceId());
                         sdkKey = plcInfo.getContent(); //content保存着sdkkey
@@ -130,7 +135,7 @@ public class RefreshService {
                         //多线程
                         LinkedList<Map> linkedList = new LinkedList<>();
                         linkedList.addAll(list1);
-                        handleByThread(linkedList,regList,15);  //同时处理的线程数量多少最高效？
+                        handleByThread(linkedList,regList,new GywlwDevice(),0,15);  //0表示handle plc
                     } catch (ParseException e) {
                         e.printStackTrace();
                     } catch (CloneNotSupportedException e) {
@@ -145,7 +150,6 @@ public class RefreshService {
 
     //GPIO
     public void refreshDataForGpio() {
-        logger.info("同步gpio数据准备工作:..........");
         List<GywlwDevice> devices = gywlwDeviceMapper.selectAll();
         if(devices.size() != 0){
             for (GywlwDevice device : devices) {
@@ -153,6 +157,7 @@ public class RefreshService {
                 if(gpioId == null){
                     continue;
                 }
+                logger.info("同步gpio数据准备工作:..........");
                 Long timestamp;
                 JedisPool pool = RedisAPI.getPool();
                 Jedis jedis = pool.getResource();
@@ -203,7 +208,20 @@ public class RefreshService {
                 if(list1.size() != 0){
                     //储存该设备最新一次更新的时间戳
                     jedis.set(device.getGpioId(),list1.get(0).getTimestamp());
-                    handler(list1,device,gpioList);
+                    //单线程
+//                    handler(list1,device,gpioList);
+                    //多线程
+                    LinkedList<GpioDataModel> linkedList = new LinkedList<>();
+                    linkedList.addAll(list1);
+                    try {
+                        handleByThread(linkedList,gpioList,device,1,15);  //0表示handle plc
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    } catch (CloneNotSupportedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
@@ -219,7 +237,6 @@ public class RefreshService {
     }
 
     public void refreshConfigParams(){
-        logger.info("同步设备配置(ConfigParams)的准备工作.....................");
         List<GywlwDevice> devices = gywlwDeviceMapper.selectAll();
         if(devices.size() != 0) {
             for (GywlwDevice device : devices) {
@@ -227,6 +244,7 @@ public class RefreshService {
                 if (gpioId == null) {
                     continue;
                 }
+                logger.info("同步设备配置(ConfigParams)的准备工作.....................");
                 Long timestamp = device.getLastConnected().getTime();
                 List<String> requestList = new ArrayList<>();
                 requestList.add("hardware_edition");
@@ -325,30 +343,34 @@ public class RefreshService {
                 List<Map> list1 = JSON.parseArray(map1.get("result_data").toString(), Map.class);
 //                System.out.println("返回数据:  "+list1.toString());
 //                logger.info("请求成功，开始处理数据： " + new Date());
-                if(list1.size() > 0){
+                if(list1.size() > 0) {
 //                    logger.info("开始解析：-----");
-                    if(map1.get(requestData) == null){
-                        continue;
-                    }
-                    String[] strList = null;
-                    for(Map map : list1){
-                        strList = map.get(requestData).toString().split(",");
-                        break;
-                    }
-//                    System.out.println(requestData + "   " + strList[0] + "   " + strList[1]);
-                    if(strList.length > 0) {
-                        if(mark == 0) {
-                            handlerForPlcParams(strList, device);
-                        }else if(mark == 1){
-                            handlerForPlcRules(strList,device);
-                        }else if(mark == 2){
-                            handlerForGpioParams(strList,device);
-                        }else if(mark == 3){
-                            handlerForGpioRules(strList,device);
+                        String[] strList = null;
+                        for (Map map : list1) {
+                            if(map.get(requestData) == null){
+                                continue;
+                            }
+                            strList = map.get(requestData).toString().split(",");
+                            break;
                         }
-                    }
-                }
+//                    System.out.println(requestData + "   " + strList[0] + "   " + strList[1]);
+                        if (!"".equals(strList[0])) {
+                            if (mark == 0) {
+                                handlerForPlcParams(strList, device);
+                            } else if (mark == 1) {
+                                handlerForPlcRules(strList, device);
+                            } else if (mark == 2) {
+                                handlerForGpioParams(strList, device);
+                            } else if (mark == 3) {
+                                handlerForGpioRules(strList, device);
+                            }
+                        } else {
+                            if (mark == 2) {
+                                handlerForGpioParams(strList, device); //无论如何都要运行
+                            }
+                        }
 
+                }
             }
         }
     }
@@ -410,7 +432,19 @@ public class RefreshService {
     }
 
     private void handlerForGpioParams(String[] strList, GywlwDevice device) {
-        int isFirstOne = 0;
+        List<GywlwDeviceGpio> list2 = gywlwDeviceGpioMapper.selectByDeviceId(device.getDeviceId());
+        if(list2.size() == 0){
+            //若是新设备，则进行初始化，增加8个gpio信息
+            String[] GpioList = {"gpio_1","gpio_2","gpio_3","gpio_4","gpio_5","gpio_6","gpio_7","gpio_8"};
+            List<String> listOfGpio = Arrays.asList(GpioList);
+            for(String str : listOfGpio){
+                GywlwDeviceGpio gywlwDeviceGpio = new GywlwDeviceGpio();
+                gywlwDeviceGpio.setId(UUID.randomUUID().toString().replace("-",""));
+                gywlwDeviceGpio.setFieldAddress(str);
+                gywlwDeviceGpio.setDeviceId(device.getDeviceId());
+                gywlwDeviceGpioMapper.insertSelective(gywlwDeviceGpio);
+            }
+        }
         for(String str : strList){
             String gpioId = device.getGpioId();
             Long timestamp = device.getLastConnected().getTime();
@@ -442,9 +476,8 @@ public class RefreshService {
 //                System.out.println("response data:"+ list1);
 //            logger.info("请求成功，开始处理数据： " + new Date());
             //更新gpio params
-            GywlwDeviceGpio gywlwDeviceGpio = new GywlwDeviceGpio();
-            gywlwDeviceGpio.setDeviceId(device.getDeviceId());
-            gywlwDeviceGpio.setFieldAddress(model.getField_address());
+            GywlwDeviceGpio gywlwDeviceGpio = gywlwDeviceGpioMapper.selectByDeviceIdAndGpioId(device.getDeviceId(),
+                    model.getField_address().substring(0,6));
             gywlwDeviceGpio.setFieldAttach(model.getField_attach());
             gywlwDeviceGpio.setFieldFunctioncode(model.getField_functioncode());
             gywlwDeviceGpio.setFieldName(model.getField_name());
@@ -452,16 +485,10 @@ public class RefreshService {
             if(model.getField_rw() != null) {
                 gywlwDeviceGpio.setFieldRw(Integer.parseInt(model.getField_rw()));
             }
-            gywlwDeviceGpio.setId(UUID.randomUUID().toString().replace("-",""));
-
 //            logger.info("更新数据库...");
             //先删除已经存在的gpio，再插入新gpio
             if(gywlwDeviceGpio.getFieldAddress()!=null) {
-                if(isFirstOne == 0) {   //第一次插入数据项前先删去已经存在的；
-                    gywlwDeviceGpioMapper.deleteByDeviceId(device.getDeviceId());
-                    isFirstOne ++;
-                }
-                gywlwDeviceGpioMapper.insertSelective(gywlwDeviceGpio);
+                gywlwDeviceGpioMapper.updateByPrimaryKeySelective(gywlwDeviceGpio);
             }
         }
     }
@@ -537,8 +564,7 @@ public class RefreshService {
     private void handler(List<GpioDataModel> list, GywlwDevice device, List<String> gpioList){
         try {
             List<GywlwHistoryDataForGPIO> listForGpio = new ArrayList<>();
-            List<GpioDataModel> subList = list.subList(0,list.size()-2);
-            for (GpioDataModel model : subList) {
+            for (GpioDataModel model : list) {
 //            System.out.println(model.getTime());
                 badAdd(listForGpio,model,device);
             }
@@ -792,14 +818,18 @@ public class RefreshService {
 //        logger.info("批量插入数据end !");
     }
 
-    public synchronized void handleByThread(LinkedList<Map> list1, List<String> regList, int threadNum)
+    public synchronized void handleByThread(LinkedList list1, List<String> regList, GywlwDevice device, int mark,int threadNum)
                 throws InterruptedException, ParseException, CloneNotSupportedException {
         int length = list1.size();
         int t1 = length % threadNum == 0 ? length / threadNum : (length / threadNum + 1);
         CountDownLatch latch = new CountDownLatch(threadNum);// 多少协作
         long a = System.currentTimeMillis();
         if(length < threadNum * 3){
-            handlerForPlc(list1, regList);
+            if(mark == 0) {
+                handlerForPlc(list1, regList);
+            }else{
+                handler(list1,device,regList);
+            }
         } else {
             for (int i = 0; i < threadNum; i++) {
                 int end = (i + 1) * t1 ;
@@ -812,7 +842,7 @@ public class RefreshService {
                     // 实现Runnable启动线程
 //                    logger.info("线程[" + (i + 1) + "] " + "  start: " + start + "   end:  " + end);
                     RunnableThread thread = new RunnableThread("线程[" + (i + 1) + "] ",
-                            list1, start, end, latch, regList);
+                            list1, start, end, latch, regList,device,mark);
                     Thread runable = new Thread(thread);
                     runable.start();
                 }
@@ -831,15 +861,19 @@ public class RefreshService {
         private int end;
         private CountDownLatch latch;
         private List<String> regList;
+        private GywlwDevice device;
+        private int mark;
 
         public RunnableThread(String threadName, List data, int start, int end, CountDownLatch latch,
-                              List<String> regList) {
+                              List<String> regList, GywlwDevice device, int mark) {
             this.threadName = threadName;
             this.data = data;
             this.start = start;
             this.end = end;
             this.latch = latch;
             this.regList = regList;
+            this.device = device;
+            this.mark = mark;
         }
 
         public void run() {
@@ -849,7 +883,11 @@ public class RefreshService {
 //            System.out.println(threadName + "--" + data.size() + "--" + start + "--" + end + "--");
             // 单个线程中的数据
             try {
-                handlerForPlc(subList, regList);
+                if(mark == 0){
+                    handlerForPlc(subList, regList); //handle plc data
+                }else{
+                    handler(subList,device,regList); //handle gpio data
+                }
             } catch (ParseException e) {
                 e.printStackTrace();
             } catch (CloneNotSupportedException e) {

@@ -379,7 +379,7 @@ public class UserController {
     @RequestMapping(path = {"/historydatabypage"}, method = {RequestMethod.POST})
     @ResponseBody
     public JSONObject historyDataByPage(@RequestParam("project_id")String projectId,
-                                        @RequestParam(value = "variable_name")String variableName,
+                                        @RequestParam(value = "variable_name",defaultValue = "ALL")String variableName,
                                         @RequestParam(value = "page_num", defaultValue = "1")Integer pageNum,
                                         @RequestParam(value = "page_size", defaultValue = "6")Integer pageSize ){
         try{

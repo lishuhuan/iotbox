@@ -39,8 +39,13 @@ public class GywlwHistoryItem implements Cloneable{
 
     private Integer ruleId;
     private String ruleName;
-    private String operator;
-    private Double operand;
+    private String ruleName2;
+    private Integer rule1;
+    private Integer rule2;
+    private Integer ruleCondition;
+    private String ruleField;
+    private String ruleAlarmlevel;
+
 
     public String getPlcName() {
         return plcName;
@@ -74,20 +79,52 @@ public class GywlwHistoryItem implements Cloneable{
         this.ruleId = ruleId;
     }
 
-    public String getOperator() {
-        return operator;
+    public String getRuleName2() {
+        return ruleName2;
     }
 
-    public void setOperator(String operator) {
-        this.operator = operator;
+    public void setRuleName2(String ruleName2) {
+        this.ruleName2 = ruleName2;
     }
 
-    public Double getOperand() {
-        return operand;
+    public Integer getRule1() {
+        return rule1;
     }
 
-    public void setOperand(Double operand) {
-        this.operand = operand;
+    public void setRule1(Integer rule1) {
+        this.rule1 = rule1;
+    }
+
+    public Integer getRule2() {
+        return rule2;
+    }
+
+    public void setRule2(Integer rule2) {
+        this.rule2 = rule2;
+    }
+
+    public Integer getRuleCondition() {
+        return ruleCondition;
+    }
+
+    public void setRuleCondition(Integer ruleCondition) {
+        this.ruleCondition = ruleCondition;
+    }
+
+    public String getRuleField() {
+        return ruleField;
+    }
+
+    public void setRuleField(String ruleField) {
+        this.ruleField = ruleField;
+    }
+
+    public String getRuleAlarmlevel() {
+        return ruleAlarmlevel;
+    }
+
+    public void setRuleAlarmlevel(String ruleAlarmlevel) {
+        this.ruleAlarmlevel = ruleAlarmlevel;
     }
 
     public Integer getItemId() {

@@ -60,8 +60,9 @@ public class ProjectService {
     public List<GywlwProject> projectList(String gywlwUserId, Byte projectStatus) {
         List<GywlwProject> list = gywlwProjectMapper.selectByGywlwUserId(gywlwUserId, projectStatus);
         System.out.println(gywlwUserId);
-        if(list.size()==0){
-            list = gywlwProjectUserGroupMapper.selectProjectByUserId(gywlwUserId, projectStatus);
+        List<GywlwProject> list1 = gywlwProjectUserGroupMapper.selectProjectByUserId(gywlwUserId, projectStatus);
+        if(list1.size() > 0 ){
+            list.addAll(list1);
         }
         //设置权限
         for(GywlwProject project : list){
@@ -221,10 +222,24 @@ public class ProjectService {
         List<GywlwHistoryItem> list = gywlwHistoryItemMapper.selectByVariableName(variableName, projectId);
         List<GywlwHistoryDataForGPIO> list1 = gywlwHistoryDataForGPIOMapper.getLatestDataByVariableName(projectId,variableName);
         if(list1.size() > 0){
-            //todo
+            for(GywlwHistoryDataForGPIO gywlwHistoryDataForGPIO : list1){
+                GywlwHistoryItem gywlwHistoryItem = new GywlwHistoryItem();
+                gywlwHistoryItem.setItemTime(gywlwHistoryDataForGPIO.getTime());
+                gywlwHistoryItem.setDeviceId(gywlwHistoryDataForGPIO.getDeviceId());
+                gywlwHistoryItem.setDeviceName(gywlwDeviceMapper.selectByDeviceId(gywlwHistoryDataForGPIO.getDeviceId()).getDeviceName());
+                gywlwHistoryItem.setPlcName("gpio");
+                GywlwDeviceGpio gpio = gywlwDeviceGpioMapper.selectByPrimaryKey(gywlwHistoryDataForGPIO.getGpioId());
+                gywlwHistoryItem.setItemName(gpio.getFieldName());
+                gywlwHistoryItem.setItemAlias(gpio.getFieldName2());
+                gywlwHistoryItem.setItemAddress(gpio.getFieldAddress());
+                gywlwHistoryItem.setItemValue(gywlwHistoryDataForGPIO.getValue() * 1.0);
+                gywlwHistoryItem.setRegId(gywlwHistoryDataForGPIO.getGpioId());
+                gywlwHistoryItem.setItemId(gywlwHistoryDataForGPIO.getId());
+                gywlwHistoryItem.setVariableName(gywlwHistoryDataForGPIO.getVariableName());
+                list.add(gywlwHistoryItem);
+            }
         }
         return list;
-
     }
 
     public List<GywlwHistoryItem> warningList(String projectId, String variableName, String startTime, String endTime) {

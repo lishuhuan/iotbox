@@ -21,6 +21,7 @@ public interface GywlwDeviceGpioMapper {
     GywlwDeviceGpio selectByDeviceIdAndGpioId(@Param("deviceId")String deviceId,
                                               @Param("gpioId")String gpioId);
 
+
     List<GywlwDeviceGpio> selectByDeviceId(String deviceId);
 
     int updateByPrimaryKeySelective(GywlwDeviceGpio record);

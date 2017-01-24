@@ -20,6 +20,20 @@
     <result column="alarm" property="alarm" jdbcType="VARCHAR" />
     <result column="variable_name" property="variableName" jdbcType="VARCHAR" />
   </resultMap>
+  <resultMap id="BaseResultMap2" type="com.nbicc.gywlw.Model.GywlwHistoryDataForGPIO" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="gpio_id" property="gpioId" jdbcType="VARCHAR" />
+    <result column="value" property="value" jdbcType="INTEGER" />
+    <result column="time" property="time" jdbcType="TIMESTAMP" />
+    <result column="device_id" property="deviceId" jdbcType="VARCHAR" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="alarm" property="alarm" jdbcType="VARCHAR" />
+    <result column="rule_name" property="ruleName" jdbcType="VARCHAR" />
+    <result column="rule_name2" property="ruleName2" jdbcType="VARCHAR" />
+    <result column="rule_condition" property="ruleCondition" jdbcType="VARCHAR" />
+    <result column="rule_field" property="ruleField" jdbcType="VARCHAR" />
+    <result column="rule_alarmlevel" property="ruleAlarmlevel" jdbcType="VARCHAR" />
+  </resultMap>
   <sql id="Base_Column_List" >
     id, gpio_id, value, time, device_id, content, alarm
   </sql>
@@ -45,11 +59,19 @@
     SELECT * from
     (select a.*,c.variable_name from gywlw_history_data_for_gpio a,gywlw_variable_reg_group b,gywlw_variable c
     where c.project_id = #{projectId,jdbcType=VARCHAR} and b.variable_id = c.variable_id
-    <if test="variableName != ALL" >
+    <if test="variableName != 'ALL'" >
     and c.variable_name = #{variableName,jdbcType=VARCHAR}
     </if>
     and a.gpio_id = b.reg_id ORDER BY time desc) t
     GROUP BY gpio_id
+  </select>
+  <select id="getAlarmDataBySeverity" resultMap="BaseResultMap2" parameterType="java.lang.String" >
+    SELECT a.*,b.rule_name,b.rule_name2,b.rule_condition,b.rule_field,b.rule_alarmlevel FROM gywlw_history_data_for_gpio a LEFT JOIN gywlw_warning_rules b
+    on a.alarm=b.rule_id
+    where b.rule_alarmlevel = #{severity,jdbcType=VARCHAR}
+    and a.device_id = #{deviceId,jdbcType=VARCHAR}
+    and a.time BETWEEN #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP}
+    ORDER BY a.time DESC ;
   </select>
   <select id="getLastTimeByDeviceId" resultMap="BaseResultMap" parameterType="java.lang.String">
     SELECT *

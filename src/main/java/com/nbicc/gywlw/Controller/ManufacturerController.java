@@ -126,14 +126,15 @@ public class ManufacturerController {
 		}
 	}
 
-	//设备实时告警
+	//plc设备实时告警
 	@RequestMapping(path = { "/devicealarmlist" }, method = { RequestMethod.POST })
 	@ResponseBody
 	public JSONObject deviceAlarmlist(@RequestParam(value = "start_time",defaultValue = "0") String startTime,
 									  @RequestParam(value = "end_time",defaultValue = "2480036920") String endTime,
-									  @RequestParam(value = "device_id") String deviceId) {
+									  @RequestParam(value = "device_id") String deviceId,
+									  @RequestParam(value = "severity",defaultValue = "ALL")String severity) {
 		try{
-            List<GywlwHistoryItem> list = manufacturerService.getDeviceAlarmlist(startTime,endTime,deviceId);
+            List<GywlwHistoryItem> list = manufacturerService.getDeviceAlarmlist(startTime,endTime,deviceId,severity);
             return MyUtil.response(0, list);
         }catch (Exception e){
             logger.error("获取告警失败" + e.getMessage());
@@ -141,22 +142,59 @@ public class ManufacturerController {
         }
 	}
 
-	//设备实时告警 by page
+	//plc设备实时告警 by page
 	@RequestMapping(path = { "/devicealarmlistbypage" }, method = { RequestMethod.POST })
 	@ResponseBody
 	public JSONObject deviceAlarmlistByPage(@RequestParam(value = "start_time",defaultValue = "0") String startTime,
+											@RequestParam(value = "severity",defaultValue = "ALL")String severity,
 									 		@RequestParam(value = "end_time",defaultValue = "2480036920") String endTime,
 									  		@RequestParam(value = "device_id") String deviceId,
 											@RequestParam(value = "page_num", defaultValue = "1")Integer pageNum,
 											@RequestParam(value = "page_size", defaultValue = "6")Integer pageSize		) {
 		try{
 			PageHelper.startPage(pageNum,pageSize);
-			List<GywlwHistoryItem> list = manufacturerService.getDeviceAlarmlist(startTime,endTime,deviceId);
+			List<GywlwHistoryItem> list = manufacturerService.getDeviceAlarmlist(startTime,endTime,deviceId,severity);
 			PageInfo<GywlwHistoryItem> pageInfo = new PageInfo<>(list);
 			return MyUtil.response(0, pageInfo);
 		}catch (Exception e){
 			logger.error("获取告警失败" + e.getMessage());
 			return MyUtil.response(1, "获取告警失败");
+		}
+	}
+
+	//gpio实时告警
+	@RequestMapping(path = { "/gpioalarmlist" }, method = { RequestMethod.POST })
+	@ResponseBody
+	public JSONObject gpioAlarmlist(@RequestParam(value = "start_time",defaultValue = "0") String startTime,
+										  @RequestParam(value = "severity",defaultValue = "ALL")String severity,
+										  @RequestParam(value = "end_time",defaultValue = "2480036920") String endTime,
+										  @RequestParam(value = "device_id") String deviceId) {
+		try{
+			List<GywlwHistoryDataForGPIO> list = manufacturerService.getDeviceAlarmlistForGpio(startTime,endTime,deviceId,severity);
+			return MyUtil.response(0, list);
+		}catch (Exception e){
+			logger.error("获取gpio告警失败" + e.getMessage());
+			return MyUtil.response(1, "获取gpio告警失败");
+		}
+	}
+
+	//gpio实时告警 by page
+	@RequestMapping(path = { "/gpioalarmlistbypage" }, method = { RequestMethod.POST })
+	@ResponseBody
+	public JSONObject gpioAlarmlistByPage(@RequestParam(value = "start_time",defaultValue = "0") String startTime,
+											@RequestParam(value = "severity",defaultValue = "ALL")String severity,
+											@RequestParam(value = "end_time",defaultValue = "2480036920") String endTime,
+											@RequestParam(value = "device_id") String deviceId,
+											@RequestParam(value = "page_num", defaultValue = "1")Integer pageNum,
+											@RequestParam(value = "page_size", defaultValue = "6")Integer pageSize		) {
+		try{
+			PageHelper.startPage(pageNum,pageSize);
+			List<GywlwHistoryDataForGPIO> list = manufacturerService.getDeviceAlarmlistForGpio(startTime,endTime,deviceId,severity);
+			PageInfo<GywlwHistoryDataForGPIO> pageInfo = new PageInfo<>(list);
+			return MyUtil.response(0, pageInfo);
+		}catch (Exception e){
+			logger.error("获取gpio告警失败" + e.getMessage());
+			return MyUtil.response(1, "获取gpio告警失败");
 		}
 	}
 	

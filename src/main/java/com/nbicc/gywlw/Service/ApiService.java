@@ -121,75 +121,78 @@ public class ApiService {
     }
 
 
-    public String uploadOrderInfo(String token, String deviceId, String orderCode, String orderNum) {
-        GywlwUser gywlwUser;
-        if(token != null) {
-            //解析token
-            LoginTicket loginTicket = loginTicketDAO.selectByTicket(token);
-            if (loginTicket == null || loginTicket.getExpired().before(new Date()) || loginTicket.getStatus() != 0) {
-                return "请重新登录";
-            }
-            gywlwUser = gywlwUserMapper.selectByPrimaryKey(loginTicket.getUserId());
-            GywlwDevice gywlwDevice = gywlwDeviceMapper.selectByDeviceId(deviceId);
-            if(gywlwDevice == null){
-                return "找不到该设备";
-            }else{
-                if(gywlwUser.getUserId().equals(gywlwDevice.getAdminId())){
-                    GywlwDeviceOrder gywlwDeviceOrder = gywlwDeviceOrderMapper.selectByDeviceId(deviceId);
-                    if(gywlwDeviceOrder == null) {
-                        GywlwDeviceOrder order = new GywlwDeviceOrder();
-                        order.setDeviceId(deviceId);
-                        order.setOrderNum(Integer.parseInt(orderNum));
-                        order.setOrderCode(orderCode);
-                        gywlwDeviceOrderMapper.insertSelective(order);
-                    }else{
-                        gywlwDeviceOrder.setOrderCode(orderCode);
-                        gywlwDeviceOrder.setOrderNum(Integer.parseInt(orderNum));
-                        gywlwDeviceOrderMapper.updateByPrimaryKeySelective(gywlwDeviceOrder);
-                    }
-
-                    GywlwDevice device1 = new GywlwDevice();
-                    device1.setDeviceId(deviceId);
-                    device1.setDeviceStatus("3");
-                    gywlwDeviceMapper.updateByPrimaryKeySelective(device1);
-                    return "ok";
-                }else{
-                    return "无权访问该设备";
-                }
-            }
+    public JSONObject uploadOrderInfo(String token, String deviceId, String orderCode, String orderNum) {
+        JSONObject result = checkAdminAndDevice(token,deviceId);
+        if(result != null){
+            return result;
         }
-        return "请重新登录";
+        GywlwDeviceOrder gywlwDeviceOrder = gywlwDeviceOrderMapper.selectByDeviceId(deviceId);
+        if(gywlwDeviceOrder == null) {
+            GywlwDeviceOrder order = new GywlwDeviceOrder();
+            order.setDeviceId(deviceId);
+            order.setOrderNum(Integer.parseInt(orderNum));
+            order.setOrderCode(orderCode);
+            gywlwDeviceOrderMapper.insertSelective(order);
+        }else{
+            gywlwDeviceOrder.setOrderCode(orderCode);
+            gywlwDeviceOrder.setOrderNum(Integer.parseInt(orderNum));
+            gywlwDeviceOrderMapper.updateByPrimaryKeySelective(gywlwDeviceOrder);
+        }
+
+        GywlwDevice device1 = new GywlwDevice();
+        device1.setDeviceId(deviceId);
+        device1.setDeviceStatus("3");
+        gywlwDeviceMapper.updateByPrimaryKeySelective(device1);
+        return MyUtil.response(0,"上传订单信息成功！");
     }
 
     public JSONObject regInfo(String token, String deviceId){
-        GywlwUser gywlwUser;
+        JSONObject result = checkAdminAndDevice(token,deviceId);
+        if(result != null){
+            return result;
+        }
+        List<GywlwRegInfo> list = gywlwRegInfoMapper.selectByPlcId(gywlwPlcInfoMapper.selectByDeviceId1(deviceId).getId());
+        for(GywlwRegInfo reginfo : list){
+            GywlwHistoryItem item = gywlwHistoryItemMapper.getDataForRegId(reginfo.getRegId());
+            if(item == null){
+                continue;
+            }
+            reginfo.setValue(item.getItemValue());
+            reginfo.setLastConnect(item.getItemTime());
+        }
+        return MyUtil.response(0,list);
+    }
+
+    public JSONObject getRules(String token, String deviceId) {
+        JSONObject result = checkAdminAndDevice(token,deviceId);
+        if(result == null){
+            return MyUtil.response(0,gywlwWarningRulesMapper.selectByDeviceId(deviceId));
+        }
+        return result;
+    }
+
+    public JSONObject checkAdminAndDevice(String token, String deviceId) {
         if(token != null) {
             //解析token
             LoginTicket loginTicket = loginTicketDAO.selectByTicket(token);
             if (loginTicket == null || loginTicket.getExpired().before(new Date()) || loginTicket.getStatus() != 0) {
-                return MyUtil.response(1,"请重新登录");
+                return MyUtil.response(1, "请重新登录");
             }
-            gywlwUser = gywlwUserMapper.selectByPrimaryKey(loginTicket.getUserId());
+            GywlwUser gywlwUser = gywlwUserMapper.selectByPrimaryKey(loginTicket.getUserId());
             GywlwDevice gywlwDevice = gywlwDeviceMapper.selectByDeviceId(deviceId);
             if(gywlwDevice == null){
                 return MyUtil.response(1,"找不到该设备");
-            }else{
-                if(gywlwUser.getUserId().equals(gywlwDevice.getAdminId())){
-                    List<GywlwRegInfo> list = gywlwRegInfoMapper.selectByPlcId(gywlwPlcInfoMapper.selectByDeviceId1(deviceId).getId());
-                    for(GywlwRegInfo reginfo : list){
-                        GywlwHistoryItem item = gywlwHistoryItemMapper.getDataForRegId(reginfo.getRegId());
-                        if(item == null){
-                            continue;
-                        }
-                        reginfo.setValue(item.getItemValue());
-                        reginfo.setLastConnect(item.getItemTime());
-                    }
-                    return MyUtil.response(0,list);
-                }else{
+            }else {
+                if (gywlwUser.getUserId().equals(gywlwDevice.getAdminId())) {
+                    return null;
+                }
+                else{
                     return MyUtil.response(1,"无权访问该设备");
                 }
             }
+
         }
-        return MyUtil.response(1,"请重新登录");
+        return MyUtil.response(1, "请重新登录");
+
     }
 }

@@ -26,6 +26,11 @@ public interface GywlwHistoryDataForGPIOMapper {
 
     List<GywlwHistoryDataForGPIO> getLatestData(String deviceId);
 
+    List<GywlwHistoryDataForGPIO> getAlarmDataBySeverity(@Param("deviceId")String deviceId,
+                                                         @Param("severity")String severity,
+                                                         @Param("startTime") String startTime,
+                                                         @Param("endTime") String endTime);
+
     GywlwHistoryDataForGPIO getLastTimeByDeviceId(String deviceId);
 
     int updateByPrimaryKeySelective(GywlwHistoryDataForGPIO record);

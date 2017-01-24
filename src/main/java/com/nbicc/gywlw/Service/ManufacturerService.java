@@ -68,10 +68,11 @@ public class ManufacturerService {
 		return list;
 	}
 	
-	public List<GywlwHistoryItem> getDeviceAlarmlist(String startTime,String endTime,String deviceId){
+	public List<GywlwHistoryItem> getDeviceAlarmlist(String startTime,String endTime,String deviceId,String severity){
 		refreshService.refresh();
 		return gywlwHistoryItemMapper.getDeviceAlarmlist(MyUtil.timeTransformToString(startTime),
-				MyUtil.timeTransformToString(endTime), deviceId);
+				MyUtil.timeTransformToString(endTime), deviceId,severity);
+
 	}
 	
 	public GywlwHistoryItem getAlarmDetail(String itemId){
@@ -112,4 +113,8 @@ public class ManufacturerService {
 		return list;
 	}
 
+	public List<GywlwHistoryDataForGPIO> getDeviceAlarmlistForGpio(String startTime, String endTime, String deviceId, String severity) {
+		refreshService.refresh();
+		return gywlwHistoryDataForGPIOMapper.getAlarmDataBySeverity(deviceId,severity,MyUtil.timeTransformToString(startTime),MyUtil.timeTransformToString(endTime));
+	}
 }
