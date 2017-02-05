@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
@@ -22,6 +23,7 @@ import java.util.concurrent.CountDownLatch;
  * Created by BigMao on 2016/12/23.
  */
 @Service
+@Transactional
 public class RefreshService {
     private static final String[] ALARM = {"alarm1","alarm2"};
 

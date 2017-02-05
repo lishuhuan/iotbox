@@ -1,6 +1,7 @@
 package com.nbicc.gywlw.Controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.nbicc.gywlw.Service.ApiService;
 import com.nbicc.gywlw.Service.RefreshService;
 import com.nbicc.gywlw.util.InitDataForHistory;
 import com.nbicc.gywlw.util.MyUtil;
@@ -23,6 +24,8 @@ public class TestController {
     private RefreshService refreshService;
     @Autowired
     InitDataForHistory initDataForHistory;
+    @Autowired
+    ApiService apiService;
     @RequestMapping(path = {"/insertdata"}, method = {RequestMethod.POST})
     @ResponseBody
     public JSONObject insertdata(){
@@ -49,6 +52,19 @@ public class TestController {
         }catch (Exception e){
             logger.error("refresh失败" + e.getMessage());
             return "refresh失败";
+        }
+    }
+
+    //测试事务
+    @RequestMapping(path = {"/testtransaction"}, method = {RequestMethod.POST,RequestMethod.GET})
+    @ResponseBody
+    public String testTransaction(){
+        try {
+            apiService.testTransaction();
+            return "ok";
+        }catch (Exception e){
+            logger.error("exception" + e.getMessage());
+            return "exception";
         }
     }
 }

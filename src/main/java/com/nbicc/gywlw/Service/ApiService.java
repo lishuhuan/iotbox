@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -120,7 +121,7 @@ public class ApiService {
         return MyUtil.response(1,"请重新登录");
     }
 
-
+    @Transactional
     public JSONObject uploadOrderInfo(String token, String deviceId, String orderCode, String orderNum) {
         JSONObject result = checkAdminAndDevice(token,deviceId);
         if(result != null){
@@ -201,5 +202,34 @@ public class ApiService {
         }
         return MyUtil.response(1, "请重新登录");
 
+    }
+
+    public JSONObject plcInfo(String token, String deviceId) {
+        JSONObject result = checkAdminAndDevice(token,deviceId);
+        if(result == null){
+            //只提供必要的信息，其他的不显示
+            List<GywlwPlcInfo> list1 = new ArrayList<>();
+            List<GywlwPlcInfo> list = gywlwPlcInfoMapper.selectByDeviceId(deviceId);
+            if(list.size()>0){
+                for(GywlwPlcInfo plcinfo: list){
+                    GywlwPlcInfo plc = new GywlwPlcInfo();
+                    plc.setPlcName(plcinfo.getPlcName());
+                    plc.setPlcType(plcinfo.getPlcType());
+                    plc.setDeviceId(plcinfo.getDeviceId());
+                    plc.setPlcBrand(plcinfo.getPlcBrand());
+                    list1.add(plc);
+                }
+            }
+            return MyUtil.response(0,list1);
+        }
+        return result;
+    }
+
+    @Transactional
+    public void testTransaction(){
+        GywlwPlcInfo info = new GywlwPlcInfo();
+        info.setId("233");
+        gywlwPlcInfoMapper.insertSelective(info);
+        int y = Integer.parseInt("a");
     }
 }

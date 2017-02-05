@@ -4,6 +4,7 @@ import com.nbicc.gywlw.Model.*;
 import com.nbicc.gywlw.mapper.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -11,6 +12,7 @@ import java.util.List;
  * Created by BigMao on 2016/11/26.
  */
 @Service
+@Transactional
 public class MessageService {
     @Autowired
     private GywlwMessageMapper gywlwMessageMapper;

@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
@@ -27,6 +28,7 @@ import java.util.*;
  * Created by BigMao on 2016/11/17.
  */
 @Service
+@Transactional
 public class UserService {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 

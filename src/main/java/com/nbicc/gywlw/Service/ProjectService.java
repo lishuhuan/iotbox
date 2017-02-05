@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.util.*;
@@ -15,6 +16,7 @@ import java.util.*;
  * Created by BigMao on 2016/11/21.
  */
 @Service
+@Transactional
 public class ProjectService {
 
     private static final Logger logger = LoggerFactory.getLogger(ProjectService.class);

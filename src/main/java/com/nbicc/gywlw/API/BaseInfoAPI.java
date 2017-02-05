@@ -49,17 +49,17 @@ public class BaseInfoAPI {
         }
     }
 
-//    @RequestMapping(path = {"/plcinfo"}, method = {RequestMethod.POST})
-//    @ResponseBody
-//    public JSONObject plcInfo(@RequestParam("token")String token,
-//                              @RequestParam("plc_id") String plcId) {
-//        try {
-//            return apiService.plcInfo(token,plcId);
-//        }catch (Exception e){
-//            logger.error("操作异常 " + e.getMessage());
-//            return MyUtil.response(-1, "操作异常");
-//        }
-//    }
+    @RequestMapping(path = {"/plcinfo"}, method = {RequestMethod.POST})
+    @ResponseBody
+    public JSONObject plcInfo(@RequestParam("token")String token,
+                              @RequestParam("device_id") String deviceId) {
+        try {
+            return apiService.plcInfo(token,deviceId);
+        }catch (Exception e){
+            logger.error("操作异常 " + e.getMessage());
+            return MyUtil.response(-1, "操作异常");
+        }
+    }
 
     @RequestMapping(path = {"/devicestatus"}, method = {RequestMethod.POST})
     @ResponseBody
