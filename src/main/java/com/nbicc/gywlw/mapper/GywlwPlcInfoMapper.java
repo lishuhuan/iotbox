@@ -8,6 +8,8 @@ import java.util.List;
 public interface GywlwPlcInfoMapper {
     int deleteByPrimaryKey(String id);
 
+    int deleteByDeviceId(String deviceId);
+
     int insert(GywlwPlcInfo record);
 
     int insertSelective(GywlwPlcInfo record);
@@ -18,7 +20,6 @@ public interface GywlwPlcInfoMapper {
 
     List<GywlwPlcInfo> selectByDeviceId(String deviceId);
 
-    GywlwPlcInfo selectByDeviceId1(String deviceId);
 
     int updateByPrimaryKeySelective(GywlwPlcInfo record);
 

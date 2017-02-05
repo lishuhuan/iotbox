@@ -42,6 +42,8 @@ public class RefreshService {
     private GywlwWarningRulesMapper gywlwWarningRulesMapper;
     @Autowired
     private GywlwDeviceGpioMapper gywlwDeviceGpioMapper;
+    @Autowired
+    private GywlwBrandMapper gywlwBrandMapper;
 
 
     public void refresh(){
@@ -227,11 +229,12 @@ public class RefreshService {
         }
     }
 
-
+    //同步gpio rules
     public void refreshRulesForGpio(){
         refreshParams(3);
     }
 
+    //同步plc rules
     public void refreshRulesForPlc(){
         refreshParams(1);
     }
@@ -250,6 +253,16 @@ public class RefreshService {
                 requestList.add("hardware_edition");
                 requestList.add("software_edition");
                 requestList.add("3g_mode");
+                requestList.add("serial0_mode"); //每个通道对应设备的驱动类型；
+                requestList.add("serial1_mode");
+                requestList.add("serial2_mode");
+                requestList.add("serial3_mode");
+                requestList.add("serial4_mode");
+                requestList.add("serial0_subdev_id");
+                requestList.add("serial1_subdev_id");
+                requestList.add("serial2_subdev_id");
+                requestList.add("serial3_subdev_id");
+                requestList.add("serial4_subdev_id");
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("deviceId",gpioId);
                 jsonObject.put("idList",requestList);
@@ -284,14 +297,15 @@ public class RefreshService {
         }
     }
 
+    //同步plc数据项设置
     public void refreshParamsForPlc(){
         refreshParams(0);
     }
 
+    //同步gpio参数设置
     public void refreshParamsForGpio(){
         refreshParams(2);
     }
-
 
 
     //mark=0表示同步plc数据项设置，mark=1表示同步plcrules数据；
@@ -493,6 +507,7 @@ public class RefreshService {
         }
     }
 
+    //todo setPlcId那里目前只实现了一对一这一种情况，日后补充一对多情况
     private void handlerForPlcRules(String[] strList, GywlwDevice device) {
         int isFirstOne = 0;
         for(String str : strList){
@@ -528,7 +543,7 @@ public class RefreshService {
             //更新rules
             GywlwWarningRules gywlwWarningRules = new GywlwWarningRules();
             gywlwWarningRules.setDeviceId(device.getDeviceId());
-            gywlwWarningRules.setPlcId(gywlwPlcInfoMapper.selectByDeviceId1(device.getDeviceId()).getId());
+//            gywlwWarningRules.setPlcId(gywlwPlcInfoMapper.selectByDeviceId1(device.getDeviceId()).getId());
             if(model.getRules_1() != null) {
                 gywlwWarningRules.setRule1(Integer.parseInt(model.getRules_1()));
             }
@@ -900,15 +915,110 @@ public class RefreshService {
     public void handlerForConfigParams(List<Map> list1, GywlwDevice device) throws ParseException {
         GywlwDevice gywlwDevice = new GywlwDevice();
         gywlwDevice.setDeviceId(device.getDeviceId());
+        List<GywlwPlcInfo> plcInfoList = new ArrayList<>();
         for(Map map : list1){
+            //1.更新盒子信息
             gywlwDevice.setHardwareEdition((String) map.get("hardware_edition"));
             gywlwDevice.setSoftwareEdition((String) map.get("software_edition"));
             gywlwDevice.setThreeGMode(Integer.parseInt((String) map.get("3g_mode")));
             gywlwDevice.setLastConnected(MyUtil.timeTransformToDateNo1000(map.get("timestamp").toString()));
+            //2.更新通道对应plc的驱动类型
+            Map<Integer,String> brandMap = new HashMap<>();
+            brandMap.put(0,"三菱");
+            brandMap.put(1,"三菱");
+            brandMap.put(2,"松下");
+            brandMap.put(3,"台达");
+            brandMap.put(4,"西门子");
+            Map<Integer,String> typeMap = new HashMap<>();
+            typeMap.put(0,"FX系列");
+            typeMap.put(1,"FX系列");
+            typeMap.put(2,"FP系列");
+            typeMap.put(3,"台达");
+            typeMap.put(4,"S7-200");
+            //#0
+            GywlwPlcInfo plcInfo = new GywlwPlcInfo();
+            plcInfo.setSubdeviceId((String) map.get("serial0_subdev_id"));
+            if(plcInfo.getSubdeviceId()!=null && !plcInfo.getSubdeviceId().equals("0")) {
+                if (map.get("serial0_mode") != null) {
+                    Integer serialxMode = Integer.parseInt((String) map.get("serial0_mode"));
+                    plcInfo.setPlcBrand(brandMap.get(serialxMode));
+                    plcInfo.setPlcType(typeMap.get(serialxMode));
+                    plcInfo.setContent(gywlwBrandMapper.selectByProductModel(plcInfo.getPlcType()).getDeviceKey());
+                    plcInfo.setId(UUID.randomUUID().toString().replace("-", ""));
+                    plcInfo.setDeviceId(device.getDeviceId());
+                    plcInfo.setPlcName(plcInfo.getPlcBrand() + "0");
+                    plcInfoList.add(plcInfo);
+                }
+            }
+            //#1
+            plcInfo = new GywlwPlcInfo();
+            plcInfo.setSubdeviceId((String) map.get("serial1_subdev_id"));
+            if(plcInfo.getSubdeviceId()!=null && !plcInfo.getSubdeviceId().equals("0")) {
+                if (map.get("serial1_mode") != null) {
+                    Integer serialxMode = Integer.parseInt((String) map.get("serial1_mode"));
+                    plcInfo.setPlcBrand(brandMap.get(serialxMode));
+                    plcInfo.setPlcType(typeMap.get(serialxMode));
+                    plcInfo.setContent(gywlwBrandMapper.selectByProductModel(plcInfo.getPlcType()).getDeviceKey());
+                    plcInfo.setId(UUID.randomUUID().toString().replace("-", ""));
+                    plcInfo.setDeviceId(device.getDeviceId());
+                    plcInfo.setPlcName(plcInfo.getPlcBrand() + "1");
+                    plcInfoList.add(plcInfo);
+                }
+            }
+            //#2
+            plcInfo = new GywlwPlcInfo();
+            plcInfo.setSubdeviceId((String) map.get("serial2_subdev_id"));
+            if(plcInfo.getSubdeviceId()!=null && !plcInfo.getSubdeviceId().equals("0")) {
+                if (map.get("serial2_mode") != null) {
+                    Integer serialxMode = Integer.parseInt((String) map.get("serial2_mode"));
+                    plcInfo.setPlcBrand(brandMap.get(serialxMode));
+                    plcInfo.setPlcType(typeMap.get(serialxMode));
+                    plcInfo.setContent(gywlwBrandMapper.selectByProductModel(plcInfo.getPlcType()).getDeviceKey());
+                    plcInfo.setId(UUID.randomUUID().toString().replace("-", ""));
+                    plcInfo.setDeviceId(device.getDeviceId());
+                    plcInfo.setPlcName(plcInfo.getPlcBrand() + "2");
+                    plcInfoList.add(plcInfo);
+                }
+            }
+            //#3
+            plcInfo = new GywlwPlcInfo();
+            plcInfo.setSubdeviceId((String) map.get("serial3_subdev_id"));
+            if(plcInfo.getSubdeviceId()!=null && !plcInfo.getSubdeviceId().equals("0")) {
+                if (map.get("serial3_mode") != null) {
+                    Integer serialxMode = Integer.parseInt((String) map.get("serial3_mode"));
+                    plcInfo.setPlcBrand(brandMap.get(serialxMode));
+                    plcInfo.setPlcType(typeMap.get(serialxMode));
+                    plcInfo.setContent(gywlwBrandMapper.selectByProductModel(plcInfo.getPlcType()).getDeviceKey());
+                    plcInfo.setId(UUID.randomUUID().toString().replace("-", ""));
+                    plcInfo.setDeviceId(device.getDeviceId());
+                    plcInfo.setPlcName(plcInfo.getPlcBrand() + "3");
+                    plcInfoList.add(plcInfo);
+                }
+            }
+            //#4
+            plcInfo = new GywlwPlcInfo();
+            plcInfo.setSubdeviceId((String) map.get("serial4_subdev_id"));
+            if(plcInfo.getSubdeviceId()!=null && !plcInfo.getSubdeviceId().equals("0")) {
+                if (map.get("serial4_mode") != null) {
+                    Integer serialxMode = Integer.parseInt((String) map.get("serial4_mode"));
+                    plcInfo.setPlcBrand(brandMap.get(serialxMode));
+                    plcInfo.setPlcType(typeMap.get(serialxMode));
+                    plcInfo.setContent(gywlwBrandMapper.selectByProductModel(plcInfo.getPlcType()).getDeviceKey());
+                    plcInfo.setId(UUID.randomUUID().toString().replace("-", ""));
+                    plcInfo.setDeviceId(device.getDeviceId());
+                    plcInfo.setPlcName(plcInfo.getPlcBrand() + "4");
+                    plcInfoList.add(plcInfo);
+                }
+            }
             break;//只取最新一条
         }
 //        logger.info("更新数据库...");
         gywlwDeviceMapper.updateByPrimaryKeySelective(gywlwDevice);
+        gywlwPlcInfoMapper.deleteByDeviceId(device.getDeviceId());
+        for(GywlwPlcInfo plc : plcInfoList) {
+            gywlwPlcInfoMapper.insertSelective(plc);
+        }
+
     }
 
 
@@ -944,7 +1054,7 @@ public class RefreshService {
 //            logger.info("请求成功，开始处理数据： " + new Date());
                 //更新plc中的subdeviceid
                 GywlwPlcInfo gywlwPlcInfo = new GywlwPlcInfo();
-                gywlwPlcInfo.setId(gywlwPlcInfoMapper.selectByDeviceId1(device.getDeviceId()).getId());
+                gywlwPlcInfo.setId(gywlwPlcInfoMapper.selectBySubDeviceId(model.getField_subdev_id()).getId());
                 gywlwPlcInfo.setSubdeviceId(model.getField_subdev_id());
                 if(gywlwPlcInfo.getSubdeviceId()!=null) {
                     gywlwPlcInfoMapper.updateByPrimaryKeySelective(gywlwPlcInfo);

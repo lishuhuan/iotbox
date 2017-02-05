@@ -42,6 +42,10 @@
     delete from gywlw_plc_info
     where id = #{id,jdbcType=VARCHAR}
   </delete>
+  <delete id="deleteByDeviceId" parameterType="java.lang.String" >
+    delete from gywlw_plc_info
+    where device_id = #{deviceId,jdbcType=VARCHAR}
+  </delete>
   <delete id="deleteByPlcId" parameterType="java.lang.String" >
     delete from gywlw_plc_info
     where plc_id = #{plcId,jdbcType=VARCHAR}

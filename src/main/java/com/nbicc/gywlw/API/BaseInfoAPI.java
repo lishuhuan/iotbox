@@ -2,9 +2,11 @@ package com.nbicc.gywlw.API;
 
 import com.alibaba.fastjson.JSONObject;
 import com.nbicc.gywlw.Model.GywlwHistoryItem;
+import com.nbicc.gywlw.Model.GywlwRegInfo;
 import com.nbicc.gywlw.Service.ApiService;
 import com.nbicc.gywlw.Service.ManufacturerService;
 import com.nbicc.gywlw.Service.ProjectService;
+import com.nbicc.gywlw.mapper.GywlwRegInfoMapper;
 import com.nbicc.gywlw.util.MyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +34,8 @@ public class BaseInfoAPI {
     private ProjectService projectService;
     @Autowired
     private ManufacturerService manufacturerService;
+    @Autowired
+    private GywlwRegInfoMapper gywlwRegInfoMapper;
 
     //返回该用户下所拥有的盒子的唯一标识码、当前工作网络模式、固件版本号、硬件信息（盒子型号）
     @RequestMapping(path = {"/deviceinfo"}, method = {RequestMethod.POST})
@@ -56,6 +60,7 @@ public class BaseInfoAPI {
 //            return MyUtil.response(-1, "操作异常");
 //        }
 //    }
+
     @RequestMapping(path = {"/devicestatus"}, method = {RequestMethod.POST})
     @ResponseBody
     public JSONObject deviceStatus(@RequestParam("token")String token,
@@ -102,7 +107,14 @@ public class BaseInfoAPI {
                                         @RequestParam(value = "end_time",defaultValue = "4640396560000")String endTime
                                         ){
         try {
-            //todo token检查
+            GywlwRegInfo regInfo = gywlwRegInfoMapper.selectByPrimaryKey(regId);
+            if(regInfo == null){
+                return MyUtil.response(0,"查不到该reg_id");
+            }
+            JSONObject result = apiService.checkAdminAndDevice(token,regInfo.getDeviceId());
+            if(result != null){
+                return result;
+            }
             List<GywlwHistoryItem> list = projectService.getHistoryDataForReg(regId,startTime,endTime);
             return MyUtil.response(0, list);
         } catch (ParseException e) {

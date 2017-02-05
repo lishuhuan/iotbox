@@ -1,0 +1,562 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nbicc.gywlw.mapper.GywlwBrandMapper" >
+  <resultMap id="BaseResultMap" type="com.nbicc.gywlw.Model.GywlwBrand" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="type_id" property="typeId" jdbcType="VARCHAR" />
+    <result column="brand_id" property="brandId" jdbcType="BIGINT" />
+    <result column="brand_info" property="brandInfo" jdbcType="VARCHAR" />
+    <result column="device_key" property="deviceKey" jdbcType="VARCHAR" />
+    <result column="firmware_id" property="firmwareId" jdbcType="VARCHAR" />
+    <result column="main_firmware" property="mainFirmware" jdbcType="VARCHAR" />
+    <result column="sub_firmware" property="subFirmware" jdbcType="VARCHAR" />
+    <result column="iot_type" property="iotType" jdbcType="INTEGER" />
+    <result column="user_guide_url" property="userGuideUrl" jdbcType="VARCHAR" />
+    <result column="connect_type" property="connectType" jdbcType="INTEGER" />
+    <result column="token" property="token" jdbcType="VARCHAR" />
+    <result column="is_open" property="isOpen" jdbcType="CHAR" />
+    <result column="code_type" property="codeType" jdbcType="INTEGER" />
+    <result column="user_id" property="userId" jdbcType="VARCHAR" />
+    <result column="product_name" property="productName" jdbcType="VARCHAR" />
+    <result column="product_model" property="productModel" jdbcType="VARCHAR" />
+    <result column="product_brand" property="productBrand" jdbcType="VARCHAR" />
+    <result column="identification" property="identification" jdbcType="INTEGER" />
+    <result column="protocol_analysis" property="protocolAnalysis" jdbcType="INTEGER" />
+    <result column="communication_protocol" property="communicationProtocol" jdbcType="INTEGER" />
+    <result column="context" property="context" jdbcType="VARCHAR" />
+    <result column="state" property="state" jdbcType="INTEGER" />
+    <result column="audit_time" property="auditTime" jdbcType="TIMESTAMP" />
+    <result column="h5_path" property="h5Path" jdbcType="VARCHAR" />
+    <result column="preview_page" property="previewPage" jdbcType="VARCHAR" />
+    <result column="img_path" property="imgPath" jdbcType="VARCHAR" />
+    <result column="rule_status" property="ruleStatus" jdbcType="INTEGER" />
+    <result column="bluetooth_encipherment" property="bluetoothEncipherment" jdbcType="INTEGER" />
+    <result column="bluetooth_code" property="bluetoothCode" jdbcType="VARCHAR" />
+    <result column="product_id" property="productId" jdbcType="VARCHAR" />
+    <result column="sd_count" property="sdCount" jdbcType="INTEGER" />
+    <result column="entity_version" property="entityVersion" jdbcType="BIGINT" />
+    <result column="updated_by" property="updatedBy" jdbcType="VARCHAR" />
+    <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+    <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
+    <result column="created_by" property="createdBy" jdbcType="VARCHAR" />
+    <result column="del_flag" property="delFlag" jdbcType="CHAR" />
+    <result column="device_apply_total" property="deviceApplyTotal" jdbcType="BIGINT" />
+    <result column="device_new_apply_num" property="deviceNewApplyNum" jdbcType="BIGINT" />
+    <result column="is_gateway" property="isGateway" jdbcType="INTEGER" />
+    <result column="app_support" property="appSupport" jdbcType="VARCHAR" />
+    <result column="communication_mode" property="communicationMode" jdbcType="VARCHAR" />
+    <result column="gateway_parts_protocol" property="gatewayPartsProtocol" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, type_id, brand_id, brand_info, device_key, firmware_id, main_firmware, sub_firmware, 
+    iot_type, user_guide_url, connect_type, token, is_open, code_type, user_id, product_name, 
+    product_model, product_brand, identification, protocol_analysis, communication_protocol, 
+    context, state, audit_time, h5_path, preview_page, img_path, rule_status, bluetooth_encipherment, 
+    bluetooth_code, product_id, sd_count, entity_version, updated_by, created_at, updated_at, 
+    created_by, del_flag, device_apply_total, device_new_apply_num, is_gateway, app_support, 
+    communication_mode, gateway_parts_protocol
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from gywlw_brand
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByProductModel" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from gywlw_brand
+    where product_model = #{model,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from gywlw_brand
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.nbicc.gywlw.Model.GywlwBrand" >
+    insert into gywlw_brand (id, type_id, brand_id, 
+      brand_info, device_key, firmware_id, 
+      main_firmware, sub_firmware, iot_type, 
+      user_guide_url, connect_type, token, 
+      is_open, code_type, user_id, 
+      product_name, product_model, product_brand, 
+      identification, protocol_analysis, communication_protocol, 
+      context, state, audit_time, 
+      h5_path, preview_page, img_path, 
+      rule_status, bluetooth_encipherment, bluetooth_code, 
+      product_id, sd_count, entity_version, 
+      updated_by, created_at, updated_at, 
+      created_by, del_flag, device_apply_total, 
+      device_new_apply_num, is_gateway, app_support, 
+      communication_mode, gateway_parts_protocol
+      )
+    values (#{id,jdbcType=VARCHAR}, #{typeId,jdbcType=VARCHAR}, #{brandId,jdbcType=BIGINT}, 
+      #{brandInfo,jdbcType=VARCHAR}, #{deviceKey,jdbcType=VARCHAR}, #{firmwareId,jdbcType=VARCHAR}, 
+      #{mainFirmware,jdbcType=VARCHAR}, #{subFirmware,jdbcType=VARCHAR}, #{iotType,jdbcType=INTEGER}, 
+      #{userGuideUrl,jdbcType=VARCHAR}, #{connectType,jdbcType=INTEGER}, #{token,jdbcType=VARCHAR}, 
+      #{isOpen,jdbcType=CHAR}, #{codeType,jdbcType=INTEGER}, #{userId,jdbcType=VARCHAR}, 
+      #{productName,jdbcType=VARCHAR}, #{productModel,jdbcType=VARCHAR}, #{productBrand,jdbcType=VARCHAR}, 
+      #{identification,jdbcType=INTEGER}, #{protocolAnalysis,jdbcType=INTEGER}, #{communicationProtocol,jdbcType=INTEGER}, 
+      #{context,jdbcType=VARCHAR}, #{state,jdbcType=INTEGER}, #{auditTime,jdbcType=TIMESTAMP}, 
+      #{h5Path,jdbcType=VARCHAR}, #{previewPage,jdbcType=VARCHAR}, #{imgPath,jdbcType=VARCHAR}, 
+      #{ruleStatus,jdbcType=INTEGER}, #{bluetoothEncipherment,jdbcType=INTEGER}, #{bluetoothCode,jdbcType=VARCHAR}, 
+      #{productId,jdbcType=VARCHAR}, #{sdCount,jdbcType=INTEGER}, #{entityVersion,jdbcType=BIGINT}, 
+      #{updatedBy,jdbcType=VARCHAR}, #{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP}, 
+      #{createdBy,jdbcType=VARCHAR}, #{delFlag,jdbcType=CHAR}, #{deviceApplyTotal,jdbcType=BIGINT}, 
+      #{deviceNewApplyNum,jdbcType=BIGINT}, #{isGateway,jdbcType=INTEGER}, #{appSupport,jdbcType=VARCHAR}, 
+      #{communicationMode,jdbcType=VARCHAR}, #{gatewayPartsProtocol,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.nbicc.gywlw.Model.GywlwBrand" >
+    insert into gywlw_brand
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="typeId != null" >
+        type_id,
+      </if>
+      <if test="brandId != null" >
+        brand_id,
+      </if>
+      <if test="brandInfo != null" >
+        brand_info,
+      </if>
+      <if test="deviceKey != null" >
+        device_key,
+      </if>
+      <if test="firmwareId != null" >
+        firmware_id,
+      </if>
+      <if test="mainFirmware != null" >
+        main_firmware,
+      </if>
+      <if test="subFirmware != null" >
+        sub_firmware,
+      </if>
+      <if test="iotType != null" >
+        iot_type,
+      </if>
+      <if test="userGuideUrl != null" >
+        user_guide_url,
+      </if>
+      <if test="connectType != null" >
+        connect_type,
+      </if>
+      <if test="token != null" >
+        token,
+      </if>
+      <if test="isOpen != null" >
+        is_open,
+      </if>
+      <if test="codeType != null" >
+        code_type,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="productName != null" >
+        product_name,
+      </if>
+      <if test="productModel != null" >
+        product_model,
+      </if>
+      <if test="productBrand != null" >
+        product_brand,
+      </if>
+      <if test="identification != null" >
+        identification,
+      </if>
+      <if test="protocolAnalysis != null" >
+        protocol_analysis,
+      </if>
+      <if test="communicationProtocol != null" >
+        communication_protocol,
+      </if>
+      <if test="context != null" >
+        context,
+      </if>
+      <if test="state != null" >
+        state,
+      </if>
+      <if test="auditTime != null" >
+        audit_time,
+      </if>
+      <if test="h5Path != null" >
+        h5_path,
+      </if>
+      <if test="previewPage != null" >
+        preview_page,
+      </if>
+      <if test="imgPath != null" >
+        img_path,
+      </if>
+      <if test="ruleStatus != null" >
+        rule_status,
+      </if>
+      <if test="bluetoothEncipherment != null" >
+        bluetooth_encipherment,
+      </if>
+      <if test="bluetoothCode != null" >
+        bluetooth_code,
+      </if>
+      <if test="productId != null" >
+        product_id,
+      </if>
+      <if test="sdCount != null" >
+        sd_count,
+      </if>
+      <if test="entityVersion != null" >
+        entity_version,
+      </if>
+      <if test="updatedBy != null" >
+        updated_by,
+      </if>
+      <if test="createdAt != null" >
+        created_at,
+      </if>
+      <if test="updatedAt != null" >
+        updated_at,
+      </if>
+      <if test="createdBy != null" >
+        created_by,
+      </if>
+      <if test="delFlag != null" >
+        del_flag,
+      </if>
+      <if test="deviceApplyTotal != null" >
+        device_apply_total,
+      </if>
+      <if test="deviceNewApplyNum != null" >
+        device_new_apply_num,
+      </if>
+      <if test="isGateway != null" >
+        is_gateway,
+      </if>
+      <if test="appSupport != null" >
+        app_support,
+      </if>
+      <if test="communicationMode != null" >
+        communication_mode,
+      </if>
+      <if test="gatewayPartsProtocol != null" >
+        gateway_parts_protocol,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="typeId != null" >
+        #{typeId,jdbcType=VARCHAR},
+      </if>
+      <if test="brandId != null" >
+        #{brandId,jdbcType=BIGINT},
+      </if>
+      <if test="brandInfo != null" >
+        #{brandInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceKey != null" >
+        #{deviceKey,jdbcType=VARCHAR},
+      </if>
+      <if test="firmwareId != null" >
+        #{firmwareId,jdbcType=VARCHAR},
+      </if>
+      <if test="mainFirmware != null" >
+        #{mainFirmware,jdbcType=VARCHAR},
+      </if>
+      <if test="subFirmware != null" >
+        #{subFirmware,jdbcType=VARCHAR},
+      </if>
+      <if test="iotType != null" >
+        #{iotType,jdbcType=INTEGER},
+      </if>
+      <if test="userGuideUrl != null" >
+        #{userGuideUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="connectType != null" >
+        #{connectType,jdbcType=INTEGER},
+      </if>
+      <if test="token != null" >
+        #{token,jdbcType=VARCHAR},
+      </if>
+      <if test="isOpen != null" >
+        #{isOpen,jdbcType=CHAR},
+      </if>
+      <if test="codeType != null" >
+        #{codeType,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="productName != null" >
+        #{productName,jdbcType=VARCHAR},
+      </if>
+      <if test="productModel != null" >
+        #{productModel,jdbcType=VARCHAR},
+      </if>
+      <if test="productBrand != null" >
+        #{productBrand,jdbcType=VARCHAR},
+      </if>
+      <if test="identification != null" >
+        #{identification,jdbcType=INTEGER},
+      </if>
+      <if test="protocolAnalysis != null" >
+        #{protocolAnalysis,jdbcType=INTEGER},
+      </if>
+      <if test="communicationProtocol != null" >
+        #{communicationProtocol,jdbcType=INTEGER},
+      </if>
+      <if test="context != null" >
+        #{context,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null" >
+        #{state,jdbcType=INTEGER},
+      </if>
+      <if test="auditTime != null" >
+        #{auditTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="h5Path != null" >
+        #{h5Path,jdbcType=VARCHAR},
+      </if>
+      <if test="previewPage != null" >
+        #{previewPage,jdbcType=VARCHAR},
+      </if>
+      <if test="imgPath != null" >
+        #{imgPath,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleStatus != null" >
+        #{ruleStatus,jdbcType=INTEGER},
+      </if>
+      <if test="bluetoothEncipherment != null" >
+        #{bluetoothEncipherment,jdbcType=INTEGER},
+      </if>
+      <if test="bluetoothCode != null" >
+        #{bluetoothCode,jdbcType=VARCHAR},
+      </if>
+      <if test="productId != null" >
+        #{productId,jdbcType=VARCHAR},
+      </if>
+      <if test="sdCount != null" >
+        #{sdCount,jdbcType=INTEGER},
+      </if>
+      <if test="entityVersion != null" >
+        #{entityVersion,jdbcType=BIGINT},
+      </if>
+      <if test="updatedBy != null" >
+        #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createdAt != null" >
+        #{createdAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedAt != null" >
+        #{updatedAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="delFlag != null" >
+        #{delFlag,jdbcType=CHAR},
+      </if>
+      <if test="deviceApplyTotal != null" >
+        #{deviceApplyTotal,jdbcType=BIGINT},
+      </if>
+      <if test="deviceNewApplyNum != null" >
+        #{deviceNewApplyNum,jdbcType=BIGINT},
+      </if>
+      <if test="isGateway != null" >
+        #{isGateway,jdbcType=INTEGER},
+      </if>
+      <if test="appSupport != null" >
+        #{appSupport,jdbcType=VARCHAR},
+      </if>
+      <if test="communicationMode != null" >
+        #{communicationMode,jdbcType=VARCHAR},
+      </if>
+      <if test="gatewayPartsProtocol != null" >
+        #{gatewayPartsProtocol,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.nbicc.gywlw.Model.GywlwBrand" >
+    update gywlw_brand
+    <set >
+      <if test="typeId != null" >
+        type_id = #{typeId,jdbcType=VARCHAR},
+      </if>
+      <if test="brandId != null" >
+        brand_id = #{brandId,jdbcType=BIGINT},
+      </if>
+      <if test="brandInfo != null" >
+        brand_info = #{brandInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceKey != null" >
+        device_key = #{deviceKey,jdbcType=VARCHAR},
+      </if>
+      <if test="firmwareId != null" >
+        firmware_id = #{firmwareId,jdbcType=VARCHAR},
+      </if>
+      <if test="mainFirmware != null" >
+        main_firmware = #{mainFirmware,jdbcType=VARCHAR},
+      </if>
+      <if test="subFirmware != null" >
+        sub_firmware = #{subFirmware,jdbcType=VARCHAR},
+      </if>
+      <if test="iotType != null" >
+        iot_type = #{iotType,jdbcType=INTEGER},
+      </if>
+      <if test="userGuideUrl != null" >
+        user_guide_url = #{userGuideUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="connectType != null" >
+        connect_type = #{connectType,jdbcType=INTEGER},
+      </if>
+      <if test="token != null" >
+        token = #{token,jdbcType=VARCHAR},
+      </if>
+      <if test="isOpen != null" >
+        is_open = #{isOpen,jdbcType=CHAR},
+      </if>
+      <if test="codeType != null" >
+        code_type = #{codeType,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="productName != null" >
+        product_name = #{productName,jdbcType=VARCHAR},
+      </if>
+      <if test="productModel != null" >
+        product_model = #{productModel,jdbcType=VARCHAR},
+      </if>
+      <if test="productBrand != null" >
+        product_brand = #{productBrand,jdbcType=VARCHAR},
+      </if>
+      <if test="identification != null" >
+        identification = #{identification,jdbcType=INTEGER},
+      </if>
+      <if test="protocolAnalysis != null" >
+        protocol_analysis = #{protocolAnalysis,jdbcType=INTEGER},
+      </if>
+      <if test="communicationProtocol != null" >
+        communication_protocol = #{communicationProtocol,jdbcType=INTEGER},
+      </if>
+      <if test="context != null" >
+        context = #{context,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null" >
+        state = #{state,jdbcType=INTEGER},
+      </if>
+      <if test="auditTime != null" >
+        audit_time = #{auditTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="h5Path != null" >
+        h5_path = #{h5Path,jdbcType=VARCHAR},
+      </if>
+      <if test="previewPage != null" >
+        preview_page = #{previewPage,jdbcType=VARCHAR},
+      </if>
+      <if test="imgPath != null" >
+        img_path = #{imgPath,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleStatus != null" >
+        rule_status = #{ruleStatus,jdbcType=INTEGER},
+      </if>
+      <if test="bluetoothEncipherment != null" >
+        bluetooth_encipherment = #{bluetoothEncipherment,jdbcType=INTEGER},
+      </if>
+      <if test="bluetoothCode != null" >
+        bluetooth_code = #{bluetoothCode,jdbcType=VARCHAR},
+      </if>
+      <if test="productId != null" >
+        product_id = #{productId,jdbcType=VARCHAR},
+      </if>
+      <if test="sdCount != null" >
+        sd_count = #{sdCount,jdbcType=INTEGER},
+      </if>
+      <if test="entityVersion != null" >
+        entity_version = #{entityVersion,jdbcType=BIGINT},
+      </if>
+      <if test="updatedBy != null" >
+        updated_by = #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createdAt != null" >
+        created_at = #{createdAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedAt != null" >
+        updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null" >
+        created_by = #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="delFlag != null" >
+        del_flag = #{delFlag,jdbcType=CHAR},
+      </if>
+      <if test="deviceApplyTotal != null" >
+        device_apply_total = #{deviceApplyTotal,jdbcType=BIGINT},
+      </if>
+      <if test="deviceNewApplyNum != null" >
+        device_new_apply_num = #{deviceNewApplyNum,jdbcType=BIGINT},
+      </if>
+      <if test="isGateway != null" >
+        is_gateway = #{isGateway,jdbcType=INTEGER},
+      </if>
+      <if test="appSupport != null" >
+        app_support = #{appSupport,jdbcType=VARCHAR},
+      </if>
+      <if test="communicationMode != null" >
+        communication_mode = #{communicationMode,jdbcType=VARCHAR},
+      </if>
+      <if test="gatewayPartsProtocol != null" >
+        gateway_parts_protocol = #{gatewayPartsProtocol,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.nbicc.gywlw.Model.GywlwBrand" >
+    update gywlw_brand
+    set type_id = #{typeId,jdbcType=VARCHAR},
+      brand_id = #{brandId,jdbcType=BIGINT},
+      brand_info = #{brandInfo,jdbcType=VARCHAR},
+      device_key = #{deviceKey,jdbcType=VARCHAR},
+      firmware_id = #{firmwareId,jdbcType=VARCHAR},
+      main_firmware = #{mainFirmware,jdbcType=VARCHAR},
+      sub_firmware = #{subFirmware,jdbcType=VARCHAR},
+      iot_type = #{iotType,jdbcType=INTEGER},
+      user_guide_url = #{userGuideUrl,jdbcType=VARCHAR},
+      connect_type = #{connectType,jdbcType=INTEGER},
+      token = #{token,jdbcType=VARCHAR},
+      is_open = #{isOpen,jdbcType=CHAR},
+      code_type = #{codeType,jdbcType=INTEGER},
+      user_id = #{userId,jdbcType=VARCHAR},
+      product_name = #{productName,jdbcType=VARCHAR},
+      product_model = #{productModel,jdbcType=VARCHAR},
+      product_brand = #{productBrand,jdbcType=VARCHAR},
+      identification = #{identification,jdbcType=INTEGER},
+      protocol_analysis = #{protocolAnalysis,jdbcType=INTEGER},
+      communication_protocol = #{communicationProtocol,jdbcType=INTEGER},
+      context = #{context,jdbcType=VARCHAR},
+      state = #{state,jdbcType=INTEGER},
+      audit_time = #{auditTime,jdbcType=TIMESTAMP},
+      h5_path = #{h5Path,jdbcType=VARCHAR},
+      preview_page = #{previewPage,jdbcType=VARCHAR},
+      img_path = #{imgPath,jdbcType=VARCHAR},
+      rule_status = #{ruleStatus,jdbcType=INTEGER},
+      bluetooth_encipherment = #{bluetoothEncipherment,jdbcType=INTEGER},
+      bluetooth_code = #{bluetoothCode,jdbcType=VARCHAR},
+      product_id = #{productId,jdbcType=VARCHAR},
+      sd_count = #{sdCount,jdbcType=INTEGER},
+      entity_version = #{entityVersion,jdbcType=BIGINT},
+      updated_by = #{updatedBy,jdbcType=VARCHAR},
+      created_at = #{createdAt,jdbcType=TIMESTAMP},
+      updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+      created_by = #{createdBy,jdbcType=VARCHAR},
+      del_flag = #{delFlag,jdbcType=CHAR},
+      device_apply_total = #{deviceApplyTotal,jdbcType=BIGINT},
+      device_new_apply_num = #{deviceNewApplyNum,jdbcType=BIGINT},
+      is_gateway = #{isGateway,jdbcType=INTEGER},
+      app_support = #{appSupport,jdbcType=VARCHAR},
+      communication_mode = #{communicationMode,jdbcType=VARCHAR},
+      gateway_parts_protocol = #{gatewayPartsProtocol,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

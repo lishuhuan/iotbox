@@ -151,7 +151,14 @@ public class ApiService {
         if(result != null){
             return result;
         }
-        List<GywlwRegInfo> list = gywlwRegInfoMapper.selectByPlcId(gywlwPlcInfoMapper.selectByDeviceId1(deviceId).getId());
+        List<GywlwRegInfo> list = new ArrayList<>();
+//      gywlwRegInfoMapper.selectByPlcId(gywlwPlcInfoMapper.selectByDeviceId1(deviceId).getId());
+        List<GywlwPlcInfo> plcInfoList = gywlwPlcInfoMapper.selectByDeviceId(deviceId);
+        for(GywlwPlcInfo plcInfo : plcInfoList){
+            if(gywlwRegInfoMapper.selectByPlcId(plcInfo.getId()) != null) {
+                list.addAll(gywlwRegInfoMapper.selectByPlcId(plcInfo.getId()));
+            }
+        }
         for(GywlwRegInfo reginfo : list){
             GywlwHistoryItem item = gywlwHistoryItemMapper.getDataForRegId(reginfo.getRegId());
             if(item == null){
