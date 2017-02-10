@@ -187,6 +187,7 @@ public class ApiService {
                 return MyUtil.response(1, "请重新登录");
             }
             GywlwUser gywlwUser = gywlwUserMapper.selectByPrimaryKey(loginTicket.getUserId());
+            hostHolder.setGywlwUser(gywlwUser);
             GywlwDevice gywlwDevice = gywlwDeviceMapper.selectByDeviceId(deviceId);
             if(gywlwDevice == null){
                 return MyUtil.response(1,"找不到该设备");

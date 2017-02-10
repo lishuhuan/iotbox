@@ -28,7 +28,7 @@ import java.util.*;
  * Created by BigMao on 2016/11/17.
  */
 @Service
-@Transactional
+
 public class UserService {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
@@ -42,6 +42,7 @@ public class UserService {
     private HostHolder hostHolder;
 
     //注册
+    @Transactional
     public Map<String, Object> register(String username, String password, String phone, String companyName, String sms) {
         Map<String, Object> map = new HashMap<String, Object>();
 
@@ -90,6 +91,7 @@ public class UserService {
     }
 
     //登录
+    @Transactional
     public Map<String, Object> login(String phone, String password,Integer userType) {
         Map<String, Object> map = new HashMap<String, Object>();
         if (StringUtils.isBlank(phone)) {
@@ -137,6 +139,7 @@ public class UserService {
         return ticket.getTicket();
     }
 
+    @Transactional
     public void logout(String ticket) {
         loginTicketDAO.delete(ticket);
     }
@@ -170,6 +173,7 @@ public class UserService {
     }
 
     //修改密码 By Sms or Oldpsd
+    @Transactional
     public int changePsd(String phone, String code, String newPassword,int mark){
         //mark==0 通过短信修改密码
         if(mark == 0) {

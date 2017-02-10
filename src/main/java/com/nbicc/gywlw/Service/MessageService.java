@@ -1,6 +1,9 @@
 package com.nbicc.gywlw.Service;
 
-import com.nbicc.gywlw.Model.*;
+import com.nbicc.gywlw.Model.GywlwMessage;
+import com.nbicc.gywlw.Model.GywlwProject;
+import com.nbicc.gywlw.Model.GywlwUser;
+import com.nbicc.gywlw.Model.HostHolder;
 import com.nbicc.gywlw.mapper.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,7 +15,7 @@ import java.util.List;
  * Created by BigMao on 2016/11/26.
  */
 @Service
-@Transactional
+
 public class MessageService {
     @Autowired
     private GywlwMessageMapper gywlwMessageMapper;
@@ -38,6 +41,7 @@ public class MessageService {
         return gywlwMessageMapper.selectByUserId(hostHolder.getGywlwUser().getUserId());
     }
 
+    @Transactional
     public void sendMessage(String sendId,String receiveId,String content,Byte messageType,String text){
         GywlwMessage gywlwMessage = new GywlwMessage();
         String content1 = content;
@@ -54,6 +58,7 @@ public class MessageService {
         gywlwMessageMapper.insertSelective(gywlwMessage);
     }
 
+    @Transactional
     public int operate(String messageId,String operate, String delMark){
         if(delMark.equals("1")){
             gywlwMessageMapper.deleteByPrimaryKey(Integer.parseInt(messageId));
@@ -91,6 +96,7 @@ public class MessageService {
         return 0;
     }
 
+
     public void changeAdmin(GywlwMessage gywlwMessage1){
         String quitId = gywlwMessage1.getSendId();
         String addId = gywlwMessage1.getReceiveId();
@@ -124,6 +130,7 @@ public class MessageService {
         gywlwProjectUserGroupMapper.deleteByaddId(addId);
 
     }
+
 
     public void changeFactoryAdmin(GywlwMessage gywlwMessage1){
         String quitId = gywlwMessage1.getSendId();

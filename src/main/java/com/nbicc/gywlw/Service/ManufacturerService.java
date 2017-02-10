@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@Transactional
+
 public class ManufacturerService {
 
 	private static final Logger logger = LoggerFactory.getLogger(ManufacturerService.class);
@@ -90,7 +90,8 @@ public class ManufacturerService {
 		}
 		return list;
 	}
-	
+
+	@Transactional
 	public Boolean editFactoryLimitUserDistribution(String factoryId,String userId,int tag){
 		if(tag==0){
 			GywlwUserAdminGroup adminGroup=new GywlwUserAdminGroup();

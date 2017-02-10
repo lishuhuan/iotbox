@@ -16,7 +16,7 @@ import java.util.*;
  * Created by BigMao on 2016/11/21.
  */
 @Service
-@Transactional
+
 public class ProjectService {
 
     private static final Logger logger = LoggerFactory.getLogger(ProjectService.class);
@@ -97,6 +97,8 @@ public class ProjectService {
         }
         return null;
     }
+
+    @Transactional
     public String editProject(String projectId, String projectName, String parentText, String projectDesc,
                               String longitude, String latitude, String province, String city, String purchaseDate,
                               String completionDate, String installDate, String contactName, String contactPhone,
@@ -133,6 +135,7 @@ public class ProjectService {
         return gywlwProject.getProjectId();
     }
 
+    @Transactional
     public void editDisplay(String projectId, String display){
         GywlwProject gywlwProject = new GywlwProject();
         gywlwProject.setProjectId(projectId);
@@ -140,11 +143,13 @@ public class ProjectService {
         gywlwProjectMapper.updateByPrimaryKeySelective(gywlwProject);
     }
 
+    @Transactional
     public void stopProject(String gywlwProjectId,String projectStatus) {
         gywlwProjectMapper.stopByProjectId(gywlwProjectId,projectStatus);
     }
 
     //删除所有与项目相关的
+    @Transactional
     public void deleteProject(String gywlwProjectId) {
         gywlwProjectDeviceGroupMapper.deleteByProjectId(gywlwProjectId);
         gywlwProjectUserGroupMapper.deleteByProjectIdAndUserId(gywlwProjectId,"ALL");
@@ -166,6 +171,7 @@ public class ProjectService {
         return gywlwUserMapper.selectByPhone(userPhone);
     }
 
+    @Transactional
     public String addProjectMember(String projectId, String userId, Byte writePermission) {
         GywlwProjectUserGroup userInProject = gywlwProjectUserGroupMapper.selectByProjectIdAndUserId(projectId, userId);
         if (userInProject != null) {
@@ -180,10 +186,12 @@ public class ProjectService {
         }
     }
 
+    @Transactional
     public void deleteProjectMember(String projectId, String userId) {
         gywlwProjectUserGroupMapper.deleteByProjectIdAndUserId(projectId, userId);
     }
 
+    @Transactional
     public void editMemberPermission(List<MemberPermission> list){
         GywlwProjectUserGroup gywlwProjectUserGroup = new GywlwProjectUserGroup();
         for(MemberPermission memberPermission : list){
@@ -203,6 +211,7 @@ public class ProjectService {
         return gywlwVariableMapper.selectByProjectIdWithoutTime(projectId);
     }
 
+    @Transactional
     public int addVariable(String projectId, String variableName){
         if(gywlwVariableMapper.selectByProjectIdAndVariableName(projectId,variableName) != null){
             return -1;
@@ -215,6 +224,7 @@ public class ProjectService {
         return 0;
     }
 
+    @Transactional
     public void deleteVariable(String variableId){
         gywlwVariableMapper.deleteByPrimaryKey(variableId);
     }
@@ -273,6 +283,7 @@ public class ProjectService {
     }
 
 
+    @Transactional
     public void setExpire(String deviceId, Date expiredDate, Byte expiredRight) {
         GywlwDevice gywlwDevice = new GywlwDevice();
         gywlwDevice.setDeviceId(deviceId);
@@ -288,6 +299,7 @@ public class ProjectService {
         return gywlwDeviceMapper.selectByDeviceId(deviceId);
     }
 
+    @Transactional
     public int changeInfo(String userName, String companyName, String sex, String email, String fixedphone) {
         if(hostHolder.getGywlwUser().getUserType()==1 && hostHolder.getGywlwUser().getDuserLevel() == 0 &&
                 !companyName.equals("")){
@@ -305,6 +317,7 @@ public class ProjectService {
 
     }
 
+    @Transactional
     public String bindDevice(String deviceSn, int mark) {
         String msg = null;
         GywlwDevice gywlwDevice = gywlwDeviceMapper.selectByDeviceSn(deviceSn);
@@ -378,6 +391,7 @@ public class ProjectService {
             }
         }
 
+    @Transactional
     public String giveAdmin(String userPhone,String password){
         if(!MyUtil.MD5(password).equals(gywlwUserMapper.selectByPhoneWithPsd(hostHolder.getGywlwUser().getUserPhone()).getUserPsd())){
             return "密码错误";
@@ -413,6 +427,7 @@ public class ProjectService {
     }
 
 
+    @Transactional
     public void bindRegAndVariable(String variableId,String regId){
         String deviceId = gywlwRegInfoMapper.selectByPrimaryKey(regId).getDeviceId();
         String projectId = gywlwVariableMapper.selectByPrimaryKey(variableId).getProjectId();
@@ -425,6 +440,7 @@ public class ProjectService {
         operateDeviceToProject(deviceId,projectId);
     }
 
+    @Transactional
     public void unbindRegAndVariable(String id){
         GywlwVariableRegGroup gywlwVariableRegGroup = new GywlwVariableRegGroup();
         gywlwVariableRegGroup.setId(Integer.parseInt(id));
@@ -449,6 +465,7 @@ public class ProjectService {
         return list;
     }
 
+    @Transactional
     public void saveTrendInfo(ReceiveModel model){
         try {
             for (Variable variable : model.getVariables()) {
@@ -472,6 +489,7 @@ public class ProjectService {
     }
 
     //当变量组绑定数据项时，将盒子与项目绑定
+    @Transactional
     public void operateDeviceToProject(String deviceId, String projectId){
         GywlwProjectDeviceGroup gywlwProjectDeviceGroup1 = gywlwProjectDeviceGroupMapper.
                 selectByDeviceIdAndProjectId(deviceId,projectId);
@@ -581,6 +599,7 @@ public class ProjectService {
         if(gywlwRegInfo == null){
             return null;
         }
+        GywlwDevice d = gywlwDeviceMapper.selectByDeviceId(gywlwRegInfo.getDeviceId());
         if(hostHolder.getGywlwUser().getUserId().
                 equals(gywlwDeviceMapper.selectByDeviceId(gywlwRegInfo.getDeviceId()).getAdminId())){
             List<GywlwHistoryItem> list = gywlwHistoryItemMapper.getDataForReg(regId,

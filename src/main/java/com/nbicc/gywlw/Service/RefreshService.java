@@ -23,7 +23,6 @@ import java.util.concurrent.CountDownLatch;
  * Created by BigMao on 2016/12/23.
  */
 @Service
-@Transactional
 public class RefreshService {
     private static final String[] ALARM = {"alarm1","alarm2"};
 
@@ -47,7 +46,7 @@ public class RefreshService {
     @Autowired
     private GywlwBrandMapper gywlwBrandMapper;
 
-
+    @Transactional
     public void refresh(){
         refreshConfigParams();
         refreshParamsForPlc();  //同步plc数据项设置
@@ -121,12 +120,16 @@ public class RefreshService {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                logger.info("待同步数据 : "+ str);
+                if(str.length() > 1000) {
+                    logger.info("plc待同步数据 : " + str.substring(0,1000));
+                }else{
+                    logger.info("plc待同步数据 : " + str);
+                }
                 //handle response
-                if(str.equals("0")){
+                if(str == null || str.equals("0")){
                     continue;
                 }
-                JSONObject json = new JSONObject();
+//                JSONObject json = new JSONObject();
                 Map<String, Object> map1 = JSON.parseObject(str);
                 List<Map> list1 = JSON.parseArray(map1.get("result_data").toString(), Map.class);
    //             System.out.println("list1.size():"+list1.toString());
@@ -199,12 +202,17 @@ public class RefreshService {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                logger.info("gpio待同步数据 : "+ str);
+                if(str.length() > 1000) {
+                    logger.info("gpio待同步数据 : " + str.substring(0,1000));
+                }else{
+                    logger.info("gpio待同步数据 : " + str);
+                }
+
                 //handle response
-                if(str.equals("0")){
+                if(str == null || str.equals("0")){
                     continue;
                 }
-                JSONObject json = new JSONObject();
+//                JSONObject json = new JSONObject();
                 Map<String, Object> map1 = JSON.parseObject(str);
                 List<GpioDataModel> list1 = JSON.parseArray(map1.get("result_data").toString(), GpioDataModel.class);
 //                System.out.println("response data:"+ list1);
@@ -277,12 +285,16 @@ public class RefreshService {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                if(str.equals("0")){
+                if(str == null || str.equals("0")){
                     continue;
                 }
-                logger.info("同步设备配置(ConfigParams)的待同步数据 : "+ str);
+                if(str.length() > 1000) {
+                    logger.info("同步设备配置(ConfigParams)的待同步数据 : " + str.substring(0,1000));
+                }else{
+                    logger.info("同步设备配置(ConfigParams)的待同步数据 : " + str);
+                }
                 //handle response
-                JSONObject json = new JSONObject();
+//                JSONObject json = new JSONObject();
                 Map<String, Object> map1 = JSON.parseObject(str);
                 List<Map> list1 = JSON.parseArray(map1.get("result_data").toString(), Map.class);
 //                System.out.println("返回数据:  "+list1.toString());
@@ -349,12 +361,16 @@ public class RefreshService {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                if(str.equals("0")){
+                if(str == null || str.equals("0")){
                     continue;
                 }
-                logger.info("Params待同步数据   : "+ str);
+                if(str.length() > 1000) {
+                    logger.info("Params待同步数据 : " + str.substring(0,1000));
+                }else{
+                    logger.info("Params待同步数据 : " + str);
+                }
                 //handle response
-                JSONObject json = new JSONObject();
+//                JSONObject json = new JSONObject();
                 Map<String, Object> map1 = JSON.parseObject(str);
                 List<Map> list1 = JSON.parseArray(map1.get("result_data").toString(), Map.class);
 //                System.out.println("返回数据:  "+list1.toString());
@@ -370,7 +386,7 @@ public class RefreshService {
                             break;
                         }
 //                    System.out.println(requestData + "   " + strList[0] + "   " + strList[1]);
-                        if (!"".equals(strList[0])) {
+                        if (strList != null && !"".equals(strList[0])) {
                             if (mark == 0) {
                                 handlerForPlcParams(strList, device);
                             } else if (mark == 1) {
@@ -411,12 +427,12 @@ public class RefreshService {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            if(responseStr.equals("0")){
+            if(responseStr == null || responseStr.equals("0")){
                 continue;
             }
 //            System.out.println("待同步数据 : "+ responseStr);
             //handle response
-            JSONObject json = new JSONObject();
+//            JSONObject json = new JSONObject();
             Map<String, Object> map1 = JSON.parseObject(responseStr);
             List<Map> map2 = JSON.parseArray(map1.get("result_data").toString(),Map.class);
             GpioRulesModel model = JSON.parseObject(map2.get(0).get(str).toString(),GpioRulesModel.class);
@@ -479,15 +495,18 @@ public class RefreshService {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            if(responseStr.equals("0")){
+            if(responseStr == null || responseStr.equals("0")){
                 continue;
             }
 //            System.out.println("待同步数据 : "+ responseStr);
             //handle response
-            JSONObject json = new JSONObject();
+//            JSONObject json = new JSONObject();
             Map<String, Object> map1 = JSON.parseObject(responseStr);
             List<Map> map2 = JSON.parseArray(map1.get("result_data").toString(),Map.class);
-            GpioParamsModel model = new GpioParamsModel();
+            if(map2.size() == 0){
+                continue;
+            }
+            GpioParamsModel model;
             model = JSON.parseObject(map2.get(map2.size()-1).get(str).toString(),GpioParamsModel.class);
 //                System.out.println("response data:"+ list1);
 //            logger.info("请求成功，开始处理数据： " + new Date());
@@ -530,12 +549,12 @@ public class RefreshService {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            if(responseStr.equals("0")){
+            if(responseStr==null || responseStr.equals("0")){
                 continue;
             }
 //            System.out.println("待同步数据 : "+ responseStr);
             //handle response
-            JSONObject json = new JSONObject();
+//            JSONObject json = new JSONObject();
             Map<String, Object> map1 = JSON.parseObject(responseStr);
             List<Map> map2 = JSON.parseArray(map1.get("result_data").toString(),Map.class);
             PlcRulesModel model = JSON.parseObject(map2.get(0).get(str).toString(),PlcRulesModel.class);
@@ -828,11 +847,11 @@ public class RefreshService {
             }
         }
     //    System.out.println("待插入数据：" + MyUtil.response(0,historyItemList));
-//        logger.info("批量插入数据start...");
+        logger.info("批量插入数据start...");
         if(historyItemList.size() > 0) {
             gywlwHistoryItemMapper.insertBatch(historyItemList);
         }
-//        logger.info("批量插入数据end !");
+        logger.info("批量插入数据end !");
     }
 
     public synchronized void handleByThread(LinkedList list1, List<String> regList, GywlwDevice device, int mark,int threadNum)
@@ -841,7 +860,7 @@ public class RefreshService {
         int t1 = length % threadNum == 0 ? length / threadNum : (length / threadNum + 1);
         CountDownLatch latch = new CountDownLatch(threadNum);// 多少协作
         long a = System.currentTimeMillis();
-        if(length < threadNum * 3){
+        if(length < threadNum * 15){
             if(mark == 0) {
                 handlerForPlc(list1, regList);
             }else{
@@ -857,11 +876,13 @@ public class RefreshService {
                     // HandleThread thread = new HandleThread("线程[" + (i + 1) +"] ",data, i * tl, end > length ? length : end, latch);
                     // thread.start();
                     // 实现Runnable启动线程
-//                    logger.info("线程[" + (i + 1) + "] " + "  start: " + start + "   end:  " + end);
+                    logger.info("线程[" + (i + 1) + "] " + "  start: " + start + "   end:  " + end);
                     RunnableThread thread = new RunnableThread("线程[" + (i + 1) + "] ",
                             list1, start, end, latch, regList,device,mark);
                     Thread runable = new Thread(thread);
                     runable.start();
+                }else{
+                    latch.countDown();
                 }
             }
             latch.await();// 等待所有工人完成工作
@@ -1016,16 +1037,22 @@ public class RefreshService {
         }
 //        logger.info("更新数据库...");
         gywlwDeviceMapper.updateByPrimaryKeySelective(gywlwDevice);
-        gywlwPlcInfoMapper.deleteByDeviceId(device.getDeviceId());
+//        gywlwPlcInfoMapper.deleteByDeviceId(device.getDeviceId());
         for(GywlwPlcInfo plc : plcInfoList) {
-            gywlwPlcInfoMapper.insertSelective(plc);
+            GywlwPlcInfo plcInfo = gywlwPlcInfoMapper.selectBySubDeviceId(plc.getSubdeviceId());
+            if(plcInfo == null) {
+                gywlwPlcInfoMapper.insertSelective(plc);
+            }else{
+                plc.setId(plcInfo.getId());
+                gywlwPlcInfoMapper.deleteByPrimaryKey(plcInfo.getId());
+                gywlwPlcInfoMapper.insertSelective(plc);
+            }
         }
 
     }
 
 
     public void handlerForPlcParams(String[] list1, GywlwDevice device){
-        int isFirstOne = 0;
         for(String str : list1){
             String gpioId = device.getGpioId();
             Long timestamp = device.getLastConnected().getTime();
@@ -1043,12 +1070,12 @@ public class RefreshService {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            if(responseStr.equals("0")){
+            if(responseStr == null || responseStr.equals("0")){
                 continue;
             }
 //            System.out.println("待同步数据 : "+ responseStr);
             //handle response
-            JSONObject json = new JSONObject();
+//            JSONObject json = new JSONObject();
             Map<String, Object> map1 = JSON.parseObject(responseStr);
             List<Map> map2 = JSON.parseArray(map1.get("result_data").toString(),Map.class);
             PlcConfigModel model = JSON.parseObject(map2.get(0).get(str).toString(),PlcConfigModel.class);
@@ -1083,12 +1110,16 @@ public class RefreshService {
                 }
                 //先删除已经存在的数据项，再插入新数据项
                 if(gywlwRegInfo.getRegAddress()!=null) {
-                    if(isFirstOne == 0) {   //第一次插入数据项前先删去已经存在的；
-                        gywlwRegInfoMapper.deleteByPlcId(gywlwPlcInfo.getId());
-                        isFirstOne ++;
+                    GywlwRegInfo regInfo = gywlwRegInfoMapper.selectByRegAddress(gywlwRegInfo.getRegAddress());
+                    if(regInfo == null){
+                        gywlwRegInfo.setRegId(UUID.randomUUID().toString().replaceAll("-",""));
+                        gywlwRegInfoMapper.insertSelective(gywlwRegInfo);
+                    }else{
+                        gywlwRegInfo.setRegId(regInfo.getRegId());
+                        gywlwRegInfoMapper.deleteByPrimaryKey(regInfo.getRegId());
+                        gywlwRegInfoMapper.insertSelective(gywlwRegInfo);
                     }
-                    gywlwRegInfo.setRegId(UUID.randomUUID().toString().replaceAll("-",""));
-                    gywlwRegInfoMapper.insertSelective(gywlwRegInfo);
+
                 }
         }
     }

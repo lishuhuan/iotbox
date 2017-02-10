@@ -11,17 +11,17 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * Created by BigMao on 2016/11/17.
+ * Created by BigMao on 2017/2/9.
  */
 @Aspect
 @Component
-public class LogAspect {
+public class LogForApi {
     private static final Logger logger = LoggerFactory.getLogger(LogAspect.class);
 
-    @Pointcut("execution(* com.nbicc.gywlw.Controller.*Controller.*(..))")
+    @Pointcut("execution(* com.nbicc.gywlw.API.*.*(..))")
     public void webLog(){}
 
-    @Before("execution(* com.nbicc.gywlw.Controller.*Controller.*(..))")
+    @Before("execution(* com.nbicc.gywlw.API.*.*(..))")
     public void beforeMethod(JoinPoint joinPoint) {
         StringBuilder sb = new StringBuilder();
         for (Object arg : joinPoint.getArgs()) {
@@ -30,7 +30,7 @@ public class LogAspect {
             }
             sb.append("arg:" + arg.toString() + " | ");
         }
-        logger.info("Before Method:  请求参数为： " + sb.toString());
+        logger.info("Before Method(API):  请求参数为： " + sb.toString());
         // 接收到请求，记录请求内容
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = attributes.getRequest();
@@ -43,7 +43,7 @@ public class LogAspect {
 //        logger.info("ARGS : " + Arrays.toString(joinPoint.getArgs()));
     }
 
-    @After("execution(* com.nbicc.gywlw.Controller.*Controller.*(..))")
+    @After("execution(* com.nbicc.gywlw.API.*.*(..))")
     public void afterMethod(JoinPoint joinPoint) {
         logger.info("after method: ");
     }
@@ -56,5 +56,6 @@ public class LogAspect {
         }else{
             logger.info("RESPONSE : " + ret.toString());
         }
+
     }
 }
