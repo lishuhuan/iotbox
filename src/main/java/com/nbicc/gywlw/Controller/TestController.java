@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * Created by BigMao on 2016/12/1.
+ * 测试接口，不作其他用处
  */
 @Controller
 public class TestController {

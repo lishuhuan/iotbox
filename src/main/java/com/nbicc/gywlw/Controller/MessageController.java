@@ -17,6 +17,7 @@ import java.util.List;
 
 /**
  * Created by BigMao on 2016/11/26.
+ * 消息接口
  */
 @Controller
 public class MessageController {

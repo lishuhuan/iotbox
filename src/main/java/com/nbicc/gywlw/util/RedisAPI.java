@@ -13,7 +13,9 @@ public class RedisAPI {
      
 	    /** 
 	     *
-	     * @return JedisPool 
+	     * @return JedisPool
+		 * windows端运行时需先开启一个端口为16379的redis服务器
+		 * linux端已经配置了redis，并仅限内网访问
 	     */  
 	    public static JedisPool getPool() {  
 	        if (pool == null) {  

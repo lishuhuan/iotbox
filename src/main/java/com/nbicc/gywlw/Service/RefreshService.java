@@ -120,7 +120,7 @@ public class RefreshService {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                if(str.length() > 1000) {
+                if(str != null && str.length() > 1000) {
                     logger.info("plc待同步数据 : " + str.substring(0,1000));
                 }else{
                     logger.info("plc待同步数据 : " + str);
@@ -202,7 +202,7 @@ public class RefreshService {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                if(str.length() > 1000) {
+                if(str != null && str.length() > 1000) {
                     logger.info("gpio待同步数据 : " + str.substring(0,1000));
                 }else{
                     logger.info("gpio待同步数据 : " + str);

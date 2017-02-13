@@ -6,8 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.text.SimpleDateFormat;
-
 /**
  * Created by BigMao on 2016/12/16.
  */
@@ -18,10 +16,14 @@ public class ScheduledTasks {
     @Autowired
     private RefreshService refreshService;
 
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-
-    @Scheduled(fixedRate = 1000*600) //间隔10min同步一次数据
+    //间隔30min同步一次数据
+    @Scheduled(fixedRate = 1000*1800)
     public void refreshData(){
         refreshService.refresh();
     }
+
+//    @Scheduled(fixedRate = 1000*5)
+//    public void printSecond(){
+//        System.out.println("now time: " + System.currentTimeMillis());
+//    }
 }
