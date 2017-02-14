@@ -182,7 +182,7 @@ public class RefreshService {
                     if(dataForGPIO == null){
                         timestamp = System.currentTimeMillis() - 86400L; //当前时间减1天
                     }else{
-                        timestamp = dataForGPIO.getTime().getTime();
+                        timestamp = dataForGPIO.getItemTime().getTime();
                     }
                 }
                 List<String> gpioList = new ArrayList<>();
@@ -643,10 +643,10 @@ public class RefreshService {
         if(model.getGpio_1() != null) {
             GywlwDeviceGpio gywlwDeviceGpio = gywlwDeviceGpioMapper.selectByDeviceIdAndGpioId(device.getDeviceId(),"gpio_1");
             if(gywlwDeviceGpio != null) {
-                gywlwHistoryDataForGPIO.setTime(MyUtil.timeTransformToDateNo1000(model.getTimestamp()));
+                gywlwHistoryDataForGPIO.setItemTime(MyUtil.timeTransformToDateNo1000(model.getTimestamp()));
                 gywlwHistoryDataForGPIO.setDeviceId(device.getDeviceId());
                 gywlwHistoryDataForGPIO.setGpioId(gywlwDeviceGpio.getId());
-                gywlwHistoryDataForGPIO.setValue(model.getGpio_1().getValue());
+                gywlwHistoryDataForGPIO.setItemValue(model.getGpio_1().getValue());
                 if (model.getGpio_1().getAlarm() != 0) {
                     String alarm = "";
                     if (model.getGpio_1().getAlarm1() != null) {
@@ -666,10 +666,10 @@ public class RefreshService {
             GywlwDeviceGpio gywlwDeviceGpio = gywlwDeviceGpioMapper.selectByDeviceIdAndGpioId(device.getDeviceId(),"gpio_2");
             if(gywlwDeviceGpio != null) {
                 gywlwHistoryDataForGPIO = new GywlwHistoryDataForGPIO();
-                gywlwHistoryDataForGPIO.setTime(MyUtil.timeTransformToDateNo1000(model.getTimestamp()));
+                gywlwHistoryDataForGPIO.setItemTime(MyUtil.timeTransformToDateNo1000(model.getTimestamp()));
                 gywlwHistoryDataForGPIO.setDeviceId(device.getDeviceId());
                 gywlwHistoryDataForGPIO.setGpioId(gywlwDeviceGpio.getId());
-                gywlwHistoryDataForGPIO.setValue(model.getGpio_2().getValue());
+                gywlwHistoryDataForGPIO.setItemValue(model.getGpio_2().getValue());
                 if (model.getGpio_2().getAlarm() != 0) {
                     String alarm = "";
                     if (model.getGpio_2().getAlarm1() != null) {
@@ -690,10 +690,10 @@ public class RefreshService {
             GywlwDeviceGpio gywlwDeviceGpio = gywlwDeviceGpioMapper.selectByDeviceIdAndGpioId(device.getDeviceId(),"gpio_3");
             if(gywlwDeviceGpio != null) {
                 gywlwHistoryDataForGPIO = new GywlwHistoryDataForGPIO();
-                gywlwHistoryDataForGPIO.setTime(MyUtil.timeTransformToDateNo1000(model.getTimestamp()));
+                gywlwHistoryDataForGPIO.setItemTime(MyUtil.timeTransformToDateNo1000(model.getTimestamp()));
                 gywlwHistoryDataForGPIO.setDeviceId(device.getDeviceId());
                 gywlwHistoryDataForGPIO.setGpioId(gywlwDeviceGpio.getId());
-                gywlwHistoryDataForGPIO.setValue(model.getGpio_3().getValue());
+                gywlwHistoryDataForGPIO.setItemValue(model.getGpio_3().getValue());
                 if (model.getGpio_3().getAlarm() != 0) {
                     String alarm = "";
                     if (model.getGpio_3().getAlarm1() != null) {
@@ -713,10 +713,10 @@ public class RefreshService {
             GywlwDeviceGpio gywlwDeviceGpio = gywlwDeviceGpioMapper.selectByDeviceIdAndGpioId(device.getDeviceId(),"gpio_4");
             if(gywlwDeviceGpio != null) {
                 gywlwHistoryDataForGPIO = new GywlwHistoryDataForGPIO();
-                gywlwHistoryDataForGPIO.setTime(MyUtil.timeTransformToDateNo1000(model.getTimestamp()));
+                gywlwHistoryDataForGPIO.setItemTime(MyUtil.timeTransformToDateNo1000(model.getTimestamp()));
                 gywlwHistoryDataForGPIO.setDeviceId(device.getDeviceId());
                 gywlwHistoryDataForGPIO.setGpioId(gywlwDeviceGpio.getId());
-                gywlwHistoryDataForGPIO.setValue(model.getGpio_4().getValue());
+                gywlwHistoryDataForGPIO.setItemValue(model.getGpio_4().getValue());
                 if (model.getGpio_4().getAlarm() != 0) {
                     String alarm = "";
                     if (model.getGpio_4().getAlarm1() != null) {
@@ -736,10 +736,10 @@ public class RefreshService {
             GywlwDeviceGpio gywlwDeviceGpio = gywlwDeviceGpioMapper.selectByDeviceIdAndGpioId(device.getDeviceId(),"gpio_5");
             if(gywlwDeviceGpio != null) {
                 gywlwHistoryDataForGPIO = new GywlwHistoryDataForGPIO();
-                gywlwHistoryDataForGPIO.setTime(MyUtil.timeTransformToDateNo1000(model.getTimestamp()));
+                gywlwHistoryDataForGPIO.setItemTime(MyUtil.timeTransformToDateNo1000(model.getTimestamp()));
                 gywlwHistoryDataForGPIO.setDeviceId(device.getDeviceId());
                 gywlwHistoryDataForGPIO.setGpioId(gywlwDeviceGpio.getId());
-                gywlwHistoryDataForGPIO.setValue(model.getGpio_5().getValue());
+                gywlwHistoryDataForGPIO.setItemValue(model.getGpio_5().getValue());
                 if (model.getGpio_5().getAlarm() != 0) {
                     String alarm = "";
                     if (model.getGpio_5().getAlarm1() != null) {
@@ -759,10 +759,10 @@ public class RefreshService {
             GywlwDeviceGpio gywlwDeviceGpio = gywlwDeviceGpioMapper.selectByDeviceIdAndGpioId(device.getDeviceId(),"gpio_6");
             if(gywlwDeviceGpio != null) {
                 gywlwHistoryDataForGPIO = new GywlwHistoryDataForGPIO();
-                gywlwHistoryDataForGPIO.setTime(MyUtil.timeTransformToDateNo1000(model.getTimestamp()));
+                gywlwHistoryDataForGPIO.setItemTime(MyUtil.timeTransformToDateNo1000(model.getTimestamp()));
                 gywlwHistoryDataForGPIO.setDeviceId(device.getDeviceId());
                 gywlwHistoryDataForGPIO.setGpioId(gywlwDeviceGpio.getId());
-                gywlwHistoryDataForGPIO.setValue(model.getGpio_6().getValue());
+                gywlwHistoryDataForGPIO.setItemValue(model.getGpio_6().getValue());
                 if (model.getGpio_6().getAlarm() != 0) {
                     String alarm = "";
                     if (model.getGpio_6().getAlarm1() != null) {
@@ -782,9 +782,9 @@ public class RefreshService {
             GywlwDeviceGpio gywlwDeviceGpio = gywlwDeviceGpioMapper.selectByDeviceIdAndGpioId(device.getDeviceId(),"gpio_7");
             if(gywlwDeviceGpio != null) {
                 gywlwHistoryDataForGPIO = new GywlwHistoryDataForGPIO();
-                gywlwHistoryDataForGPIO.setTime(MyUtil.timeTransformToDateNo1000(model.getTimestamp()));
+                gywlwHistoryDataForGPIO.setItemTime(MyUtil.timeTransformToDateNo1000(model.getTimestamp()));
                 gywlwHistoryDataForGPIO.setDeviceId(device.getDeviceId());
-                gywlwHistoryDataForGPIO.setValue(model.getGpio_7().getValue());
+                gywlwHistoryDataForGPIO.setItemValue(model.getGpio_7().getValue());
                 gywlwHistoryDataForGPIO.setGpioId(gywlwDeviceGpio.getId());
                 if (model.getGpio_7().getAlarm() != 0) {
                     String alarm = "";
@@ -805,9 +805,9 @@ public class RefreshService {
             GywlwDeviceGpio gywlwDeviceGpio = gywlwDeviceGpioMapper.selectByDeviceIdAndGpioId(device.getDeviceId(),"gpio_8");
             if(gywlwDeviceGpio != null) {
                 gywlwHistoryDataForGPIO = new GywlwHistoryDataForGPIO();
-                gywlwHistoryDataForGPIO.setTime(MyUtil.timeTransformToDateNo1000(model.getTimestamp()));
+                gywlwHistoryDataForGPIO.setItemTime(MyUtil.timeTransformToDateNo1000(model.getTimestamp()));
                 gywlwHistoryDataForGPIO.setDeviceId(device.getDeviceId());
-                gywlwHistoryDataForGPIO.setValue(model.getGpio_8().getValue());
+                gywlwHistoryDataForGPIO.setItemValue(model.getGpio_8().getValue());
                 gywlwHistoryDataForGPIO.setGpioId(gywlwDeviceGpio.getId());
                 if (model.getGpio_8().getAlarm() != 0) {
                     String alarm = "";

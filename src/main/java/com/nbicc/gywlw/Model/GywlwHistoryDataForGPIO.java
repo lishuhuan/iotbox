@@ -7,9 +7,9 @@ public class GywlwHistoryDataForGPIO {
 
     private String gpioId;
 
-    private Integer value;
+    private Integer itemValue;
 
-    private Date time;
+    private Date itemTime;
 
     private String deviceId;
 
@@ -28,6 +28,16 @@ public class GywlwHistoryDataForGPIO {
     private String ruleField;
 
     private String ruleAlarmlevel;
+
+    private String itemName;
+
+    public String getItemName() {
+        return itemName;
+    }
+
+    public void setItemName(String itemName) {
+        this.itemName = itemName;
+    }
 
     public String getRuleName() {
         return ruleName;
@@ -93,20 +103,20 @@ public class GywlwHistoryDataForGPIO {
         this.gpioId = gpioId == null ? null : gpioId.trim();
     }
 
-    public Integer getValue() {
-        return value;
+    public Integer getItemValue() {
+        return itemValue;
     }
 
-    public void setValue(Integer value) {
-        this.value = value;
+    public void setItemValue(Integer itemValue) {
+        this.itemValue = itemValue;
     }
 
-    public Date getTime() {
-        return time;
+    public Date getItemTime() {
+        return itemTime;
     }
 
-    public void setTime(Date time) {
-        this.time = time;
+    public void setItemTime(Date itemTime) {
+        this.itemTime = itemTime;
     }
 
     public String getDeviceId() {

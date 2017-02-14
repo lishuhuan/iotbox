@@ -4,17 +4,18 @@
   <resultMap id="BaseResultMap" type="com.nbicc.gywlw.Model.GywlwHistoryDataForGPIO" >
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="gpio_id" property="gpioId" jdbcType="VARCHAR" />
-    <result column="value" property="value" jdbcType="INTEGER" />
-    <result column="time" property="time" jdbcType="TIMESTAMP" />
+    <result column="value" property="itemValue" jdbcType="INTEGER" />
+    <result column="time" property="itemTime" jdbcType="TIMESTAMP" />
     <result column="device_id" property="deviceId" jdbcType="VARCHAR" />
     <result column="content" property="content" jdbcType="VARCHAR" />
     <result column="alarm" property="alarm" jdbcType="VARCHAR" />
+    <result column="field_address" property="itemName" jdbcType="VARCHAR" />
   </resultMap>
   <resultMap id="BaseResultMap1" type="com.nbicc.gywlw.Model.GywlwHistoryDataForGPIO" >
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="gpio_id" property="gpioId" jdbcType="VARCHAR" />
-    <result column="value" property="value" jdbcType="INTEGER" />
-    <result column="time" property="time" jdbcType="TIMESTAMP" />
+    <result column="value" property="itemValue" jdbcType="INTEGER" />
+    <result column="time" property="itemTime" jdbcType="TIMESTAMP" />
     <result column="device_id" property="deviceId" jdbcType="VARCHAR" />
     <result column="content" property="content" jdbcType="VARCHAR" />
     <result column="alarm" property="alarm" jdbcType="VARCHAR" />
@@ -23,8 +24,8 @@
   <resultMap id="BaseResultMap2" type="com.nbicc.gywlw.Model.GywlwHistoryDataForGPIO" >
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="gpio_id" property="gpioId" jdbcType="VARCHAR" />
-    <result column="value" property="value" jdbcType="INTEGER" />
-    <result column="time" property="time" jdbcType="TIMESTAMP" />
+    <result column="value" property="itemValue" jdbcType="INTEGER" />
+    <result column="time" property="itemTime" jdbcType="TIMESTAMP" />
     <result column="device_id" property="deviceId" jdbcType="VARCHAR" />
     <result column="content" property="content" jdbcType="VARCHAR" />
     <result column="alarm" property="alarm" jdbcType="VARCHAR" />
@@ -45,9 +46,11 @@
   </select>
   <select id="getHistoryData" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select
-    <include refid="Base_Column_List" />
-    from gywlw_history_data_for_gpio
-    where device_id = #{deviceId,jdbcType=VARCHAR} and gpio_id = #{gpioId,jdbcType=VARCHAR}
+    a.*, b.field_address
+    from gywlw_history_data_for_gpio a
+    LEFT JOIN gywlw_device_gpio b
+    ON a.gpio_id=b.id
+    where a.device_id = #{deviceId,jdbcType=VARCHAR} and a.gpio_id = #{gpioId,jdbcType=VARCHAR}
   </select>
   <select id="getLatestData" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select
@@ -89,8 +92,8 @@
     )
     values
     <foreach collection ="list" item="a" index= "index" separator =",">
-      (#{a.gpioId,jdbcType=VARCHAR},#{a.value,jdbcType=INTEGER},
-      #{a.time,jdbcType=TIMESTAMP},#{a.deviceId,jdbcType=VARCHAR},#{a.content,jdbcType=VARCHAR},
+      (#{a.gpioId,jdbcType=VARCHAR},#{a.itemValue,jdbcType=INTEGER},
+      #{a.itemTime,jdbcType=TIMESTAMP},#{a.deviceId,jdbcType=VARCHAR},#{a.content,jdbcType=VARCHAR},
       #{a.alarm,jdbcType=VARCHAR}
       )
     </foreach>
@@ -99,8 +102,8 @@
     insert into gywlw_history_data_for_gpio (id, gpio_id, value, 
       time, device_id, content, 
       alarm)
-    values (#{id,jdbcType=INTEGER}, #{gpioId,jdbcType=VARCHAR}, #{value,jdbcType=INTEGER}, 
-      #{time,jdbcType=TIMESTAMP}, #{deviceId,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR}, 
+    values (#{id,jdbcType=INTEGER}, #{gpioId,jdbcType=VARCHAR}, #{itemValue,jdbcType=INTEGER},
+      #{itemTime,jdbcType=TIMESTAMP}, #{deviceId,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR},
       #{alarm,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.nbicc.gywlw.Model.GywlwHistoryDataForGPIO" >
@@ -112,10 +115,10 @@
       <if test="gpioId != null" >
         gpio_id,
       </if>
-      <if test="value != null" >
+      <if test="itemValue != null" >
         value,
       </if>
-      <if test="time != null" >
+      <if test="itemTime != null" >
         time,
       </if>
       <if test="deviceId != null" >
@@ -135,11 +138,11 @@
       <if test="gpioId != null" >
         #{gpioId,jdbcType=VARCHAR},
       </if>
-      <if test="value != null" >
-        #{value,jdbcType=INTEGER},
+      <if test="itemValue != null" >
+        #{itemValue,jdbcType=INTEGER},
       </if>
-      <if test="time != null" >
-        #{time,jdbcType=TIMESTAMP},
+      <if test="itemTime != null" >
+        #{itemTime,jdbcType=TIMESTAMP},
       </if>
       <if test="deviceId != null" >
         #{deviceId,jdbcType=VARCHAR},
@@ -158,11 +161,11 @@
       <if test="gpioId != null" >
         gpio_id = #{gpioId,jdbcType=VARCHAR},
       </if>
-      <if test="value != null" >
-        value = #{value,jdbcType=INTEGER},
+      <if test="itemValue != null" >
+        value = #{itemValue,jdbcType=INTEGER},
       </if>
-      <if test="time != null" >
-        time = #{time,jdbcType=TIMESTAMP},
+      <if test="itemTime != null" >
+        time = #{itemTime,jdbcType=TIMESTAMP},
       </if>
       <if test="deviceId != null" >
         device_id = #{deviceId,jdbcType=VARCHAR},
@@ -179,8 +182,8 @@
   <update id="updateByPrimaryKey" parameterType="com.nbicc.gywlw.Model.GywlwHistoryDataForGPIO" >
     update gywlw_history_data_for_gpio
     set gpio_id = #{gpioId,jdbcType=VARCHAR},
-      value = #{value,jdbcType=INTEGER},
-      time = #{time,jdbcType=TIMESTAMP},
+      value = #{itemValue,jdbcType=INTEGER},
+      time = #{itemTime,jdbcType=TIMESTAMP},
       device_id = #{deviceId,jdbcType=VARCHAR},
       content = #{content,jdbcType=VARCHAR},
       alarm = #{alarm,jdbcType=VARCHAR}

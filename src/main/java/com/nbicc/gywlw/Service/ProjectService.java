@@ -238,7 +238,7 @@ public class ProjectService {
         if(list1.size() > 0){
             for(GywlwHistoryDataForGPIO gywlwHistoryDataForGPIO : list1){
                 GywlwHistoryItem gywlwHistoryItem = new GywlwHistoryItem();
-                gywlwHistoryItem.setItemTime(gywlwHistoryDataForGPIO.getTime());
+                gywlwHistoryItem.setItemTime(gywlwHistoryDataForGPIO.getItemTime());
                 gywlwHistoryItem.setDeviceId(gywlwHistoryDataForGPIO.getDeviceId());
                 gywlwHistoryItem.setDeviceName(gywlwDeviceMapper.selectByDeviceId(gywlwHistoryDataForGPIO.getDeviceId()).getDeviceName());
                 gywlwHistoryItem.setPlcName("gpio");
@@ -246,7 +246,7 @@ public class ProjectService {
                 gywlwHistoryItem.setItemName(gpio.getFieldName());
                 gywlwHistoryItem.setItemAlias(gpio.getFieldName2());
                 gywlwHistoryItem.setItemAddress(gpio.getFieldAddress());
-                gywlwHistoryItem.setItemValue(gywlwHistoryDataForGPIO.getValue() * 1.0);
+                gywlwHistoryItem.setItemValue(gywlwHistoryDataForGPIO.getItemValue() * 1.0);
                 gywlwHistoryItem.setRegId(gywlwHistoryDataForGPIO.getGpioId());
                 gywlwHistoryItem.setItemId(gywlwHistoryDataForGPIO.getId());
                 gywlwHistoryItem.setVariableName(gywlwHistoryDataForGPIO.getVariableName());
@@ -621,10 +621,10 @@ public class ProjectService {
         if(gywlwDeviceGpio == null){
             return null;
         }
-        String[] str = gywlwDeviceGpio.getFieldAddress().split("_");
+//        String[] str = gywlwDeviceGpio.getFieldAddress().split("_");
         PageHelper.startPage(pageNum, pageSize);
-        List<GywlwHistoryDataForGPIO> list = gywlwHistoryDataForGPIOMapper.
-                getHistoryData(gywlwDeviceGpio.getDeviceId(),str[1]);
+        List<GywlwHistoryDataForGPIO> list = gywlwHistoryDataForGPIOMapper.getHistoryData(gywlwDeviceGpio.getDeviceId(),
+                gywlwDeviceGpio.getId());
         PageInfo<GywlwHistoryDataForGPIO> pageInfo = new PageInfo<>(list);
         return pageInfo;
     }

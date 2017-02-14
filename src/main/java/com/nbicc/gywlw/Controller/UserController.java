@@ -825,14 +825,11 @@ public class UserController {
                                         @RequestParam(value = "page_num", defaultValue = "1")Integer pageNum,
                                         @RequestParam(value = "page_size", defaultValue = "20")Integer pageSize){
         try {
-            PageInfo<GywlwHistoryItem> pageInfo = projectService.getHistoryDataForReg(regId,startTime,endTime,pageNum,pageSize);
-            Integer size = pageInfo.getSize();
-            if(size.equals(0)) {
+            PageInfo<GywlwHistoryItem> pageInfo = projectService.getHistoryDataForReg(regId,
+                    startTime,endTime,pageNum,pageSize);
+            if (pageInfo == null || pageInfo.getSize() == 0) {
                 PageInfo<GywlwHistoryDataForGPIO> listForGpio = projectService.getHistoryDataForGpio(regId, startTime,
                         endTime, pageNum, pageSize);
-                if (listForGpio == null) {
-                    return MyUtil.response(0, "查不到相关数据！");
-                }
                 return MyUtil.response(0, listForGpio);
             }
             return MyUtil.response(0, pageInfo);

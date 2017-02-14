@@ -29,7 +29,7 @@
   </sql>
   <select id="selectByUserIdAndDeviceSn" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
-    a.admin_id,a.factory_id,a.content,a.device_id,a.device_sn,a.device_name,a.last_connected,a.device_online,a.expired_right, a.expired
+    a.admin_id,a.factory_id,a.content,a.device_id, a.create_time, a.device_sn,a.device_name,a.last_connected,a.device_online,a.expired_right, a.expired
     from gywlw_device a,(SELECT device_id FROM `gywlw_project_device_group`
                          JOIN gywlw_project_user_group
                          ON gywlw_project_device_group.project_id=gywlw_project_user_group.project_id
@@ -43,7 +43,7 @@
   </select>
   <select id="selectByUserIdAndDeviceSnWithAdmin" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select
-    admin_id,factory_id,device_id,device_sn,device_name,last_connected,device_online,expired,expired_right
+    admin_id,factory_id,device_id, create_time, device_sn,device_name,last_connected,device_online,expired,expired_right
     from gywlw_device
     <if test="deviceSn =='ALL'">
       where admin_id = #{userId,jdbcType=VARCHAR}  and del_mark = 0

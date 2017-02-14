@@ -1,10 +1,7 @@
 package com.nbicc.gywlw.Service;
 
 import com.nbicc.gywlw.Model.*;
-import com.nbicc.gywlw.mapper.GywlwDeviceMapper;
-import com.nbicc.gywlw.mapper.GywlwHistoryDataForGPIOMapper;
-import com.nbicc.gywlw.mapper.GywlwHistoryItemMapper;
-import com.nbicc.gywlw.mapper.GywlwUserMapper;
+import com.nbicc.gywlw.mapper.*;
 import com.nbicc.gywlw.util.MyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +27,9 @@ public class ManufacturerService {
 	
 	@Autowired
 	private GywlwHistoryItemMapper gywlwHistoryItemMapper;
+
+	@Autowired
+	private GywlwDeviceGpioMapper gywlwDeviceGpioMapper;
 
 	@Autowired
 	private ProjectService projectService;
@@ -60,9 +60,11 @@ public class ManufacturerService {
 				GywlwHistoryItem historyItem = new GywlwHistoryItem();
 				historyItem.setDeviceId(deviceId);
 				historyItem.setRegId(gpio.getGpioId());
-				historyItem.setItemValue(gpio.getValue() * 1.0);
+				historyItem.setItemName(gywlwDeviceGpioMapper.selectByPrimaryKey(gpio.getGpioId()).getFieldName());
+				historyItem.setItemAddress(gywlwDeviceGpioMapper.selectByPrimaryKey(gpio.getGpioId()).getFieldAddress());
+				historyItem.setItemValue(gpio.getItemValue() * 1.0);
 				historyItem.setItemId(gpio.getId());
-				historyItem.setItemTime(gpio.getTime());
+				historyItem.setItemTime(gpio.getItemTime());
 				list.add(historyItem);
 			}
 		}
