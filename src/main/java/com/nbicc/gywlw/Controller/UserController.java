@@ -47,8 +47,7 @@ public class UserController {
     public JSONObject projectList(@RequestParam(value = "project_status", defaultValue = "1")String projectStatus) {
         try {
             String localUserId = hostHolder.getGywlwUser().getUserId();
-            List<GywlwProject> allProject = new ArrayList<>();
-            allProject = projectService.projectList(localUserId,Byte.parseByte(projectStatus));
+            List<GywlwProject> allProject = projectService.projectList(localUserId,Byte.parseByte(projectStatus));
             return MyUtil.response(0, allProject);
         }catch (Exception e){
             logger.error("获取项目列表失败" + e.getMessage());
@@ -64,9 +63,8 @@ public class UserController {
                                         @RequestParam(value = "page_size", defaultValue = "6")Integer pageSize) {
         try {
             String localUserId = hostHolder.getGywlwUser().getUserId();
-            List<GywlwProject> allProject = new ArrayList<>();
             PageHelper.startPage(pageNum,pageSize);
-            allProject = projectService.projectList(localUserId,Byte.parseByte(projectStatus));
+            List<GywlwProject> allProject = projectService.projectList(localUserId,Byte.parseByte(projectStatus));
             PageInfo<GywlwProject> pageInfo = new PageInfo<>(allProject);
             return MyUtil.response(0, pageInfo);
         }catch (Exception e){
@@ -215,8 +213,7 @@ public class UserController {
     @ResponseBody
     public JSONObject projectMemberList(@RequestParam("project_id") String projectId){
         try {
-            List<GywlwProjectUserGroup> allProjectMember = new ArrayList<GywlwProjectUserGroup>();
-            allProjectMember = projectService.projectMemberList(projectId);
+            List<GywlwProjectUserGroup> allProjectMember = projectService.projectMemberList(projectId);
             return MyUtil.response(0, allProjectMember);
         }catch (Exception e){
             logger.error("获取项目成员列表失败" + e.getMessage());
@@ -231,9 +228,8 @@ public class UserController {
                                               @RequestParam(value = "page_num",defaultValue = "1")Integer pageNum,
                                               @RequestParam(value = "page_size",defaultValue = "0")Integer pageSize){
         try {
-            List<GywlwProjectUserGroup> allProjectMember = new ArrayList<GywlwProjectUserGroup>();
             PageHelper.startPage(pageNum,pageSize);
-            allProjectMember = projectService.projectMemberList(projectId);
+            List<GywlwProjectUserGroup>allProjectMember = projectService.projectMemberList(projectId);
             PageInfo<GywlwProjectUserGroup> pageInfo = new PageInfo<>(allProjectMember);
             return MyUtil.response(0, pageInfo);
         }catch (Exception e){
