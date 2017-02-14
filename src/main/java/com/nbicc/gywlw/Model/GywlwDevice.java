@@ -47,7 +47,7 @@ public class GywlwDevice {
 
     private String orderCode;
 
-    private Integer orderNum;
+    private Integer orderTotal;
 
     public String getOrderCode() {
         return orderCode;
@@ -57,12 +57,12 @@ public class GywlwDevice {
         this.orderCode = orderCode;
     }
 
-    public Integer getOrderNum() {
-        return orderNum;
+    public Integer getOrderTotal() {
+        return orderTotal;
     }
 
-    public void setOrderNum(Integer orderNum) {
-        this.orderNum = orderNum;
+    public void setOrderTotal(Integer orderTotal) {
+        this.orderTotal = orderTotal;
     }
 
     public String getDeviceStatus() {

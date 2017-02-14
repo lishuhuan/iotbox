@@ -1,5 +1,7 @@
 package com.nbicc.gywlw.Service;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.nbicc.gywlw.Model.*;
 import com.nbicc.gywlw.mapper.*;
 import com.nbicc.gywlw.util.MyUtil;
@@ -593,30 +595,38 @@ public class ProjectService {
     }
 
     //查看plc中数据项的历史数据
-    public List<GywlwHistoryItem> getHistoryDataForReg(String regId,String startTime,String endTime) throws ParseException {
+    public PageInfo<GywlwHistoryItem> getHistoryDataForReg(String regId, String startTime, String endTime,
+                                                       Integer pageNum, Integer pageSize) throws ParseException {
         refreshService.refresh();
         GywlwRegInfo gywlwRegInfo = gywlwRegInfoMapper.selectByPrimaryKey(regId);
         if(gywlwRegInfo == null){
             return null;
         }
-        GywlwDevice d = gywlwDeviceMapper.selectByDeviceId(gywlwRegInfo.getDeviceId());
+//        GywlwDevice d = gywlwDeviceMapper.selectByDeviceId(gywlwRegInfo.getDeviceId());
         if(hostHolder.getGywlwUser().getUserId().
                 equals(gywlwDeviceMapper.selectByDeviceId(gywlwRegInfo.getDeviceId()).getAdminId())){
+            PageHelper.startPage(pageNum,pageSize);
             List<GywlwHistoryItem> list = gywlwHistoryItemMapper.getDataForReg(regId,
                     MyUtil.timeTransformToDateNo1000(startTime),MyUtil.timeTransformToDateNo1000(endTime));
-            return list;
+            PageInfo<GywlwHistoryItem> pageInfo = new PageInfo<>(list);
+            return pageInfo;
         }
         return null;
     }
 
-    public List<GywlwHistoryDataForGPIO> getHistoryDataForGpio(String regId, String startTime, String endTime) {
+    public PageInfo<GywlwHistoryDataForGPIO> getHistoryDataForGpio(String regId, String startTime, String endTime,
+                                                               Integer pageNum, Integer pageSize) {
 //        refreshService.refresh();  //在查询数据项的时候已经刷新过一次了
         GywlwDeviceGpio gywlwDeviceGpio = gywlwDeviceGpioMapper.selectByPrimaryKey(regId);
         if(gywlwDeviceGpio == null){
             return null;
         }
         String[] str = gywlwDeviceGpio.getFieldAddress().split("_");
-        return gywlwHistoryDataForGPIOMapper.getHistoryData(gywlwDeviceGpio.getDeviceId(),str[1]);
+        PageHelper.startPage(pageNum, pageSize);
+        List<GywlwHistoryDataForGPIO> list = gywlwHistoryDataForGPIOMapper.
+                getHistoryData(gywlwDeviceGpio.getDeviceId(),str[1]);
+        PageInfo<GywlwHistoryDataForGPIO> pageInfo = new PageInfo<>(list);
+        return pageInfo;
     }
 }
 

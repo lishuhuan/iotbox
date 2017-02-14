@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
@@ -45,8 +44,10 @@ public class RefreshService {
     private GywlwDeviceGpioMapper gywlwDeviceGpioMapper;
     @Autowired
     private GywlwBrandMapper gywlwBrandMapper;
+    @Autowired
+    private GywlwDeviceOrderMapper gywlwDeviceOrderMapper;
 
-    @Transactional
+
     public void refresh(){
         refreshConfigParams();
         refreshParamsForPlc();  //同步plc数据项设置
@@ -59,6 +60,7 @@ public class RefreshService {
 
     //PLC，默认一个物联网盒子上连接的plc都是同一型号(目前是一对一)
     public void refreshDataForPlc(){
+        long a = System.currentTimeMillis();
         JedisPool pool = RedisAPI.getPool();
         Jedis jedis = pool.getResource();
         List<GywlwDevice> devices = gywlwDeviceMapper.selectAll();
@@ -153,10 +155,14 @@ public class RefreshService {
                 }
             }
         }
+        System.out.println("结束*****************************");
+        long b = System.currentTimeMillis();
+        System.out.println("plc数据同步结束，总花费时间:" + (b - a) + "毫秒***********************");
     }
 
     //GPIO
     public void refreshDataForGpio() {
+        long a = System.currentTimeMillis();
         List<GywlwDevice> devices = gywlwDeviceMapper.selectAll();
         if(devices.size() != 0){
             for (GywlwDevice device : devices) {
@@ -188,12 +194,12 @@ public class RefreshService {
                 gpioList.add("gpio_6");
                 gpioList.add("gpio_7");
                 gpioList.add("gpio_8");
+                gpioList.add("throughput");
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("deviceId",gpioId);
                 jsonObject.put("idList",gpioList);
                 jsonObject.put("timestamp",timestamp);
 //                System.out.println("请求参数: " + jsonObject);
-
 //                logger.info("准备工作结束，发送psot请求： " + new Date());
 
                 String str = null;
@@ -226,7 +232,8 @@ public class RefreshService {
                     LinkedList<GpioDataModel> linkedList = new LinkedList<>();
                     linkedList.addAll(list1);
                     try {
-                        handleByThread(linkedList,gpioList,device,1,15);  //0表示handle plc
+                        saveThroughPut(list1,device);  //存储累计产量
+                        handleByThread(linkedList,gpioList,device,1,15);  //1表示handle gpio data
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     } catch (ParseException e) {
@@ -235,6 +242,22 @@ public class RefreshService {
                         e.printStackTrace();
                     }
                 }
+            }
+        }
+        System.out.println("结束*****************************");
+        long b = System.currentTimeMillis();
+        System.out.println("gpio数据同步结束，总花费时间:" + (b - a) + "毫秒***********************");
+    }
+
+    //存储累计产量
+    private void saveThroughPut(List<GpioDataModel> list1, GywlwDevice device) {
+        for(GpioDataModel model : list1){
+            if(model.getThroughPut() != null){
+                Integer throughPut = model.getThroughPut().getValue();
+                GywlwDeviceOrder gywlwDeviceOrder = gywlwDeviceOrderMapper.selectByDeviceId(device.getDeviceId());
+                gywlwDeviceOrder.setOrderFinished(throughPut);
+                gywlwDeviceOrderMapper.updateByPrimaryKeySelective(gywlwDeviceOrder);
+                break;
             }
         }
     }
@@ -596,7 +619,7 @@ public class RefreshService {
         }
     }
 
-    //用了硬编码，处理速度还可以，就没有用多线程
+    //用了硬编码,多线程
     private void handler(List<GpioDataModel> list, GywlwDevice device, List<String> gpioList){
         try {
             List<GywlwHistoryDataForGPIO> listForGpio = new ArrayList<>();
@@ -799,6 +822,7 @@ public class RefreshService {
                 listForGpio.add(gywlwHistoryDataForGPIO);
             }
         }
+
     }
 
     public void handlerForPlc(List<Map> list1, List<String> regList) throws ParseException, CloneNotSupportedException {
@@ -859,7 +883,7 @@ public class RefreshService {
         int length = list1.size();
         int t1 = length % threadNum == 0 ? length / threadNum : (length / threadNum + 1);
         CountDownLatch latch = new CountDownLatch(threadNum);// 多少协作
-        long a = System.currentTimeMillis();
+//        long a = System.currentTimeMillis();
         if(length < threadNum * 15){
             if(mark == 0) {
                 handlerForPlc(list1, regList);
@@ -887,9 +911,9 @@ public class RefreshService {
             }
             latch.await();// 等待所有工人完成工作
         }
-        System.out.println("结束*****************************");
-        long b = System.currentTimeMillis();
-        System.out.println("时间:" + (b - a) + "毫秒***********************");
+//        System.out.println("结束*****************************");
+//        long b = System.currentTimeMillis();
+//        System.out.println("数据同步结束，总花费时间:" + (b - a) + "毫秒***********************");
     }
 
     class RunnableThread implements Runnable {

@@ -17,7 +17,7 @@ public class ScheduledTasks {
     private RefreshService refreshService;
 
     //间隔30min同步一次数据
-    @Scheduled(fixedRate = 1000*1800)
+    @Scheduled(initialDelay=1000*600, fixedRate = 1000*1800)
     public void refreshData(){
         refreshService.refresh();
     }

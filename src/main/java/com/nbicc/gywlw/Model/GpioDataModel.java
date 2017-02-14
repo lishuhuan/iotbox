@@ -14,6 +14,7 @@ public class GpioDataModel {
     private Gpio gpio_6;
     private Gpio gpio_7;
     private Gpio gpio_8;
+    private Gpio throughPut;
 
     private String timestamp;
 
@@ -127,6 +128,14 @@ public class GpioDataModel {
 
     public void setGpio_8(Gpio gpio_8) {
         this.gpio_8 = gpio_8;
+    }
+
+    public Gpio getThroughPut() {
+        return throughPut;
+    }
+
+    public void setThroughPut(Gpio throughPut) {
+        this.throughPut = throughPut;
     }
 }
 

@@ -1,6 +1,7 @@
 package com.nbicc.gywlw.API;
 
 import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.PageInfo;
 import com.nbicc.gywlw.Model.GywlwHistoryItem;
 import com.nbicc.gywlw.Model.GywlwRegInfo;
 import com.nbicc.gywlw.Service.ApiService;
@@ -104,9 +105,12 @@ public class BaseInfoAPI {
     public JSONObject historyDataForReg(@RequestParam("token")String token,
                                         @RequestParam("reg_id")String regId,
                                         @RequestParam(value = "start_time",defaultValue = "0")String startTime,
-                                        @RequestParam(value = "end_time",defaultValue = "4640396560000")String endTime
+                                        @RequestParam(value = "end_time",defaultValue = "4640396560000")String endTime,
+                                        @RequestParam(value = "limit",defaultValue = "100")Integer limit,
+                                        @RequestParam(value = "cursor",defaultValue = "0")Integer cursor
                                         ){
         try {
+
             GywlwRegInfo regInfo = gywlwRegInfoMapper.selectByPrimaryKey(regId);
             if(regInfo == null){
                 return MyUtil.response(0,"查不到该reg_id");
@@ -115,7 +119,9 @@ public class BaseInfoAPI {
             if(result != null){
                 return result;
             }
-            List<GywlwHistoryItem> list = projectService.getHistoryDataForReg(regId,startTime,endTime);
+            //todo
+            PageInfo<GywlwHistoryItem> list = projectService.getHistoryDataForReg(regId,startTime,endTime,cursor,limit);
+
             return MyUtil.response(0, list);
         } catch (ParseException e) {
             logger.error("查询数据项历史数据出错" + e.getMessage());

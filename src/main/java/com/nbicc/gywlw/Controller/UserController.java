@@ -829,17 +829,16 @@ public class UserController {
                                         @RequestParam(value = "page_num", defaultValue = "1")Integer pageNum,
                                         @RequestParam(value = "page_size", defaultValue = "20")Integer pageSize){
         try {
-            PageHelper.startPage(pageNum,pageSize);
-            List<GywlwHistoryItem> list = projectService.getHistoryDataForReg(regId,startTime,endTime);
-            if(list == null){
-                List<GywlwHistoryDataForGPIO> listForGpio = projectService.getHistoryDataForGpio(regId,startTime,endTime);
-                if(listForGpio == null) {
+            PageInfo<GywlwHistoryItem> pageInfo = projectService.getHistoryDataForReg(regId,startTime,endTime,pageNum,pageSize);
+            Integer size = pageInfo.getSize();
+            if(size.equals(0)) {
+                PageInfo<GywlwHistoryDataForGPIO> listForGpio = projectService.getHistoryDataForGpio(regId, startTime,
+                        endTime, pageNum, pageSize);
+                if (listForGpio == null) {
                     return MyUtil.response(0, "查不到相关数据！");
                 }
-                PageInfo<GywlwHistoryDataForGPIO> pageInfo1 = new PageInfo<>(listForGpio);
-                return MyUtil.response(0, pageInfo1);
+                return MyUtil.response(0, listForGpio);
             }
-            PageInfo<GywlwHistoryItem> pageInfo = new PageInfo<>(list);
             return MyUtil.response(0, pageInfo);
         } catch (ParseException e) {
             logger.error("查询数据项历史数据出错" + e.getMessage());

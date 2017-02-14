@@ -112,7 +112,7 @@ public class ApiService {
                 if("3".equals(gywlwDevice.getDeviceStatus())) {
                     GywlwDeviceOrder gywlwDeviceOrder = gywlwDeviceOrderMapper.selectByDeviceId(gywlwDevice.getDeviceId());
                     device.setOrderCode(gywlwDeviceOrder.getOrderCode());
-                    device.setOrderNum(gywlwDeviceOrder.getOrderNum());
+                    device.setOrderTotal(gywlwDeviceOrder.getOrderTotal());
                 }
                 newList.add(device);
             }
@@ -131,12 +131,14 @@ public class ApiService {
         if(gywlwDeviceOrder == null) {
             GywlwDeviceOrder order = new GywlwDeviceOrder();
             order.setDeviceId(deviceId);
-            order.setOrderNum(Integer.parseInt(orderNum));
+            order.setDeviceSn(gywlwDeviceMapper.selectByDeviceId(deviceId).getDeviceSn());
+            order.setOrderTotal(Integer.parseInt(orderNum));
             order.setOrderCode(orderCode);
+            order.setCreatedTime(new Date());
             gywlwDeviceOrderMapper.insertSelective(order);
         }else{
             gywlwDeviceOrder.setOrderCode(orderCode);
-            gywlwDeviceOrder.setOrderNum(Integer.parseInt(orderNum));
+            gywlwDeviceOrder.setOrderTotal(Integer.parseInt(orderNum));
             gywlwDeviceOrderMapper.updateByPrimaryKeySelective(gywlwDeviceOrder);
         }
 

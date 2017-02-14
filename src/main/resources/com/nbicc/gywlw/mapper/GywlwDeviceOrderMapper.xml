@@ -4,12 +4,23 @@
   <resultMap id="BaseResultMap" type="com.nbicc.gywlw.Model.GywlwDeviceOrder" >
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="device_id" property="deviceId" jdbcType="VARCHAR" />
+    <result column="device_sn" property="deviceSn" jdbcType="VARCHAR" />
     <result column="order_code" property="orderCode" jdbcType="VARCHAR" />
-    <result column="order_num" property="orderNum" jdbcType="INTEGER" />
-    <result column="plc_id" property="plcId" jdbcType="VARCHAR" />
+    <result column="order_total" property="orderTotal" jdbcType="INTEGER" />
+    <result column="order_finished" property="orderFinished" jdbcType="INTEGER" />
+    <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+    <result column="recent_work_time" property="recentWorkTime" jdbcType="VARCHAR" />
+    <result column="finish_time" property="finishTime" jdbcType="VARCHAR" />
+    <result column="total_time" property="totalTime" jdbcType="VARCHAR" />
+    <result column="passageway" property="passageway" jdbcType="VARCHAR" />
+    <result column="production_id" property="productionId" jdbcType="VARCHAR" />
+    <result column="production_name" property="productionName" jdbcType="VARCHAR" />
+    <result column="operate_mark" property="operateMark" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, device_id, order_code, order_num, plc_id
+    id, device_id, device_sn, order_code, order_total, order_finished, created_time, 
+    recent_work_time, finish_time, total_time, passageway, production_id, production_name, 
+    operate_mark
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -28,10 +39,16 @@
     where id = #{id,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.nbicc.gywlw.Model.GywlwDeviceOrder" >
-    insert into gywlw_device_order (id, device_id, order_code, 
-      order_num, plc_id)
-    values (#{id,jdbcType=INTEGER}, #{deviceId,jdbcType=VARCHAR}, #{orderCode,jdbcType=VARCHAR}, 
-      #{orderNum,jdbcType=INTEGER}, #{plcId,jdbcType=VARCHAR})
+    insert into gywlw_device_order (id, device_id, device_sn, 
+      order_code, order_total, order_finished, 
+      created_time, recent_work_time, finish_time, 
+      total_time, passageway, production_id, 
+      production_name, operate_mark)
+    values (#{id,jdbcType=INTEGER}, #{deviceId,jdbcType=VARCHAR}, #{deviceSn,jdbcType=VARCHAR}, 
+      #{orderCode,jdbcType=VARCHAR}, #{orderTotal,jdbcType=INTEGER}, #{orderFinished,jdbcType=INTEGER}, 
+      #{createdTime,jdbcType=TIMESTAMP}, #{recentWorkTime,jdbcType=VARCHAR}, #{finishTime,jdbcType=VARCHAR}, 
+      #{totalTime,jdbcType=VARCHAR}, #{passageway,jdbcType=VARCHAR}, #{productionId,jdbcType=VARCHAR}, 
+      #{productionName,jdbcType=VARCHAR}, #{operateMark,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.nbicc.gywlw.Model.GywlwDeviceOrder" >
     insert into gywlw_device_order
@@ -42,14 +59,41 @@
       <if test="deviceId != null" >
         device_id,
       </if>
+      <if test="deviceSn != null" >
+        device_sn,
+      </if>
       <if test="orderCode != null" >
         order_code,
       </if>
-      <if test="orderNum != null" >
-        order_num,
+      <if test="orderTotal != null" >
+        order_total,
       </if>
-      <if test="plcId != null" >
-        plc_id,
+      <if test="orderFinished != null" >
+        order_finished,
+      </if>
+      <if test="createdTime != null" >
+        created_time,
+      </if>
+      <if test="recentWorkTime != null" >
+        recent_work_time,
+      </if>
+      <if test="finishTime != null" >
+        finish_time,
+      </if>
+      <if test="totalTime != null" >
+        total_time,
+      </if>
+      <if test="passageway != null" >
+        passageway,
+      </if>
+      <if test="productionId != null" >
+        production_id,
+      </if>
+      <if test="productionName != null" >
+        production_name,
+      </if>
+      <if test="operateMark != null" >
+        operate_mark,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
@@ -59,14 +103,41 @@
       <if test="deviceId != null" >
         #{deviceId,jdbcType=VARCHAR},
       </if>
+      <if test="deviceSn != null" >
+        #{deviceSn,jdbcType=VARCHAR},
+      </if>
       <if test="orderCode != null" >
         #{orderCode,jdbcType=VARCHAR},
       </if>
-      <if test="orderNum != null" >
-        #{orderNum,jdbcType=INTEGER},
+      <if test="orderTotal != null" >
+        #{orderTotal,jdbcType=INTEGER},
       </if>
-      <if test="plcId != null" >
-        #{plcId,jdbcType=VARCHAR},
+      <if test="orderFinished != null" >
+        #{orderFinished,jdbcType=INTEGER},
+      </if>
+      <if test="createdTime != null" >
+        #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="recentWorkTime != null" >
+        #{recentWorkTime,jdbcType=VARCHAR},
+      </if>
+      <if test="finishTime != null" >
+        #{finishTime,jdbcType=VARCHAR},
+      </if>
+      <if test="totalTime != null" >
+        #{totalTime,jdbcType=VARCHAR},
+      </if>
+      <if test="passageway != null" >
+        #{passageway,jdbcType=VARCHAR},
+      </if>
+      <if test="productionId != null" >
+        #{productionId,jdbcType=VARCHAR},
+      </if>
+      <if test="productionName != null" >
+        #{productionName,jdbcType=VARCHAR},
+      </if>
+      <if test="operateMark != null" >
+        #{operateMark,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -76,14 +147,41 @@
       <if test="deviceId != null" >
         device_id = #{deviceId,jdbcType=VARCHAR},
       </if>
+      <if test="deviceSn != null" >
+        device_sn = #{deviceSn,jdbcType=VARCHAR},
+      </if>
       <if test="orderCode != null" >
         order_code = #{orderCode,jdbcType=VARCHAR},
       </if>
-      <if test="orderNum != null" >
-        order_num = #{orderNum,jdbcType=INTEGER},
+      <if test="orderTotal != null" >
+        order_total = #{orderTotal,jdbcType=INTEGER},
       </if>
-      <if test="plcId != null" >
-        plc_id = #{plcId,jdbcType=VARCHAR},
+      <if test="orderFinished != null" >
+        order_finished = #{orderFinished,jdbcType=INTEGER},
+      </if>
+      <if test="createdTime != null" >
+        created_time = #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="recentWorkTime != null" >
+        recent_work_time = #{recentWorkTime,jdbcType=VARCHAR},
+      </if>
+      <if test="finishTime != null" >
+        finish_time = #{finishTime,jdbcType=VARCHAR},
+      </if>
+      <if test="totalTime != null" >
+        total_time = #{totalTime,jdbcType=VARCHAR},
+      </if>
+      <if test="passageway != null" >
+        passageway = #{passageway,jdbcType=VARCHAR},
+      </if>
+      <if test="productionId != null" >
+        production_id = #{productionId,jdbcType=VARCHAR},
+      </if>
+      <if test="productionName != null" >
+        production_name = #{productionName,jdbcType=VARCHAR},
+      </if>
+      <if test="operateMark != null" >
+        operate_mark = #{operateMark,jdbcType=VARCHAR},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
@@ -91,9 +189,18 @@
   <update id="updateByPrimaryKey" parameterType="com.nbicc.gywlw.Model.GywlwDeviceOrder" >
     update gywlw_device_order
     set device_id = #{deviceId,jdbcType=VARCHAR},
+      device_sn = #{deviceSn,jdbcType=VARCHAR},
       order_code = #{orderCode,jdbcType=VARCHAR},
-      order_num = #{orderNum,jdbcType=INTEGER},
-      plc_id = #{plcId,jdbcType=VARCHAR}
+      order_total = #{orderTotal,jdbcType=INTEGER},
+      order_finished = #{orderFinished,jdbcType=INTEGER},
+      created_time = #{createdTime,jdbcType=TIMESTAMP},
+      recent_work_time = #{recentWorkTime,jdbcType=VARCHAR},
+      finish_time = #{finishTime,jdbcType=VARCHAR},
+      total_time = #{totalTime,jdbcType=VARCHAR},
+      passageway = #{passageway,jdbcType=VARCHAR},
+      production_id = #{productionId,jdbcType=VARCHAR},
+      production_name = #{productionName,jdbcType=VARCHAR},
+      operate_mark = #{operateMark,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>
