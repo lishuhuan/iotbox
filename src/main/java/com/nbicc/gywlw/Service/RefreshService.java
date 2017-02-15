@@ -23,6 +23,10 @@ import java.util.concurrent.CountDownLatch;
  */
 @Service
 public class RefreshService {
+
+    //useMark为0代表refresh未被使用，1表示正在运行
+    private static Integer useMark = 0;
+
     private static final String[] ALARM = {"alarm1","alarm2"};
 
     private static final Logger logger = LoggerFactory.getLogger(RefreshService.class);
@@ -49,204 +53,228 @@ public class RefreshService {
 
 
     public void refresh(){
-        refreshConfigParams();
-        refreshParamsForPlc();  //同步plc数据项设置
-        refreshRulesForPlc();   //同步plc rules
-        refreshParamsForGpio();    //同步gpio参数设置
-        refreshRulesForGpio();    //同步gpio rules
-        refreshDataForGpio();
-        refreshDataForPlc();
+        if(useMark == 1){
+            return;
+        }else{
+            logger.info("**************refresh start! *******************");
+            useMark = 1;
+        }
+        try {
+            refreshConfigParams();
+            refreshParamsForPlc();  //同步plc数据项设置
+            refreshRulesForPlc();   //同步plc rules
+            refreshParamsForGpio();    //同步gpio参数设置
+            refreshRulesForGpio();    //同步gpio rules
+            refreshDataForGpio();
+            refreshDataForPlc();
+        }finally {
+            useMark = 0;
+        }
     }
 
     //PLC，默认一个物联网盒子上连接的plc都是同一型号(目前是一对一)
     public void refreshDataForPlc(){
         long a = System.currentTimeMillis();
         JedisPool pool = RedisAPI.getPool();
-        Jedis jedis = pool.getResource();
-        List<GywlwDevice> devices = gywlwDeviceMapper.selectAll();
-        if(devices.size() != 0) {
-            for (GywlwDevice device : devices) {
-                List<String> deviceIdList = new ArrayList<>();
-                String sdkKey = "";
-                Long timestamp = 0L;
-                String redisKey = null;
+        Jedis jedis = null;
+        try {
+            jedis = pool.getResource();
+            List<GywlwDevice> devices = gywlwDeviceMapper.selectAll();
+            if (devices.size() != 0) {
+                for (GywlwDevice device : devices) {
+                    List<String> deviceIdList = new ArrayList<>();
+                    String sdkKey = "";
+                    Long timestamp = 0L;
+                    String redisKey = null;
 //                Long timestamp = 1482798633000L;//test
 //                timestamp = device.getLastConnected().getTime(); //当前时间减1天
-                List<String> regList = new ArrayList<>();
-                List<String> requestList = new ArrayList<>();
-                List<GywlwPlcInfo> plcinfos = gywlwPlcInfoMapper.selectByDeviceId(device.getDeviceId());
-                if (plcinfos.size() != 0) {
-                    for (GywlwPlcInfo plcInfo : plcinfos) {
-                        if(plcInfo.getSubdeviceId() == null){
-                            continue;
-                        }
-                        logger.info("同步plc数据准备工作： " + new Date());
-                        //redis保存最近一次的更新时间
-                        redisKey = plcInfo.getSubdeviceId();
-                        if(jedis.get(redisKey)!=null){
-                            timestamp = Long.parseLong(jedis.get(plcInfo.getSubdeviceId()));
-                        }else{
-                            GywlwHistoryItem historyItem = gywlwHistoryItemMapper.getLastTimeByPlcId(plcInfo.getId());
-                            if(historyItem == null){
-                                timestamp = System.currentTimeMillis() - 86400L; //当前时间减1天
-                            }else{
-                                timestamp = historyItem.getItemTime().getTime();
+                    List<String> regList = new ArrayList<>();
+                    List<String> requestList = new ArrayList<>();
+                    List<GywlwPlcInfo> plcinfos = gywlwPlcInfoMapper.selectByDeviceId(device.getDeviceId());
+                    if (plcinfos.size() != 0) {
+                        for (GywlwPlcInfo plcInfo : plcinfos) {
+                            if (plcInfo.getSubdeviceId() == null) {
+                                continue;
+                            }
+                            logger.info("同步plc数据准备工作： " + new Date());
+                            //redis保存最近一次的更新时间
+                            redisKey = plcInfo.getSubdeviceId();
+                            if (jedis.get(redisKey) != null) {
+                                timestamp = Long.parseLong(jedis.get(plcInfo.getSubdeviceId()));
+                            } else {
+                                GywlwHistoryItem historyItem = gywlwHistoryItemMapper.getLastTimeByPlcId(plcInfo.getId());
+                                if (historyItem == null) {
+                                    timestamp = System.currentTimeMillis() - 86400L; //当前时间减1天
+                                } else {
+                                    timestamp = historyItem.getItemTime().getTime();
+                                }
+                            }
+                            deviceIdList.add(plcInfo.getSubdeviceId());
+                            sdkKey = plcInfo.getContent(); //content保存着sdkkey
+                            List<GywlwRegInfo> reglists = gywlwRegInfoMapper.selectByPlcId(plcInfo.getId());
+                            if (reglists.size() != 0) {
+                                for (GywlwRegInfo reg : reglists) {
+                                    regList.add(reg.getRegAddress());
+                                }
                             }
                         }
-                        deviceIdList.add(plcInfo.getSubdeviceId());
-                        sdkKey = plcInfo.getContent(); //content保存着sdkkey
-                        List<GywlwRegInfo> reglists = gywlwRegInfoMapper.selectByPlcId(plcInfo.getId());
-                        if(reglists.size() != 0){
-                            for(GywlwRegInfo reg: reglists){
-                                regList.add(reg.getRegAddress());
-                            }
-                        }
+                    } else {
+                        continue;
                     }
-                }else{
-                    continue;
-                }
-                if(regList != null) {
-                    requestList.addAll(regList);
-                }
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("deviceIdList",deviceIdList);
-                jsonObject.put("sdkKey",sdkKey);
-                jsonObject.put("timestamp",timestamp);
-                jsonObject.put("idList",requestList);
+                    if (regList != null) {
+                        requestList.addAll(regList);
+                    }
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("deviceIdList", deviceIdList);
+                    jsonObject.put("sdkKey", sdkKey);
+                    jsonObject.put("timestamp", timestamp);
+                    jsonObject.put("idList", requestList);
 
 //                System.out.println("请求参数: " + jsonObject);
 //                logger.info("准备工作结束，发送psot请求： " + new Date());
-                String str = null;
-                try {
-                    str = HttpsTest.postForm(jsonObject,2);  //2代表plc通道，也就是走子设备通道
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                if(str != null && str.length() > 1000) {
-                    logger.info("plc待同步数据 : " + str.substring(0,1000));
-                }else{
-                    logger.info("plc待同步数据 : " + str);
-                }
-                //handle response
-                if(str == null || str.equals("0")){
-                    continue;
-                }
-//                JSONObject json = new JSONObject();
-                Map<String, Object> map1 = JSON.parseObject(str);
-                List<Map> list1 = JSON.parseArray(map1.get("result_data").toString(), Map.class);
-   //             System.out.println("list1.size():"+list1.toString());
-//                logger.info("请求成功，开始处理数据： " + new Date());
-                if(list1.size() > 0){
+                    String str = null;
                     try {
-                        jedis.set(redisKey, list1.get(0).get("timestamp").toString());
-                        //单线程
+                        str = HttpsTest.postForm(jsonObject, 2);  //2代表plc通道，也就是走子设备通道
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    if (str != null && str.length() > 1000) {
+                        logger.info("plc待同步数据 : " + str.substring(0, 1000));
+                    } else {
+                        logger.info("plc待同步数据 : " + str);
+                    }
+                    //handle response
+                    if (str == null || str.equals("0")) {
+                        continue;
+                    }
+//                JSONObject json = new JSONObject();
+                    Map<String, Object> map1 = JSON.parseObject(str);
+                    List<Map> list1 = JSON.parseArray(map1.get("result_data").toString(), Map.class);
+                    //             System.out.println("list1.size():"+list1.toString());
+//                logger.info("请求成功，开始处理数据： " + new Date());
+                    if (list1.size() > 0) {
+                        try {
+                            jedis.set(redisKey, list1.get(0).get("timestamp").toString());
+                            //单线程
 //                        handlerForPlc(list1,regList);
-                        //多线程
-                        LinkedList<Map> linkedList = new LinkedList<>();
-                        linkedList.addAll(list1);
-                        handleByThread(linkedList,regList,new GywlwDevice(),0,15);  //0表示handle plc
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    } catch (CloneNotSupportedException e) {
-                        e.printStackTrace();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                            //多线程
+                            LinkedList<Map> linkedList = new LinkedList<>();
+                            linkedList.addAll(list1);
+                            handleByThread(linkedList, regList, new GywlwDevice(), 0, 15);  //0表示handle plc
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        } catch (CloneNotSupportedException e) {
+                            e.printStackTrace();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }
+            System.out.println("结束*****************************");
+            long b = System.currentTimeMillis();
+            System.out.println("plc数据同步结束，总花费时间:" + (b - a) + "毫秒***********************");
+        }finally {
+            if(jedis != null){
+                jedis.close();
+            }
         }
-        System.out.println("结束*****************************");
-        long b = System.currentTimeMillis();
-        System.out.println("plc数据同步结束，总花费时间:" + (b - a) + "毫秒***********************");
     }
 
     //GPIO
     public void refreshDataForGpio() {
         long a = System.currentTimeMillis();
-        List<GywlwDevice> devices = gywlwDeviceMapper.selectAll();
-        if(devices.size() != 0){
-            for (GywlwDevice device : devices) {
-                String gpioId = device.getGpioId();
-                if(gpioId == null){
-                    continue;
-                }
-                logger.info("同步gpio数据准备工作:..........");
-                Long timestamp;
-                JedisPool pool = RedisAPI.getPool();
-                Jedis jedis = pool.getResource();
-                if(jedis.get(device.getGpioId())!=null){
-                    timestamp = Long.parseLong(jedis.get(device.getGpioId()));
-                }else{
-                    GywlwHistoryDataForGPIO dataForGPIO = gywlwHistoryDataForGPIOMapper.
-                            getLastTimeByDeviceId(device.getDeviceId());
-                    if(dataForGPIO == null){
-                        timestamp = System.currentTimeMillis() - 86400L; //当前时间减1天
-                    }else{
-                        timestamp = dataForGPIO.getItemTime().getTime();
+        JedisPool pool = RedisAPI.getPool();
+        Jedis jedis = null;
+        try {
+            jedis = pool.getResource();
+            List<GywlwDevice> devices = gywlwDeviceMapper.selectAll();
+            if (devices.size() != 0) {
+                for (GywlwDevice device : devices) {
+                    String gpioId = device.getGpioId();
+                    if (gpioId == null) {
+                        continue;
                     }
-                }
-                List<String> gpioList = new ArrayList<>();
-                gpioList.add("gpio_1");
-                gpioList.add("gpio_2");
-                gpioList.add("gpio_3");
-                gpioList.add("gpio_4");
-                gpioList.add("gpio_5");
-                gpioList.add("gpio_6");
-                gpioList.add("gpio_7");
-                gpioList.add("gpio_8");
-                gpioList.add("throughput");
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("deviceId",gpioId);
-                jsonObject.put("idList",gpioList);
-                jsonObject.put("timestamp",timestamp);
+                    logger.info("同步gpio数据准备工作:..........");
+                    Long timestamp;
+                    if (jedis.get(device.getGpioId()) != null) {
+                        timestamp = Long.parseLong(jedis.get(device.getGpioId()));
+                    } else {
+                        GywlwHistoryDataForGPIO dataForGPIO = gywlwHistoryDataForGPIOMapper.
+                                getLastTimeByDeviceId(device.getDeviceId());
+                        if (dataForGPIO == null) {
+                            timestamp = System.currentTimeMillis() - 86400L; //当前时间减1天
+                        } else {
+                            timestamp = dataForGPIO.getItemTime().getTime();
+                        }
+                    }
+                    List<String> gpioList = new ArrayList<>();
+                    gpioList.add("gpio_1");
+                    gpioList.add("gpio_2");
+                    gpioList.add("gpio_3");
+                    gpioList.add("gpio_4");
+                    gpioList.add("gpio_5");
+                    gpioList.add("gpio_6");
+                    gpioList.add("gpio_7");
+                    gpioList.add("gpio_8");
+                    gpioList.add("throughput");
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("deviceId", gpioId);
+                    jsonObject.put("idList", gpioList);
+                    jsonObject.put("timestamp", timestamp);
 //                System.out.println("请求参数: " + jsonObject);
 //                logger.info("准备工作结束，发送psot请求： " + new Date());
 
-                String str = null;
-                try {
-                    str = HttpsTest.postForm(jsonObject,1); //1代表走设备通道
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                if(str != null && str.length() > 1000) {
-                    logger.info("gpio待同步数据 : " + str.substring(0,1000));
-                }else{
-                    logger.info("gpio待同步数据 : " + str);
-                }
+                    String str = null;
+                    try {
+                        str = HttpsTest.postForm(jsonObject, 1); //1代表走设备通道
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    if (str != null && str.length() > 1000) {
+                        logger.info("gpio待同步数据 : " + str.substring(0, 1000));
+                    } else {
+                        logger.info("gpio待同步数据 : " + str);
+                    }
 
-                //handle response
-                if(str == null || str.equals("0")){
-                    continue;
-                }
+                    //handle response
+                    if (str == null || str.equals("0")) {
+                        continue;
+                    }
 //                JSONObject json = new JSONObject();
-                Map<String, Object> map1 = JSON.parseObject(str);
-                List<GpioDataModel> list1 = JSON.parseArray(map1.get("result_data").toString(), GpioDataModel.class);
+                    Map<String, Object> map1 = JSON.parseObject(str);
+                    List<GpioDataModel> list1 = JSON.parseArray(map1.get("result_data").toString(), GpioDataModel.class);
 //                System.out.println("response data:"+ list1);
 //                logger.info("请求成功，开始处理数据： " + new Date());
-                if(list1.size() != 0){
-                    //储存该设备最新一次更新的时间戳
-                    jedis.set(device.getGpioId(),list1.get(0).getTimestamp());
-                    //单线程
+                    if (list1.size() != 0) {
+                        //储存该设备最新一次更新的时间戳
+                        jedis.set(device.getGpioId(), list1.get(0).getTimestamp());
+                        //单线程
 //                    handler(list1,device,gpioList);
-                    //多线程
-                    LinkedList<GpioDataModel> linkedList = new LinkedList<>();
-                    linkedList.addAll(list1);
-                    try {
-                        saveThroughPut(list1,device);  //存储累计产量
-                        handleByThread(linkedList,gpioList,device,1,15);  //1表示handle gpio data
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    } catch (CloneNotSupportedException e) {
-                        e.printStackTrace();
+                        //多线程
+                        LinkedList<GpioDataModel> linkedList = new LinkedList<>();
+                        linkedList.addAll(list1);
+                        try {
+                            saveThroughPut(list1, device);  //存储累计产量
+                            handleByThread(linkedList, gpioList, device, 1, 15);  //1表示handle gpio data
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        } catch (CloneNotSupportedException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }
+            System.out.println("结束*****************************");
+            long b = System.currentTimeMillis();
+            System.out.println("gpio数据同步结束，总花费时间:" + (b - a) + "毫秒***********************");
+        }finally {
+            if(jedis != null){
+                jedis.close();
+            }
         }
-        System.out.println("结束*****************************");
-        long b = System.currentTimeMillis();
-        System.out.println("gpio数据同步结束，总花费时间:" + (b - a) + "毫秒***********************");
     }
 
     //存储累计产量

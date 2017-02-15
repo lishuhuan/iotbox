@@ -830,6 +830,9 @@ public class UserController {
             if (pageInfo == null || pageInfo.getSize() == 0) {
                 PageInfo<GywlwHistoryDataForGPIO> listForGpio = projectService.getHistoryDataForGpio(regId, startTime,
                         endTime, pageNum, pageSize);
+                if(listForGpio == null){
+                    return MyUtil.response(1,"查不到相关数据");
+                }
                 return MyUtil.response(0, listForGpio);
             }
             return MyUtil.response(0, pageInfo);
