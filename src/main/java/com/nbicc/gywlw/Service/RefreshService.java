@@ -25,7 +25,7 @@ import java.util.concurrent.CountDownLatch;
 public class RefreshService {
 
     //useMark为0代表refresh未被使用，1表示正在运行
-    private static Integer useMark = 0;
+    private static String runningDeviceId = null;
 
     private static final String[] ALARM = {"alarm1","alarm2"};
 
@@ -52,36 +52,41 @@ public class RefreshService {
     private GywlwDeviceOrderMapper gywlwDeviceOrderMapper;
 
 
-    public void refresh(){
-        if(useMark == 1){
+    public void refresh(String deviceId){
+        if(deviceId == null){
+            return;
+        }
+        if(deviceId.equals(runningDeviceId)){
+            logger.info("****设备编号：" + deviceId + "正在同步数据*******");
             return;
         }else{
             logger.info("**************refresh start! *******************");
-            useMark = 1;
+            runningDeviceId = deviceId;
         }
         try {
-            refreshConfigParams();
-            refreshParamsForPlc();  //同步plc数据项设置
-            refreshRulesForPlc();   //同步plc rules
-            refreshParamsForGpio();    //同步gpio参数设置
-            refreshRulesForGpio();    //同步gpio rules
-            refreshDataForGpio();
-            refreshDataForPlc();
+            refreshConfigParams(deviceId);
+            refreshParamsForPlc(deviceId);  //同步plc数据项设置
+            refreshRulesForPlc(deviceId);   //同步plc rules
+            refreshParamsForGpio(deviceId);    //同步gpio参数设置
+            refreshRulesForGpio(deviceId);    //同步gpio rules
+            refreshDataForGpio(deviceId);
+            refreshDataForPlc(deviceId);
         }finally {
-            useMark = 0;
+            runningDeviceId = null;
         }
     }
 
     //PLC，默认一个物联网盒子上连接的plc都是同一型号(目前是一对一)
-    public void refreshDataForPlc(){
+    public void refreshDataForPlc(String deviceId){
         long a = System.currentTimeMillis();
         JedisPool pool = RedisAPI.getPool();
         Jedis jedis = null;
         try {
             jedis = pool.getResource();
-            List<GywlwDevice> devices = gywlwDeviceMapper.selectAll();
-            if (devices.size() != 0) {
-                for (GywlwDevice device : devices) {
+//            List<GywlwDevice> devices = gywlwDeviceMapper.selectAll();
+//            if (devices.size() != 0) {
+//                for (GywlwDevice device : devices) {
+            GywlwDevice device = gywlwDeviceMapper.selectByDeviceId(deviceId);
                     List<String> deviceIdList = new ArrayList<>();
                     String sdkKey = "";
                     Long timestamp = 0L;
@@ -96,7 +101,7 @@ public class RefreshService {
                             if (plcInfo.getSubdeviceId() == null) {
                                 continue;
                             }
-                            logger.info("同步plc数据准备工作： " + new Date());
+                            logger.info("盒子编号：" + deviceId + "开始同步plc数据准备工作： " + new Date());
                             //redis保存最近一次的更新时间
                             redisKey = plcInfo.getSubdeviceId();
                             if (jedis.get(redisKey) != null) {
@@ -119,7 +124,7 @@ public class RefreshService {
                             }
                         }
                     } else {
-                        continue;
+                        return;
                     }
                     if (regList != null) {
                         requestList.addAll(regList);
@@ -145,7 +150,7 @@ public class RefreshService {
                     }
                     //handle response
                     if (str == null || str.equals("0")) {
-                        continue;
+                        return;
                     }
 //                JSONObject json = new JSONObject();
                     Map<String, Object> map1 = JSON.parseObject(str);
@@ -169,8 +174,8 @@ public class RefreshService {
                             e.printStackTrace();
                         }
                     }
-                }
-            }
+//                }
+//                }
             System.out.println("结束*****************************");
             long b = System.currentTimeMillis();
             System.out.println("plc数据同步结束，总花费时间:" + (b - a) + "毫秒***********************");
@@ -182,20 +187,21 @@ public class RefreshService {
     }
 
     //GPIO
-    public void refreshDataForGpio() {
+    public void refreshDataForGpio(String deviceId) {
         long a = System.currentTimeMillis();
         JedisPool pool = RedisAPI.getPool();
         Jedis jedis = null;
         try {
             jedis = pool.getResource();
-            List<GywlwDevice> devices = gywlwDeviceMapper.selectAll();
-            if (devices.size() != 0) {
-                for (GywlwDevice device : devices) {
+//            List<GywlwDevice> devices = gywlwDeviceMapper.selectAll();
+//            if (devices.size() != 0) {
+//                for (GywlwDevice device : devices) {
+            GywlwDevice device = gywlwDeviceMapper.selectByDeviceId(deviceId);
                     String gpioId = device.getGpioId();
                     if (gpioId == null) {
-                        continue;
+                        return;
                     }
-                    logger.info("同步gpio数据准备工作:..........");
+                    logger.info("盒子编号：" + deviceId + " 开始同步gpio数据准备工作:..........");
                     Long timestamp;
                     if (jedis.get(device.getGpioId()) != null) {
                         timestamp = Long.parseLong(jedis.get(device.getGpioId()));
@@ -239,7 +245,7 @@ public class RefreshService {
 
                     //handle response
                     if (str == null || str.equals("0")) {
-                        continue;
+                        return;
                     }
 //                JSONObject json = new JSONObject();
                     Map<String, Object> map1 = JSON.parseObject(str);
@@ -265,8 +271,8 @@ public class RefreshService {
                             e.printStackTrace();
                         }
                     }
-                }
-            }
+//                }
+//            }
             System.out.println("结束*****************************");
             long b = System.currentTimeMillis();
             System.out.println("gpio数据同步结束，总花费时间:" + (b - a) + "毫秒***********************");
@@ -291,22 +297,23 @@ public class RefreshService {
     }
 
     //同步gpio rules
-    public void refreshRulesForGpio(){
-        refreshParams(3);
+    public void refreshRulesForGpio(String deviceId){
+        refreshParams(deviceId, 3);
     }
 
     //同步plc rules
-    public void refreshRulesForPlc(){
-        refreshParams(1);
+    public void refreshRulesForPlc(String deviceId){
+        refreshParams(deviceId, 1);
     }
 
-    public void refreshConfigParams(){
-        List<GywlwDevice> devices = gywlwDeviceMapper.selectAll();
-        if(devices.size() != 0) {
-            for (GywlwDevice device : devices) {
+    public void refreshConfigParams(String deviceId){
+//        List<GywlwDevice> devices = gywlwDeviceMapper.selectAll();
+//        if(devices.size() != 0) {
+//            for (GywlwDevice device : devices) {
+        GywlwDevice device = gywlwDeviceMapper.selectByDeviceId(deviceId);
                 String gpioId = device.getGpioId();
                 if (gpioId == null) {
-                    continue;
+                    return;
                 }
                 logger.info("同步设备配置(ConfigParams)的准备工作.....................");
                 Long timestamp = device.getLastConnected().getTime();
@@ -337,7 +344,7 @@ public class RefreshService {
                     e.printStackTrace();
                 }
                 if(str == null || str.equals("0")){
-                    continue;
+                    return;
                 }
                 if(str.length() > 1000) {
                     logger.info("同步设备配置(ConfigParams)的待同步数据 : " + str.substring(0,1000));
@@ -358,29 +365,30 @@ public class RefreshService {
                     }
                 }
 
-            }
-        }
+//            }
+//        }
     }
 
     //同步plc数据项设置
-    public void refreshParamsForPlc(){
-        refreshParams(0);
+    public void refreshParamsForPlc(String deviceId){
+        refreshParams(deviceId, 0);
     }
 
     //同步gpio参数设置
-    public void refreshParamsForGpio(){
-        refreshParams(2);
+    public void refreshParamsForGpio(String deviceId){
+        refreshParams(deviceId, 2);
     }
 
 
     //mark=0表示同步plc数据项设置，mark=1表示同步plcrules数据；
-    public void refreshParams(int mark){
-        List<GywlwDevice> devices = gywlwDeviceMapper.selectAll();
-        if(devices.size() != 0) {
-            for (GywlwDevice device : devices) {
+    public void refreshParams(String deviceId, int mark){
+//        List<GywlwDevice> devices = gywlwDeviceMapper.selectAll();
+//        if(devices.size() != 0) {
+//            for (GywlwDevice device : devices) {
+        GywlwDevice device = gywlwDeviceMapper.selectByDeviceId(deviceId);
                 String gpioId = device.getGpioId();
                 if (gpioId == null) {
-                    continue;
+                    return;
                 }
                 Long timestamp;
                 timestamp = device.getLastConnected().getTime();
@@ -413,7 +421,7 @@ public class RefreshService {
                     e.printStackTrace();
                 }
                 if(str == null || str.equals("0")){
-                    continue;
+                    return;
                 }
                 if(str.length() > 1000) {
                     logger.info("Params待同步数据 : " + str.substring(0,1000));
@@ -452,10 +460,9 @@ public class RefreshService {
                                 handlerForGpioParams(strList, device); //无论如何都要运行
                             }
                         }
-
                 }
-            }
-        }
+//            }
+//        }
     }
 
     private void handlerForGpioRules(String[] strList, GywlwDevice device) {

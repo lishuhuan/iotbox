@@ -51,6 +51,8 @@
     LEFT JOIN gywlw_device_gpio b
     ON a.gpio_id=b.id
     where a.device_id = #{deviceId,jdbcType=VARCHAR} and a.gpio_id = #{gpioId,jdbcType=VARCHAR}
+    and a.time BETWEEN #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP}
+    ORDER BY a.time DESC
   </select>
   <select id="getLatestData" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select

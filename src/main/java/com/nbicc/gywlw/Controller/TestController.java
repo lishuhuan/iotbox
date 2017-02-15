@@ -48,7 +48,7 @@ public class TestController {
     @ResponseBody
     public String refreshData(){
         try {
-            refreshService.refresh();
+            refreshService.refresh("2");
             return "ok";
         }catch (Exception e){
             logger.error("refresh失败" + e.getMessage());

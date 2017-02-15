@@ -50,9 +50,7 @@ public class ManufacturerService {
 	}
 	
 	public List<GywlwHistoryItem> getHistoryData(String deviceId){
-//		logger.info("开始同步数据： " + new Date());
-		refreshService.refresh();
-//		logger.info("同步数据完成，开始查表： " + new Date());
+		refreshService.refresh(deviceId);
 		List<GywlwHistoryItem> list = gywlwHistoryItemMapper.getHistoryData(deviceId);
 		List<GywlwHistoryDataForGPIO> list1 = gywlwHistoryDataForGPIOMapper.getLatestData(deviceId);
 		if(list1.size()>0){
@@ -68,19 +66,18 @@ public class ManufacturerService {
 				list.add(historyItem);
 			}
 		}
-//		logger.info("查表结束，返回数据： " + new Date());
 		return list;
 	}
 	
 	public List<GywlwHistoryItem> getDeviceAlarmlist(String startTime,String endTime,String deviceId,String severity){
-		refreshService.refresh();
+		refreshService.refresh(deviceId);
 		return gywlwHistoryItemMapper.getDeviceAlarmlist(MyUtil.timeTransformToString(startTime),
 				MyUtil.timeTransformToString(endTime), deviceId,severity);
 
 	}
 	
 	public GywlwHistoryItem getAlarmDetail(String itemId){
-		refreshService.refresh();
+//		refreshService.refresh();
 		return gywlwHistoryItemMapper.getAlarmDetail(itemId);
 	}
 	
@@ -119,7 +116,7 @@ public class ManufacturerService {
 	}
 
 	public List<GywlwHistoryDataForGPIO> getDeviceAlarmlistForGpio(String startTime, String endTime, String deviceId, String severity) {
-		refreshService.refresh();
+		refreshService.refresh(deviceId);
 		return gywlwHistoryDataForGPIOMapper.getAlarmDataBySeverity(deviceId,severity,MyUtil.timeTransformToString(startTime),MyUtil.timeTransformToString(endTime));
 	}
 }
