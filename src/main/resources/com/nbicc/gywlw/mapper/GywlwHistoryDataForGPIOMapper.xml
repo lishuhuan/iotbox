@@ -44,7 +44,7 @@
     from gywlw_history_data_for_gpio
     where id = #{id,jdbcType=INTEGER}
   </select>
-  <select id="getHistoryData" resultMap="BaseResultMap" parameterType="java.lang.String" >
+  <select id="getHistoryData" resultMap="BaseResultMap" >
     select
     a.*, b.field_address
     from gywlw_history_data_for_gpio a

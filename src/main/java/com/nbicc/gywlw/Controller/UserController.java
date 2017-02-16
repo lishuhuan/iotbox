@@ -401,7 +401,8 @@ public class UserController {
             //将时间戳转化成date格式的字符串
             String startTime = MyUtil.timeTransformToString(startTimeString);
             String endTime = MyUtil.timeTransformToString(endTimeString);
-            List<GywlwHistoryItem> list = projectService.warningList(projectId,variableName,startTime,endTime);
+            //暂时只支持看前20条
+            PageInfo<GywlwHistoryItem> list = projectService.warningList(projectId,variableName,startTime,endTime,1,20);
             return MyUtil.response(0,list);
         }catch (Exception e){
             logger.error("未查到告警数据详情" + e.getMessage());
@@ -422,10 +423,8 @@ public class UserController {
             //将时间戳转化成date格式的字符串
             String startTime = MyUtil.timeTransformToString(startTimeString);
             String endTime = MyUtil.timeTransformToString(endTimeString);
-            PageHelper.startPage(pageNum,pageSize);
-            List<GywlwHistoryItem> list = projectService.warningList(projectId,variableName,startTime,endTime);
-            PageInfo<GywlwHistoryItem> pageInfo = new PageInfo<>(list);
-            return MyUtil.response(0, pageInfo);
+            PageInfo<GywlwHistoryItem> list = projectService.warningList(projectId,variableName,startTime,endTime,pageNum,pageSize);
+            return MyUtil.response(0, list);
         }catch (Exception e){
             logger.error("未查到告警数据详情" + e.getMessage());
             return MyUtil.response(1, "未查到告警数据详情!");

@@ -30,7 +30,6 @@ public class ScheduledTasks {
                 refreshService.refresh(device.getDeviceId());  //// TODO: 2017/2/15 目前是单线程
             }
         }
-
     }
 
 //    @Scheduled(fixedRate = 1000*5)
