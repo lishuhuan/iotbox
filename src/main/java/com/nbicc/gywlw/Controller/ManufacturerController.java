@@ -19,6 +19,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.List;
 
 
+/**
+ * Created by BigMao on 2016/11/17.
+ * 设备厂商层部分
+ */
 @Controller
 @RequestMapping("/factory")
 public class ManufacturerController {

@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * Created by BigMao on 2017/2/9.
+ * aop日志 for API.*
  */
 @Aspect
 @Component

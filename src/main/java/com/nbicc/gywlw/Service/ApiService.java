@@ -17,6 +17,7 @@ import java.util.List;
 
 /**
  * Created by BigMao on 2017/1/18.
+ * 对应BaseAPI
  */
 @Service
 public class ApiService {

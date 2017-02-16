@@ -17,7 +17,8 @@ import java.util.Map;
 
 
 /**
- * Created by fangdong on 2016/11/17.
+ * Created by BigMao on 2016/11/17.
+ * 登录注册部分
  */
 @Controller
 public class LoginController {

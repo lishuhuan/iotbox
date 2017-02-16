@@ -19,6 +19,7 @@ import java.security.cert.X509Certificate;
 
 /**
  * Created by BigMao on 2016/12/3.
+ * 向平台发送https请求同步数据
  */
 public class HttpClientUtil {
     public static final String ADD_URL1 = "https://iot-expeed.tech:8083/device/queryDeviceStatusHistory";

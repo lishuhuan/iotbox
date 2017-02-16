@@ -18,6 +18,7 @@ import java.security.cert.X509Certificate;
 
 /**
  * Created by BigMao on 2016/12/12.
+ * 无用
  */
 
 public class HttpsTest {

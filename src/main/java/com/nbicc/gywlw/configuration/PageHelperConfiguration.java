@@ -10,6 +10,7 @@ import java.util.Properties;
 
 /**
  * Created by BigMao on 2016/12/2.
+ * 基于Mybatis的分页插件 ，详细用法参考 https://github.com/pagehelper/Mybatis-PageHelper
  */
 @Configuration
 public class PageHelperConfiguration {

@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.*;
 
 /**
  * Created by BigMao on 2016/11/17.
+ * 登录密钥增删查接口
  */
 @Mapper
 public interface LoginTicketDAO {

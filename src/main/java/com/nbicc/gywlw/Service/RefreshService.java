@@ -16,16 +16,21 @@ import redis.clients.jedis.JedisPool;
 
 import java.text.ParseException;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.*;
 
 /**
  * Created by BigMao on 2016/12/23.
+ * 数据同步，向平台发送https请求拿数据，后按照业务逻辑存储
  */
 @Service
 public class RefreshService {
 
     //useMark为0代表refresh未被使用，1表示正在运行
     private static String runningDeviceId = null;
+
+//    private ThreadPoolExecutor threadPool = new ThreadPoolExecutor(2, 5, 3, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(20),
+//            new ThreadPoolExecutor.AbortPolicy());
+    private ExecutorService threadPool = Executors.newFixedThreadPool(10);
 
     private static final String[] ALARM = {"alarm1","alarm2"};
 
@@ -165,7 +170,7 @@ public class RefreshService {
                             //多线程
                             LinkedList<Map> linkedList = new LinkedList<>();
                             linkedList.addAll(list1);
-                            handleByThread(linkedList, regList, new GywlwDevice(), 0, 15);  //0表示handle plc
+                            handleByThread(linkedList, regList, new GywlwDevice(), 0, 10);  //0表示handle plc
                         } catch (ParseException e) {
                             e.printStackTrace();
                         } catch (CloneNotSupportedException e) {
@@ -223,7 +228,7 @@ public class RefreshService {
                     gpioList.add("gpio_6");
                     gpioList.add("gpio_7");
                     gpioList.add("gpio_8");
-                    gpioList.add("throughput");
+                    gpioList.add("throughput");  //累计产量
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("deviceId", gpioId);
                     jsonObject.put("idList", gpioList);
@@ -262,7 +267,7 @@ public class RefreshService {
                         linkedList.addAll(list1);
                         try {
                             saveThroughPut(list1, device);  //存储累计产量
-                            handleByThread(linkedList, gpioList, device, 1, 15);  //1表示handle gpio data
+                            handleByThread(linkedList, gpioList, device, 1, 10);  //1表示handle gpio data
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         } catch (ParseException e) {
@@ -273,6 +278,7 @@ public class RefreshService {
                     }
 //                }
 //            }
+
             System.out.println("结束*****************************");
             long b = System.currentTimeMillis();
             System.out.println("gpio数据同步结束，总花费时间:" + (b - a) + "毫秒***********************");
@@ -926,29 +932,41 @@ public class RefreshService {
                 handler(list1,device,regList);
             }
         } else {
+//            for (int i = 0; i < threadNum; i++) {
+//                int end = (i + 1) * t1 ;
+//                end = end > length ? length : end;
+//                int start = i * t1;
+//                if (start <= length) {
+//                    // 继承thread启动线程
+//                    // HandleThread thread = new HandleThread("线程[" + (i + 1) +"] ",data, i * tl, end > length ? length : end, latch);
+//                    // thread.start();
+//                    // 实现Runnable启动线程
+//                    logger.info("线程[" + (i + 1) + "] " + "  start: " + start + "   end:  " + end);
+//                    RunnableThread thread = new RunnableThread("线程[" + (i + 1) + "] ",
+//                            list1, start, end, latch, regList,device,mark);
+//                    Thread runable = new Thread(thread);
+//                    runable.start();
+//                }else{
+//                    latch.countDown();
+//                }
+//            }
+//            latch.await();// 等待所有工人完成工作
+//            ThreadPoolExecutor threadPool = new ThreadPoolExecutor(2, 5, 3, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(20),
+//                    new ThreadPoolExecutor.AbortPolicy());
             for (int i = 0; i < threadNum; i++) {
                 int end = (i + 1) * t1 ;
                 end = end > length ? length : end;
                 int start = i * t1;
                 if (start <= length) {
-                    // 继承thread启动线程
-                    // HandleThread thread = new HandleThread("线程[" + (i + 1) +"] ",data, i * tl, end > length ? length : end, latch);
-                    // thread.start();
-                    // 实现Runnable启动线程
                     logger.info("线程[" + (i + 1) + "] " + "  start: " + start + "   end:  " + end);
-                    RunnableThread thread = new RunnableThread("线程[" + (i + 1) + "] ",
-                            list1, start, end, latch, regList,device,mark);
-                    Thread runable = new Thread(thread);
-                    runable.start();
+                    threadPool.execute(new RunnableThread("线程[" + (i + 1) + "] ",
+                            list1, start, end, latch, regList,device,mark));
                 }else{
                     latch.countDown();
                 }
             }
             latch.await();// 等待所有工人完成工作
         }
-//        System.out.println("结束*****************************");
-//        long b = System.currentTimeMillis();
-//        System.out.println("数据同步结束，总花费时间:" + (b - a) + "毫秒***********************");
     }
 
     class RunnableThread implements Runnable {

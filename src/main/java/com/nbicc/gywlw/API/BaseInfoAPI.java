@@ -23,6 +23,7 @@ import java.util.List;
 
 /**
  * Created by BigMao on 2017/1/10.
+ * 对外api接口，详细需求和api文档查看 《工业物联网盒子API接口需求(讨论后稿).docx》和《工业物联网盒子对外接口1.1.docx》
  */
 @Controller
 @RequestMapping("/api")
