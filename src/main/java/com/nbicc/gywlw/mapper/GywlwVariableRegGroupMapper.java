@@ -20,6 +20,8 @@ public interface GywlwVariableRegGroupMapper {
     List<GywlwVariableRegGroup> selectByProjectIdAndVariable(@Param("projectId")String projectId,
                                                              @Param("variableName")String variableName);
 
+    List<GywlwVariableRegGroup> selectByProjectIdAndVariableForGpio(@Param("projectId")String projectId,
+                                                             @Param("variableName")String variableName);
 
 
     int updateByPrimaryKeySelective(GywlwVariableRegGroup record);

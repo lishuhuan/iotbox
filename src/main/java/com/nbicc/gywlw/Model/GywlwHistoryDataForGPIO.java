@@ -31,6 +31,36 @@ public class GywlwHistoryDataForGPIO {
 
     private String itemName;
 
+    private String fieldAddress;
+
+    private String fieldName;
+
+    private String fieldName2;
+
+    public String getFieldName2() {
+        return fieldName2;
+    }
+
+    public void setFieldName2(String fieldName2) {
+        this.fieldName2 = fieldName2;
+    }
+
+    public String getFieldName() {
+        return fieldName;
+    }
+
+    public void setFieldName(String fieldName) {
+        this.fieldName = fieldName;
+    }
+
+    public String getFieldAddress() {
+        return fieldAddress;
+    }
+
+    public void setFieldAddress(String fieldAddress) {
+        this.fieldAddress = fieldAddress;
+    }
+
     public String getItemName() {
         return itemName;
     }

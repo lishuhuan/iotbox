@@ -58,6 +58,7 @@ public class ManufacturerService {
 				GywlwHistoryItem historyItem = new GywlwHistoryItem();
 				historyItem.setDeviceId(deviceId);
 				historyItem.setRegId(gpio.getGpioId());
+				historyItem.setPlcName("GPIO");
 				historyItem.setItemName(gywlwDeviceGpioMapper.selectByPrimaryKey(gpio.getGpioId()).getFieldName());
 				historyItem.setItemAddress(gywlwDeviceGpioMapper.selectByPrimaryKey(gpio.getGpioId()).getFieldAddress());
 				historyItem.setItemValue(gpio.getItemValue() * 1.0);

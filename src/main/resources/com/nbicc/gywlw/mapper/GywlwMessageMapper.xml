@@ -18,7 +18,7 @@
     select 
     <include refid="Base_Column_List" />
     from gywlw_message
-    where send_id = #{userId,jdbcType=VARCHAR} OR receive_id = #{userId,jdbcType=VARCHAR};
+    where receive_id = #{userId,jdbcType=VARCHAR};
   </select>
   <select id="selectByMessageId" resultMap="BaseResultMap" parameterType="java.lang.String">
     select

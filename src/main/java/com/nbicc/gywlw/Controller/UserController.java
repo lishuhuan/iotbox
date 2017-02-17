@@ -395,15 +395,15 @@ public class UserController {
     @ResponseBody
     public JSONObject warningList(@RequestParam("project_id")String projectId,
                               @RequestParam(value = "variable_name", defaultValue = "ALL")String variableName,
-                              @RequestParam(value = "start_time",defaultValue = "0")String startTimeString,
-                              @RequestParam(value = "end_time", defaultValue = "2480036920")String endTimeString){
+                              @RequestParam(value = "start_time",defaultValue = "0")String startTime,
+                              @RequestParam(value = "end_time", defaultValue = "2480036920000")String endTime){
         try{
             //将时间戳转化成date格式的字符串
-            String startTime = MyUtil.timeTransformToString(startTimeString);
-            String endTime = MyUtil.timeTransformToString(endTimeString);
+//            String startTime = MyUtil.timeTransformToString(startTimeString);
+//            String endTime = MyUtil.timeTransformToString(endTimeString);
             //暂时只支持看前20条
             PageInfo<GywlwHistoryItem> list = projectService.warningList(projectId,variableName,startTime,endTime,1,20);
-            return MyUtil.response(0,list);
+            return MyUtil.response(0,list.getList());
         }catch (Exception e){
             logger.error("未查到告警数据详情" + e.getMessage());
             return MyUtil.response(1, "未查到告警数据详情!");
@@ -415,14 +415,14 @@ public class UserController {
     @ResponseBody
     public JSONObject warningListByPage(@RequestParam("project_id")String projectId,
                                         @RequestParam(value = "variable_name", defaultValue = "ALL")String variableName,
-                                        @RequestParam(value = "start_time",defaultValue = "0")String startTimeString,
-                                        @RequestParam(value = "end_time", defaultValue = "2480036920")String endTimeString,
+                                        @RequestParam(value = "start_time",defaultValue = "0")String startTime,
+                                        @RequestParam(value = "end_time", defaultValue = "2480036920000")String endTime,
                                         @RequestParam(value = "page_num", defaultValue = "1")Integer pageNum,
-                                        @RequestParam(value = "page_size", defaultValue = "6")Integer pageSize ){
+                                        @RequestParam(value = "page_size", defaultValue = "20")Integer pageSize ){
         try{
             //将时间戳转化成date格式的字符串
-            String startTime = MyUtil.timeTransformToString(startTimeString);
-            String endTime = MyUtil.timeTransformToString(endTimeString);
+//            String startTime = MyUtil.timeTransformToString(startTimeString);
+//            String endTime = MyUtil.timeTransformToString(endTimeString);
             PageInfo<GywlwHistoryItem> list = projectService.warningList(projectId,variableName,startTime,endTime,pageNum,pageSize);
             return MyUtil.response(0, list);
         }catch (Exception e){

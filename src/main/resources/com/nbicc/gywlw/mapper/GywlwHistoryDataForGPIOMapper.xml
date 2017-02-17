@@ -34,6 +34,10 @@
     <result column="rule_condition" property="ruleCondition" jdbcType="VARCHAR" />
     <result column="rule_field" property="ruleField" jdbcType="VARCHAR" />
     <result column="rule_alarmlevel" property="ruleAlarmlevel" jdbcType="VARCHAR" />
+    <result column="variable_name" property="variableName" jdbcType="VARCHAR" />
+    <result column="field_address" property="fieldAddress" jdbcType="VARCHAR" />
+    <result column="field_name" property="fieldName" jdbcType="VARCHAR" />
+    <result column="field_name2" property="fieldName2" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, gpio_id, value, time, device_id, content, alarm
@@ -52,6 +56,18 @@
     ON a.gpio_id=b.id
     where a.device_id = #{deviceId,jdbcType=VARCHAR} and a.gpio_id = #{gpioId,jdbcType=VARCHAR}
     and a.time BETWEEN #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP}
+    ORDER BY a.time DESC
+  </select>
+  <select id="selectwarning" resultMap="BaseResultMap2" >
+    select
+    a.*,b.rule_name,b.rule_condition,b.rule_field,b.rule_alarmlevel,b.rule_name2,b.rule_1,b.rule_2, c.variable_name,e.field_address,e.field_name,e.field_name2
+    from gywlw_history_data_for_gpio a,gywlw_warning_rules b,gywlw_variable c, gywlw_variable_reg_group d, gywlw_device_gpio e
+    <if test="variableName != 'ALL'">
+      where a.time BETWEEN #{startTime,jdbcType=TIMESTAMP} AND #{endTime,jdbcType=TIMESTAMP} AND a.alarm = b.rule_id  and c.variable_name = #{variableName,jdbcType=VARCHAR} and c.project_id = #{projectId,jdbcType=VARCHAR} and c.variable_id = d.variable_id and d.reg_id = a.gpio_id
+    </if>
+    <if test="variableName == 'ALL'">
+      where a.time BETWEEN #{startTime,jdbcType=TIMESTAMP} AND #{endTime,jdbcType=TIMESTAMP} and a.alarm = b.rule_id  AND c.project_id = #{projectId,jdbcType=VARCHAR} and c.variable_id = d.variable_id and d.reg_id = a.gpio_id
+    </if>
     ORDER BY a.time DESC
   </select>
   <select id="getLatestData" resultMap="BaseResultMap" parameterType="java.lang.String" >

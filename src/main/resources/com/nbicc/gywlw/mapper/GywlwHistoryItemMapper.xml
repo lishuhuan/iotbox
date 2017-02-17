@@ -68,13 +68,13 @@
   </select>
   <select id="selectwarning" resultMap="BaseResultMap1" parameterType="com.nbicc.gywlw.Model.GywlwHistoryItem" >
     select
-    a.item_id,a.reg_id,a.plc_name,a.device_name,a.item_type,a.item_content,a.item_time,a.variable_name,a.severity,a.item_name,a.item_alias,a.rule_id,b.rule_name,b.rule_condition,b.rule_field,b.rule_alarmlevel,b.rule_name2,b.rule_1,b.rule_2
-    from gywlw_history_item a,gywlw_warning_rules b
+    a.item_id,a.reg_id,a.plc_name,a.device_name,a.item_value,a.item_content,a.item_time,c.variable_name,a.severity,a.item_name,a.rule_id,b.rule_name,b.rule_condition,b.rule_field,b.rule_alarmlevel,b.rule_name2,b.rule_1,b.rule_2
+    from gywlw_history_item a,gywlw_warning_rules b, gywlw_variable c, gywlw_variable_reg_group d
     <if test="variableName != 'ALL'">
-    where a.item_time BETWEEN #{startTime,jdbcType=TIMESTAMP} AND #{endTime,jdbcType=TIMESTAMP} and a.rule_id = b.rule_id and a.variable_name = #{variableName,jdbcType=VARCHAR} AND a.project_id = #{projectId,jdbcType=VARCHAR}
+    where a.item_time BETWEEN #{startTime,jdbcType=TIMESTAMP} AND #{endTime,jdbcType=TIMESTAMP} and a.rule_id = b.rule_id and c.variable_name = #{variableName,jdbcType=VARCHAR} AND c.project_id = #{projectId,jdbcType=VARCHAR} and c.variable_id = d.variable_id and d.reg_id = a.reg_id
    </if>
     <if test="variableName == 'ALL'">
-    where a.item_time BETWEEN #{startTime,jdbcType=TIMESTAMP} AND #{endTime,jdbcType=TIMESTAMP} and a.rule_id = b.rule_id AND a.project_id = #{projectId,jdbcType=VARCHAR}
+      where a.item_time BETWEEN #{startTime,jdbcType=TIMESTAMP} AND #{endTime,jdbcType=TIMESTAMP} and a.rule_id = b.rule_id  AND c.project_id = #{projectId,jdbcType=VARCHAR} and c.variable_id = d.variable_id and d.reg_id = a.reg_id
     </if>
     ORDER BY a.item_time DESC
   </select>
@@ -98,13 +98,13 @@
   </insert>
   <insert id="insertBatch" parameterType="java.util.List" >
     insert into gywlw_history_item (device_id,device_name,item_address,
-    item_name,item_time,item_value,plc_id,plc_name,project_id,
+    item_name,item_alias,item_time,item_value,plc_id,plc_name,project_id,
     reg_id,rule_id
     )
     values
     <foreach collection ="list" item="a" index= "index" separator =",">
     (#{a.deviceId,jdbcType=VARCHAR},#{a.deviceName,jdbcType=VARCHAR},#{a.itemAddress,jdbcType=VARCHAR},
-    #{a.itemName,jdbcType=VARCHAR},#{a.itemTime,jdbcType=TIMESTAMP},#{a.itemValue,jdbcType=DOUBLE},
+    #{a.itemName,jdbcType=VARCHAR},#{a.itemAlias,jdbcType=VARCHAR},#{a.itemTime,jdbcType=TIMESTAMP},#{a.itemValue,jdbcType=DOUBLE},
     #{a.plcId,jdbcType=VARCHAR},#{a.plcName,jdbcType=VARCHAR},#{a.projectId,jdbcType=VARCHAR},
     #{a.regId,jdbcType=VARCHAR}, #{a.ruleId,jdbcType=INTEGER}
     )
@@ -112,13 +112,13 @@
   </insert>
   <insert id="insertBatch1" parameterType="java.util.List" >
     insert into gywlw_history_item (device_id,
-    item_name,item_time,item_value,plc_id,plc_name,project_id,
+    item_name,item_alias,item_time,item_value,plc_id,plc_name,project_id,
     reg_id
     )
     values
     <foreach collection ="list" item="b" index= "index" separator =",">
       (#{b.deviceId,jdbcType=VARCHAR},
-      #{b.itemName,jdbcType=VARCHAR},#{b.itemTime,jdbcType=TIMESTAMP},#{b.itemValue,jdbcType=DOUBLE},
+      #{b.itemName,jdbcType=VARCHAR},#{b.itemAlias,jdbcType=VARCHAR},#{b.itemTime,jdbcType=TIMESTAMP},#{b.itemValue,jdbcType=DOUBLE},
       #{b.plcId,jdbcType=VARCHAR},#{b.plcName,jdbcType=VARCHAR},#{b.projectId,jdbcType=VARCHAR},
       #{b.regId,jdbcType=VARCHAR}
       )

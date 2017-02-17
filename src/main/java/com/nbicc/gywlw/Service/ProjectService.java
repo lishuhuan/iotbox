@@ -263,7 +263,7 @@ public class ProjectService {
 
 
     public PageInfo<GywlwHistoryItem> warningList(String projectId, String variableName, String startTime,
-                                              String endTime, Integer pageNum, Integer pageSize) {
+                                              String endTime, Integer pageNum, Integer pageSize) throws ParseException {
         List<GywlwProjectDeviceGroup> groups = gywlwProjectDeviceGroupMapper.selectByProjectId(projectId);
         if(groups.size() > 0){
             for(GywlwProjectDeviceGroup group : groups){
@@ -271,11 +271,36 @@ public class ProjectService {
             }
         }
         PageHelper.startPage(pageNum,pageSize);
-        List<GywlwHistoryItem> list = gywlwHistoryItemMapper.selectwarning(projectId, variableName, startTime, endTime);
+        List<GywlwHistoryItem> list = gywlwHistoryItemMapper.selectwarning(projectId, variableName,
+                MyUtil.timeTransformToDateNo1000(startTime), MyUtil.timeTransformToDateNo1000(endTime));
         PageInfo<GywlwHistoryItem> pageInfo = new PageInfo<>(list);
         if(list.size() == 0){
-//            PageHelper.startPage(pageNum,pageSize);
-//            List<GywlwHistoryDataForGPIO> list1 = gywlwHistoryDataForGPIOMapper.
+            PageHelper.startPage(pageNum,pageSize);
+            List<GywlwHistoryDataForGPIO> list1 = gywlwHistoryDataForGPIOMapper.selectwarning(projectId, variableName,
+                    MyUtil.timeTransformToDateNo1000(startTime), MyUtil.timeTransformToDateNo1000(endTime));
+            PageInfo<GywlwHistoryDataForGPIO> pageInfo1 = new PageInfo<>(list1);
+            if(list1.size() > 0) {
+                List<GywlwHistoryItem> list2 = new ArrayList<>();
+                for (GywlwHistoryDataForGPIO gpio : list1) {
+                    GywlwHistoryItem item = new GywlwHistoryItem();
+                    item.setItemTime(gpio.getItemTime());
+                    item.setPlcName(gpio.getFieldAddress());
+                    item.setRuleName(gpio.getRuleName());
+                    item.setRuleName2(gpio.getRuleName2());
+                    item.setRuleAlarmlevel(gpio.getRuleAlarmlevel());
+                    item.setItemName(gpio.getFieldName());
+                    item.setItemAlias(gpio.getFieldName2());
+                    item.setRule1(Integer.parseInt(gpio.getRuleCondition()));
+                    item.setRuleCondition(0);
+                    item.setVariableName(gpio.getVariableName());
+                    item.setItemValue(gpio.getItemValue()*1.0);
+                    item.setProjectId(projectId);
+                    list2.add(item);
+                }
+                PageInfo<GywlwHistoryItem> pageInfo2 = new PageInfo<>(list2);
+                pageInfo2.setTotal(pageInfo1.getTotal());
+                return pageInfo2;
+            }
         }
         return pageInfo;
     }
@@ -450,7 +475,13 @@ public class ProjectService {
 
     @Transactional
     public void bindRegAndVariable(String variableId,String regId){
-        String deviceId = gywlwRegInfoMapper.selectByPrimaryKey(regId).getDeviceId();
+        GywlwRegInfo regInfo = gywlwRegInfoMapper.selectByPrimaryKey(regId);
+        String deviceId;
+        if(regInfo != null){
+            deviceId = regInfo.getDeviceId();
+        }else{
+            deviceId = gywlwDeviceGpioMapper.selectByPrimaryKey(regId).getDeviceId();
+        }
         String projectId = gywlwVariableMapper.selectByPrimaryKey(variableId).getProjectId();
         GywlwVariableRegGroup gywlwVariableRegGroup = new GywlwVariableRegGroup();
         gywlwVariableRegGroup.setVariableId(variableId);
@@ -552,7 +583,11 @@ public class ProjectService {
                             for(GywlwRegInfo regInfo : regInfos){
                                 TreeListModel modelForReg = new TreeListModel();
                                 modelForReg.setType("reg");
-                                modelForReg.setName(regInfo.getRegName());
+                                if(regInfo.getRegName() == null){
+                                    modelForReg.setName("(" + regInfo.getRegAddress() + ")");
+                                }else{
+                                    modelForReg.setName(regInfo.getRegName() + "(" + regInfo.getRegAddress() + ")");
+                                }
                                 modelForReg.setId(regInfo.getRegId());
                                 treeListForReg.add(modelForReg);
                             }
@@ -570,8 +605,14 @@ public class ProjectService {
                     for(GywlwDeviceGpio gywlwDeviceGpio : gywlwDeviceGpios){
                         TreeListModel modelForGpio1 = new TreeListModel();
                         modelForGpio1.setId(gywlwDeviceGpio.getId());
-                        modelForGpio1.setName(gywlwDeviceGpio.getFieldName());
-                        modelForGpio1.setType("gpio");
+                        if(gywlwDeviceGpio.getFieldName() == null){
+                            modelForGpio1.setName("(" + gywlwDeviceGpio.getFieldAddress() + ")");
+                        }else{
+                            modelForGpio1.setName(gywlwDeviceGpio.getFieldName() +
+                                    "(" + gywlwDeviceGpio.getFieldAddress() + ")");
+                        }
+
+                        modelForGpio1.setType("reg");
                         treeListForGpio.add(modelForGpio1);
                     }
                     modelForGpio.setChildren(treeListForGpio);
@@ -595,13 +636,35 @@ public class ProjectService {
                 treeListModel.setName(variable.getVariableName());
                 treeListModel.setId(variable.getVariableId());
                 List<TreeListModel> listForReg = new ArrayList<>();
+                //plc-reg
                 List<GywlwVariableRegGroup> gywlwRegInfoList = gywlwVariableRegGroupMapper.selectByProjectIdAndVariable(projectId,
                         variable.getVariableName());
                 if(gywlwRegInfoList.size() > 0){
                     for(GywlwVariableRegGroup variableRegGroup : gywlwRegInfoList){
                         TreeListModel modelForReg = new TreeListModel();
                         modelForReg.setType("reg");
-                        modelForReg.setName(variableRegGroup.getRegName());
+                        if(variableRegGroup.getRegName() == null){
+                            modelForReg.setName("(" + variableRegGroup.getRegAddress() + ")");
+                        }else{
+                            modelForReg.setName(variableRegGroup.getRegName() + "(" + variableRegGroup.getRegAddress() + ")");
+                        }
+                        modelForReg.setId(variableRegGroup.getId().toString());//放这个关系的id，以便删除时用
+                        listForReg.add(modelForReg);
+                    }
+                }
+                //gpio
+                List<GywlwVariableRegGroup> gywlwRegInfoList1 = gywlwVariableRegGroupMapper.
+                        selectByProjectIdAndVariableForGpio(projectId,
+                        variable.getVariableName());
+                if(gywlwRegInfoList1.size() > 0){
+                    for(GywlwVariableRegGroup variableRegGroup : gywlwRegInfoList1){
+                        TreeListModel modelForReg = new TreeListModel();
+                        modelForReg.setType("reg");
+                        if(variableRegGroup.getRegName() == null){
+                            modelForReg.setName("(" + variableRegGroup.getRegAddress() + ")");
+                        }else{
+                            modelForReg.setName(variableRegGroup.getRegName() + "(" + variableRegGroup.getRegAddress() + ")");
+                        }
                         modelForReg.setId(variableRegGroup.getId().toString());//放这个关系的id，以便删除时用
                         listForReg.add(modelForReg);
                     }

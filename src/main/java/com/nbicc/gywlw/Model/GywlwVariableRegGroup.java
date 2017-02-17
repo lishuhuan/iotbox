@@ -13,6 +13,8 @@ public class GywlwVariableRegGroup {
 
     private String regName;
 
+    private String regAddress;
+
     private String deviceId;
 
     private String deviceName;
@@ -22,6 +24,14 @@ public class GywlwVariableRegGroup {
     private String projectId;
 
     private Byte delMark;
+
+    public String getRegAddress() {
+        return regAddress;
+    }
+
+    public void setRegAddress(String regAddress) {
+        this.regAddress = regAddress;
+    }
 
     public String getVariableName() {
         return variableName;

@@ -882,14 +882,13 @@ public class RefreshService {
             GywlwDevice gywlwDevice = gywlwDeviceMapper.selectByDeviceId(plcInfo.getDeviceId());
             gywlwHistoryItem.setDeviceName(gywlwDevice.getDeviceName());
             gywlwHistoryItem.setProjectId(gywlwProjectDeviceGroupMapper.selectByDeviceId(plcInfo.getDeviceId()).getProjectId());
-            //jedis
 
             for(String reg : regList){
                 if(map.get(reg) == null){
                     continue;
                 }
-                gywlwHistoryItem.setItemName(reg);
                 GywlwRegInfo regInfo = gywlwRegInfoMapper.selectByRegAddress(reg);
+                gywlwHistoryItem.setItemName(regInfo.getRegName());
                 gywlwHistoryItem.setRegId(regInfo.getRegId());
                 gywlwHistoryItem.setItemAddress(reg);
                 gywlwHistoryItem.setItemAlias(regInfo.getRegAlias());

@@ -22,8 +22,8 @@ public interface GywlwHistoryItemMapper {
 
     List<GywlwHistoryItem> selectwarning(@Param("projectId")String projectId,
                                          @Param("variableName") String variableName,
-                                         @Param("startTime")String startTime,
-                                         @Param("endTime")String endTime);
+                                         @Param("startTime")Date startTime,
+                                         @Param("endTime")Date endTime);
 
     int updateByPrimaryKeySelective(GywlwHistoryItem record);
 

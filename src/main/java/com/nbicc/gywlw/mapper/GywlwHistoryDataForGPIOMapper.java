@@ -19,6 +19,11 @@ public interface GywlwHistoryDataForGPIOMapper {
 
     GywlwHistoryDataForGPIO selectByPrimaryKey(Integer id);
 
+    List<GywlwHistoryDataForGPIO> selectwarning(@Param("projectId")String projectId,
+                                         @Param("variableName") String variableName,
+                                         @Param("startTime")Date startTime,
+                                         @Param("endTime")Date endTime);
+
     List<GywlwHistoryDataForGPIO> getHistoryData(@Param("deviceId")String deviceId,
                                                  @Param("gpioId")String gpioId,
                                                  @Param("startTime")Date startTime,
