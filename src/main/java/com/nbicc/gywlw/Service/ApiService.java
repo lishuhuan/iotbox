@@ -1,19 +1,40 @@
 package com.nbicc.gywlw.Service;
 
-import com.alibaba.fastjson.JSONObject;
-import com.nbicc.gywlw.Dao.LoginTicketDAO;
-import com.nbicc.gywlw.Model.*;
-import com.nbicc.gywlw.mapper.*;
-import com.nbicc.gywlw.util.MyUtil;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import com.alibaba.fastjson.JSONObject;
+import com.nbicc.gywlw.Dao.LoginTicketDAO;
+import com.nbicc.gywlw.Model.GywlwDevice;
+import com.nbicc.gywlw.Model.GywlwDeviceOrder;
+import com.nbicc.gywlw.Model.GywlwHistoryItem;
+import com.nbicc.gywlw.Model.GywlwPlcInfo;
+import com.nbicc.gywlw.Model.GywlwRegInfo;
+import com.nbicc.gywlw.Model.GywlwUser;
+import com.nbicc.gywlw.Model.HostHolder;
+import com.nbicc.gywlw.Model.LoginTicket;
+import com.nbicc.gywlw.mapper.GywlwDataTrendMapper;
+import com.nbicc.gywlw.mapper.GywlwDeviceMapper;
+import com.nbicc.gywlw.mapper.GywlwDeviceOrderMapper;
+import com.nbicc.gywlw.mapper.GywlwHistoryItemMapper;
+import com.nbicc.gywlw.mapper.GywlwMessageMapper;
+import com.nbicc.gywlw.mapper.GywlwPlcInfoMapper;
+import com.nbicc.gywlw.mapper.GywlwProjectDeviceGroupMapper;
+import com.nbicc.gywlw.mapper.GywlwProjectMapper;
+import com.nbicc.gywlw.mapper.GywlwProjectUserGroupMapper;
+import com.nbicc.gywlw.mapper.GywlwRegInfoMapper;
+import com.nbicc.gywlw.mapper.GywlwUserMapper;
+import com.nbicc.gywlw.mapper.GywlwVariableMapper;
+import com.nbicc.gywlw.mapper.GywlwVariableRegGroupMapper;
+import com.nbicc.gywlw.mapper.GywlwWarningRulesMapper;
+import com.nbicc.gywlw.util.MyUtil;
 
 /**
  * Created by BigMao on 2017/1/18.
@@ -240,6 +261,8 @@ public class ApiService {
 	public JSONObject getDeviceTotalOrder(String deviceId) {
 		// TODO Auto-generated method stub
 		int total=gywlwDeviceOrderMapper.getDeviceTotalOrder(deviceId);
+		JSONObject jsonObject=new JSONObject();
+		jsonObject.put("total", total);
 		return MyUtil.response(0, total);
 	}
 }

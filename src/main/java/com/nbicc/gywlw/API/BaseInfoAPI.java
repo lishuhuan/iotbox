@@ -164,12 +164,19 @@ public class BaseInfoAPI {
     
     
 
-    @RequestMapping(path = { "/deviceTotalOrder" }, method = { RequestMethod.POST })
+    @RequestMapping(path = { "/totalproduct" }, method = { RequestMethod.POST })
     @ResponseBody
-    public JSONObject deviceTotalOrder(@RequestParam(value = "device_id") String deviceId) {
+    public JSONObject deviceTotalOrder(@RequestParam("token") String token,
+    								   @RequestParam(value = "device_id") String deviceId) {
         try{
-            JSONObject result = apiService.getDeviceTotalOrder(deviceId);
-            return result;
+        	JSONObject result = apiService.checkAdminAndDevice(token,deviceId);
+        	if(result == null) {
+        		JSONObject totel = apiService.getDeviceTotalOrder(deviceId);
+                return totel;
+            }
+        	else{
+        		return result;
+        	}
         }catch (Exception e){
             logger.error("获取盒子总产量失败" + e.getMessage());
             return MyUtil.response(1, "获取盒子总产量失败");
