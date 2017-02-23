@@ -236,4 +236,10 @@ public class ApiService {
         gywlwPlcInfoMapper.insertSelective(info);
         int y = Integer.parseInt("a");
     }
+
+	public JSONObject getDeviceTotalOrder(String deviceId) {
+		// TODO Auto-generated method stub
+		int total=gywlwDeviceOrderMapper.getDeviceTotalOrder(deviceId);
+		return MyUtil.response(0, total);
+	}
 }

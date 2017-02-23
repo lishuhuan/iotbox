@@ -28,6 +28,13 @@
     from gywlw_device_order
     where id = #{id,jdbcType=INTEGER}
   </select>
+  
+  <select id="getDeviceTotalOrder" resultType="java.lang.Integer" parameterType="java.lang.String" >
+    select order_total
+    from gywlw_device_order
+    where device_id = #{deviceId,jdbcType=VARCHAR}
+  </select>
+  
   <select id="selectByDeviceId" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select
     <include refid="Base_Column_List" />

@@ -18,4 +18,6 @@ public interface GywlwDeviceOrderMapper {
     int updateByPrimaryKeySelective(GywlwDeviceOrder record);
 
     int updateByPrimaryKey(GywlwDeviceOrder record);
+
+	int getDeviceTotalOrder(String deviceId);
 }

@@ -161,5 +161,19 @@ public class BaseInfoAPI {
             return MyUtil.response(1, "获取plc告警失败");
         }
     }
+    
+    
+
+    @RequestMapping(path = { "/deviceTotalOrder" }, method = { RequestMethod.POST })
+    @ResponseBody
+    public JSONObject deviceTotalOrder(@RequestParam(value = "device_id") String deviceId) {
+        try{
+            JSONObject result = apiService.getDeviceTotalOrder(deviceId);
+            return result;
+        }catch (Exception e){
+            logger.error("获取盒子总产量失败" + e.getMessage());
+            return MyUtil.response(1, "获取盒子总产量失败");
+        }
+    }
 
 }
