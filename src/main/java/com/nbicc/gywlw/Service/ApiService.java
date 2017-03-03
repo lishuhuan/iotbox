@@ -273,6 +273,7 @@ public class ApiService {
         	JSONObject jsonObject=new JSONObject();
         	jsonObject.put("total", device.getOrderTotal());
        		jsonObject.put("device_id", device.getDeviceId());
+       		jsonObject.put("threeGMode", device.getThreeGMode());
        		jsonObject.put("device_name", device.getDeviceName());
        		jsonObject.put("status", device.getDeviceStatus());
        		jsonObject.put("time", new Date().getTime()/1000);
@@ -292,6 +293,7 @@ public class ApiService {
 		JSONObject jsonObject=new JSONObject();
 		jsonObject.put("total", device.getOrderTotal());
 		jsonObject.put("device_id", deviceId);
+		jsonObject.put("threeGMode", device.getThreeGMode());
 		jsonObject.put("device_name", device.getDeviceName());
 		jsonObject.put("status", device.getDeviceStatus());
 		jsonObject.put("time", new Date().getTime()/1000);
