@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.nbicc.gywlw.Dao.LoginTicketDAO;
 import com.nbicc.gywlw.Model.GywlwDevice;
@@ -258,11 +259,43 @@ public class ApiService {
         int y = Integer.parseInt("a");
     }
 
-	public JSONObject getDeviceTotalOrder(String deviceId) {
+	public JSONObject getDeviceTotalOrder(String deviceId, String token) {
 		// TODO Auto-generated method stub
-		int total=gywlwDeviceOrderMapper.getDeviceTotalOrder(deviceId);
-		JSONObject jsonObject=new JSONObject();
-		jsonObject.put("total", total);
-		return MyUtil.response(0, total);
+		if(deviceId==null || "".equals(deviceId)){
+			LoginTicket loginTicket = loginTicketDAO.selectByTicket(token);
+            if(loginTicket == null || loginTicket.getExpired().before(new Date()) || loginTicket.getStatus() != 0){
+                return MyUtil.response(1,"请重新登录");
+            }
+           GywlwUser gywlwUser = gywlwUserMapper.selectByPrimaryKey(loginTicket.getUserId());
+           List<GywlwDevice> gywlwDevices = gywlwDeviceMapper.selectTotalAndDeviceByAdminId(gywlwUser.getUserId());
+           JSONArray jsonArray=new JSONArray();
+           for(GywlwDevice device:gywlwDevices){
+        	JSONObject jsonObject=new JSONObject();
+        	jsonObject.put("total", device.getOrderTotal());
+       		jsonObject.put("device_id", device.getDeviceId());
+       		jsonObject.put("device_name", device.getDeviceName());
+       		jsonObject.put("status", device.getDeviceStatus());
+       		jsonObject.put("time", new Date().getTime()/1000);
+        	jsonArray.add(jsonObject);
+           }
+           return MyUtil.response(0,jsonArray);
+		}
+		else{
+			JSONObject jsonObject=getTotalAndSta(deviceId);
+			return MyUtil.response(0,jsonObject);
+		}
 	}
+
+	private JSONObject getTotalAndSta(String deviceId) {
+		// TODO Auto-generated method stubint total=gywlwDeviceOrderMapper.getDeviceTotalOrder(deviceId);
+		GywlwDevice device=gywlwDeviceMapper.getDeviceAndTotal(deviceId);
+		JSONObject jsonObject=new JSONObject();
+		jsonObject.put("total", device.getOrderTotal());
+		jsonObject.put("device_id", deviceId);
+		jsonObject.put("device_name", device.getDeviceName());
+		jsonObject.put("status", device.getDeviceStatus());
+		jsonObject.put("time", new Date().getTime()/1000);
+		return jsonObject;
+	}
+	
 }

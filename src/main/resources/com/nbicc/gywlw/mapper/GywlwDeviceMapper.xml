@@ -58,6 +58,12 @@
     from gywlw_device
     where del_mark = 0
   </select>
+  
+   <select id="getDeviceAndTotal" resultMap="BaseResultMap">
+    select a.*,b.order_total as orderTotal from gywlw_device a 
+    LEFT JOIN gywlw_device_order b on a.device_id=b.device_id 
+    where a.device_id=#{deviceId}
+  </select>
   <select id="selectByDeviceId" resultMap="BaseResultMap" parameterType="java.lang.String">
     SELECT
     *
@@ -69,6 +75,12 @@
     *
     from gywlw_device
     WHERE admin_id = #{adminId,jdbcType=VARCHAR} and del_mark = 0
+  </select>
+  
+  <select id="selectTotalAndDeviceByAdminId" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select a.*,b.order_total as orderTotal from gywlw_device a 
+    LEFT JOIN gywlw_device_order b on a.device_id=b.device_id 
+    where a.admin_id=#{userId}
   </select>
   <select id="selectByFactoryId" resultMap="BaseResultMap" parameterType="java.lang.String">
     SELECT

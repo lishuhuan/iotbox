@@ -41,5 +41,9 @@ public interface GywlwDeviceMapper {
     public List<GywlwDevice> searchDeviceByFactory(String adminId);
     
     public List<GywlwDevice> getFactoryDevicelist(@Param("factoryId") String factoryId, @Param("deviceSn") String deviceSn,@Param("level") int level);
+
+	GywlwDevice getDeviceAndTotal(@Param("deviceId") String deviceId);
+
+	List<GywlwDevice> selectTotalAndDeviceByAdminId(@Param("userId") String userId);
     
 }
