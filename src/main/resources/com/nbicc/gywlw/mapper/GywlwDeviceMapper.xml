@@ -59,10 +59,17 @@
     where del_mark = 0
   </select>
   
+   <select id="getDeviceIdByGpioId" resultType="java.lang.String">
+    select
+    device_id
+    from gywlw_device
+    where gpio_id = #{gpioId}
+  </select>
+  
    <select id="getDeviceAndTotal" resultMap="BaseResultMap">
     select a.*,b.order_total as orderTotal from gywlw_device a 
     LEFT JOIN gywlw_device_order b on a.device_id=b.device_id 
-    where a.device_id=#{deviceId}
+    where a.gpio_id=#{deviceId}
   </select>
   <select id="selectByDeviceId" resultMap="BaseResultMap" parameterType="java.lang.String">
     SELECT

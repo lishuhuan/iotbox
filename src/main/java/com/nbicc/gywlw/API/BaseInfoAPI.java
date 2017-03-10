@@ -7,6 +7,7 @@ import com.nbicc.gywlw.Model.GywlwRegInfo;
 import com.nbicc.gywlw.Service.ApiService;
 import com.nbicc.gywlw.Service.ManufacturerService;
 import com.nbicc.gywlw.Service.ProjectService;
+import com.nbicc.gywlw.Service.RefreshService;
 import com.nbicc.gywlw.mapper.GywlwRegInfoMapper;
 import com.nbicc.gywlw.util.MyUtil;
 import org.slf4j.Logger;
@@ -38,6 +39,9 @@ public class BaseInfoAPI {
 	private ManufacturerService manufacturerService;
 	@Autowired
 	private GywlwRegInfoMapper gywlwRegInfoMapper;
+	
+	@Autowired
+	private RefreshService refreshService;
 
 	// 返回该用户下所拥有的盒子的唯一标识码、当前工作网络模式、固件版本号、硬件信息（盒子型号）
 	@RequestMapping(path = { "/deviceinfo" }, method = { RequestMethod.POST })
@@ -137,7 +141,7 @@ public class BaseInfoAPI {
 		}
 	}
 
-	@RequestMapping(path = { "/devicealarmlist" }, method = { RequestMethod.POST })
+	/*@RequestMapping(path = { "/devicealarmlist" }, method = { RequestMethod.POST })
 	@ResponseBody
 	public JSONObject deviceAlarmlist(@RequestParam("token") String token,
 			@RequestParam(value = "start_time", defaultValue = "0") String startTime,
@@ -156,18 +160,36 @@ public class BaseInfoAPI {
 			logger.error("获取plc告警失败" + e.getMessage());
 			return MyUtil.response(1, "获取plc告警失败");
 		}
-	}
+	}*/
 
 	@RequestMapping(path = { "/totalproduct" }, method = { RequestMethod.POST })
 	@ResponseBody
 	public JSONObject deviceTotalOrder(@RequestParam("token") String token,
-			@RequestParam(value = "device_id") String deviceId) {
+			@RequestParam(value = "device_id",defaultValue = "") String deviceId) {
 		try {
 			JSONObject total = apiService.getDeviceTotalOrder(deviceId,token);
 			return total;
 		} catch (Exception e) {
 			logger.error("获取盒子总产量失败" + e.getMessage());
 			return MyUtil.response(1, "获取盒子总产量失败");
+		}
+	}
+	
+	@RequestMapping(path = { "/devicealarmlist" }, method = { RequestMethod.POST })
+	@ResponseBody
+	public JSONObject deviceAlarmlist(@RequestParam("token") String token,
+			@RequestParam(value = "start_time") String startTime,
+			@RequestParam(value = "end_time") String endTime,
+			@RequestParam(value = "device_id", defaultValue = "") String deviceId,
+			@RequestParam(value = "alarm_level", defaultValue = "") String alarmLevel) {
+		try {
+			long stime=Long.parseLong(startTime)*1000;
+			long etime=Long.parseLong(endTime)*1000;
+			JSONObject total = apiService.getDeviceAlarm(deviceId,stime,etime,alarmLevel,token);
+			return total;
+		} catch (Exception e) {
+			logger.error("获取盒子告警失败" + e.getMessage());
+			return MyUtil.response(1, "获取盒子告警失败");
 		}
 	}
 

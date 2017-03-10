@@ -45,5 +45,7 @@ public interface GywlwDeviceMapper {
 	GywlwDevice getDeviceAndTotal(@Param("deviceId") String deviceId);
 
 	List<GywlwDevice> selectTotalAndDeviceByAdminId(@Param("userId") String userId);
+
+	String getDeviceIdByGpioId(@Param("gpioId") String gpioId);
     
 }
