@@ -433,8 +433,8 @@ public class ApiService {
 
 	private JSONObject setAlarmData52(JSONObject data, long endTime, String level, String deviceId,
 			int serial) {
-		String time = data.getString("timestamp");
-		if (Long.parseLong(time) < endTime) {
+		long time = data.getLongValue("timestamp");
+		if (time < endTime) {
 			JSONObject json52 = data.getJSONObject("52");
 			if (json52 != null) {
 				JSONObject rejson = trasfer(json52, serial, deviceId, 1, time, level);
@@ -454,8 +454,8 @@ public class ApiService {
 
 	private JSONObject setAlarmData53(JSONObject data, long endTime, String level, String deviceId,
 			int serial) {
-		String time = data.getString("timestamp");
-		if (Long.parseLong(time) < endTime) {
+		long time = data.getLongValue("timestamp");
+		if (time < endTime) {
 			JSONObject json53 = data.getJSONObject("53");
 			if (json53 != null) {
 				JSONObject rejson = trasfer(json53, serial, deviceId, 0, time, level);
@@ -472,7 +472,7 @@ public class ApiService {
 		}
 	}
 
-	private JSONObject trasfer(JSONObject json52, int i, String deviceId, int value, String time, String level) {
+	private JSONObject trasfer(JSONObject json52, int i, String deviceId, int value, long time, String level) {
 		// TODO Auto-generated method stub
 		if ("".equals(level) || json52.getString("rules_alarmlevel").equals(level)) {
 			JSONObject object = new JSONObject();
@@ -482,7 +482,7 @@ public class ApiService {
 			object.put("alarm_name", json52.getString("rules_name"));
 			object.put("alarm_name2", json52.getString("rules_name2"));
 			object.put("alarm_level", json52.getString("rules_alarmlevel"));
-			object.put("time", time);
+			object.put("time", time/1000);
 			object.put("rule_field", json52.getString("rules_field"));
 			object.put("rule_condition", json52.getString("rules_condition"));
 			object.put("gpio_id", "");
